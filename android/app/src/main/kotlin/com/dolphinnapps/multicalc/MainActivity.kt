@@ -1,4 +1,4 @@
-package com.dolphinnapps.multi_task_calculator
+package com.dolphinnapps.multicalc
 
 import io.flutter.embedding.android.FlutterActivity
 
