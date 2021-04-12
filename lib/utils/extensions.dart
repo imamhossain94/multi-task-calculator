@@ -1,4 +1,3 @@
-import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_task_calculator/components/build_rating_view.dart';
@@ -10,18 +9,6 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-
-
-void showMessage(BuildContext context, String title, String message){
-  Flushbar(
-    flushbarPosition: FlushbarPosition.BOTTOM,
-    borderRadius: 10,
-    margin: EdgeInsets.all(10),
-    title: title,
-    message: message,
-    duration: Duration(seconds: 3),
-  )..show(context);
-}
 
 Future<bool> onRatingPressed(BuildContext context) async {
   return showDialog(

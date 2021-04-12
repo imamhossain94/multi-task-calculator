@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:multi_task_calculator/components/build_pop_up_munu_item.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:multi_task_calculator/utils/extensions.dart';
+import 'package:multi_task_calculator/utils/themes_mode.dart';
 import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -12,7 +13,11 @@ class BuildPopupMenuButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ThemesMode().init(context);
+
     return PopupMenuButton<int>(
+      color: ThemesMode.isDarkMode?Colors.black87:Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
 
       padding: EdgeInsets.zero,
       onSelected: (index) async{

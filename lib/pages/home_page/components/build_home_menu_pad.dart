@@ -13,15 +13,13 @@ class BuildHomeMenuPad extends StatelessWidget {
           BuildHomeMenuButton(
             title: 'General',
             icon:FontAwesomeIcons.calculator,
-            onPressed: () {
-              Navigator.pushNamed(context, generalCalcPage);
-            },
+            onPressed: () => Navigator.pushNamed(context, generalCalcPage),
             color: textRed,
           ),
           BuildHomeMenuButton(
             title: 'Currency',
             icon: FontAwesomeIcons.funnelDollar,
-            onPressed: () {},
+            onPressed: ()=> Navigator.pushNamed(context, currencyCalcPage),
             color: textBlue,
           ),
           BuildHomeMenuButton(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:multi_task_calculator/pages/general_calc_page/calculator.dart';
+import 'package:multi_task_calculator/pages/currency_calc_page/currency_calc_page.dart';
+import 'package:multi_task_calculator/pages/general_calc_page/general_calc_page.dart';
 import 'package:multi_task_calculator/pages/home_page/home_page.dart';
 import 'package:multi_task_calculator/pages/splash_page.dart';
 import 'package:multi_task_calculator/pages/about_page.dart';
@@ -33,12 +34,12 @@ Route<dynamic> generateRoute(RouteSettings settings) {
 
     //Calculators
     case generalCalcPage:
-      return PageTransition(child: Calculator(), type: PageTransitionType.fade, settings: settings,);
+      return PageTransition(child: GeneralCalcPage(), type: PageTransitionType.fade, settings: settings,);
       break;
     case currencyCalcPage:
-      return PageTransition(child: UpdateCheckPage(), type: PageTransitionType.fade, settings: settings,);
+      return PageTransition(child: CurrencyCalcPage(), type: PageTransitionType.fade, settings: settings,);
       break;
-    case unitCalcPage:
+    case unitConverterPage:
       return PageTransition(child: UpdateCheckPage(), type: PageTransitionType.fade, settings: settings,);
       break;
     case discountCalcPage:

@@ -34,7 +34,7 @@ class _BuildAppDrawerState extends State<BuildAppDrawer> {
       clipBehavior: Clip.antiAlias,
       margin: EdgeInsets.all(responsiveWidth(8)),
       decoration: BoxDecoration(
-          //color: Colors.white,
+          //color: ThemesMode.isDarkMode?Colors.black87:Colors.white,
           //border: Border.all(width: 0.5, color: Colors.black12),
           borderRadius: BorderRadius.circular(responsiveWidth(8)),
           boxShadow: [
@@ -45,117 +45,120 @@ class _BuildAppDrawerState extends State<BuildAppDrawer> {
                 offset: Offset.zero)
           ]),
       child: Drawer(
-        child: ListView(
-          padding: EdgeInsets.only(left: 5, right: 5),
-          children: [
-            DrawerHeader(
-              child: BuildAppLogo()
-            ),
+        child: Container(
+          color: ThemesMode.isDarkMode?Colors.black87:Colors.white,
+          child: ListView(
+            padding: EdgeInsets.only(left: 5, right: 5),
+            children: [
+              DrawerHeader(
+                child: BuildAppLogo()
+              ),
 
-            BuildDrawerBodyItem(
-                icon: Icon(
-                  Icons.color_lens,
-                  color: textAmber,
-                ),
-                text: 'Themes',
-                onTap: () {
-                  themeChoiceDialogue(context);
-                }),
+              BuildDrawerBodyItem(
+                  icon: Icon(
+                    Icons.color_lens,
+                    color: textAmber,
+                  ),
+                  text: 'Themes',
+                  onTap: () {
+                    themeChoiceDialogue(context);
+                  }),
 
-            BuildDrawerBodyItem(
-                icon: Icon(
-                  Icons.live_help_rounded,
-                  color: textRed,
-                ),
-                text: 'Help',
-                onTap: () {
-                  //Navigator.pop(context);
-                  Navigator.pushNamed(context, helpPage);
-                }),
-            Divider(),
-            BuildDrawerBodyItem(
-                icon: Icon(
-                  Icons.shopping_cart_rounded,
-                  color: textAmber,
-                ),
-                text: 'Premium',
-                onTap: () {
-                  Share.share('Hey check out this android app $appLink');
-                }),
-            BuildDrawerBodyItem(
-                icon: Icon(
-                  Icons.star_rate_rounded,
-                  color: textRed,
-                ),
-                text: 'Rate The App',
-                onTap: () {
-                  //Navigator.pop(context);
-                  onRatingPressed(context);
-                }),
-            BuildDrawerBodyItem(
-                icon: Icon(
-                    Icons.share_rounded,
-                  color: textBlue,
-                ),
-                text: 'Share',
-                onTap: () {
-                  Share.share('Hey check out this android app $appLink');
-                }),
-            Divider(),
-            BuildDrawerBodyItem(
-                icon: Icon(
-                  Icons.shop_rounded,
-                  color: textAmber,
-                ),
-                text: 'Other Apps',
-                onTap: () async {
-                  if (await canLaunch(storeLink)) {
-                    await launch(storeLink);
-                  } else {
-                    throw 'Could not launch $storeLink';
-                  }
-                }),
-            BuildDrawerBodyItem(
-                icon: Icon(
-                    Icons.contact_mail,
+              BuildDrawerBodyItem(
+                  icon: Icon(
+                    Icons.live_help_rounded,
                     color: textRed,
-                ),
-                text: 'Send E-mail',
-                onTap: () async {
-                  if (await canLaunch(contactMail)) {
-                    await launch(contactMail);
-                  } else {
-                    throw 'Could not launch $contactMail';
-                  }
-                }),
-            BuildDrawerBodyItem(
-                icon: Icon(
-                  Icons.android_rounded,
-                  color: textBlue,
-                ),
-                text: 'About',
-                onTap: () async {
-                  Navigator.pushNamed(context, aboutPage);
-                }),
-            Divider(),
-            BuildDrawerBodyItem(
-                icon: Icon(
-                  Icons.update,
-                  color: textOrange,
-                ),
-                text: 'Check For Update',
-                onTap: () async {
-                  Navigator.pushNamed(context, updateCheckPage);
-                }),
-            BuildDrawerBodyItem(
-                icon: Icon(
-                  Icons.verified_user_rounded,
-                  color: textRed,
-                ),
-                text: 'Version ${getAppVersion()}',
-                onTap: null
-            ),
-          ],
+                  ),
+                  text: 'Help',
+                  onTap: () {
+                    //Navigator.pop(context);
+                    Navigator.pushNamed(context, helpPage);
+                  }),
+              Divider(),
+              BuildDrawerBodyItem(
+                  icon: Icon(
+                    Icons.shopping_cart_rounded,
+                    color: textAmber,
+                  ),
+                  text: 'Premium',
+                  onTap: () {
+                    Share.share('Hey check out this android app $appLink');
+                  }),
+              BuildDrawerBodyItem(
+                  icon: Icon(
+                    Icons.star_rate_rounded,
+                    color: textRed,
+                  ),
+                  text: 'Rate The App',
+                  onTap: () {
+                    //Navigator.pop(context);
+                    onRatingPressed(context);
+                  }),
+              BuildDrawerBodyItem(
+                  icon: Icon(
+                      Icons.share_rounded,
+                    color: textBlue,
+                  ),
+                  text: 'Share',
+                  onTap: () {
+                    Share.share('Hey check out this android app $appLink');
+                  }),
+              Divider(),
+              BuildDrawerBodyItem(
+                  icon: Icon(
+                    Icons.shop_rounded,
+                    color: textAmber,
+                  ),
+                  text: 'Other Apps',
+                  onTap: () async {
+                    if (await canLaunch(storeLink)) {
+                      await launch(storeLink);
+                    } else {
+                      throw 'Could not launch $storeLink';
+                    }
+                  }),
+              BuildDrawerBodyItem(
+                  icon: Icon(
+                      Icons.contact_mail,
+                      color: textRed,
+                  ),
+                  text: 'Send E-mail',
+                  onTap: () async {
+                    if (await canLaunch(contactMail)) {
+                      await launch(contactMail);
+                    } else {
+                      throw 'Could not launch $contactMail';
+                    }
+                  }),
+              BuildDrawerBodyItem(
+                  icon: Icon(
+                    Icons.android_rounded,
+                    color: textBlue,
+                  ),
+                  text: 'About',
+                  onTap: () async {
+                    Navigator.pushNamed(context, aboutPage);
+                  }),
+              Divider(),
+              BuildDrawerBodyItem(
+                  icon: Icon(
+                    Icons.update,
+                    color: textOrange,
+                  ),
+                  text: 'Check For Update',
+                  onTap: () async {
+                    Navigator.pushNamed(context, updateCheckPage);
+                  }),
+              BuildDrawerBodyItem(
+                  icon: Icon(
+                    Icons.verified_user_rounded,
+                    color: textRed,
+                  ),
+                  text: 'Version ${getAppVersion()}',
+                  onTap: null
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -34,8 +34,8 @@ const String feedbackPage = 'feedback_page';
 const String updateCheckPage = 'update_check_page';
 
 const String generalCalcPage = 'general_calc_page';
-const String currencyCalcPage = '_calc_page';
-const String unitCalcPage = 'unit_calc_page';
+const String currencyCalcPage = 'currency_calc_page';
+const String unitConverterPage = 'unit_converter_page';
 const String discountCalcPage = 'discount_calc_page';
 const String tipCalcPage = 'tip_calc_page';
 const String dateCalcPage = 'date_calc_page';

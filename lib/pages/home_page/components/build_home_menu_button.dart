@@ -21,50 +21,52 @@ class BuildHomeMenuButton extends StatelessWidget {
     ThemesMode().init(context);
     double size = (ScreenConfig.screenWidth-40) / 3;
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onPressed,
-        child: Container(
-            width: size,
-            height: size,
-            margin: EdgeInsets.all(5),
-            padding: EdgeInsets.all(5),
-            decoration: BoxDecoration(
-              color: ThemesMode.isDarkMode?Colors.black87:Colors.white,
-              borderRadius: BorderRadius.circular(5),
-              boxShadow: [
-                BoxShadow(
+    return Container(
+        width: size,
+        height: size,
+        margin: EdgeInsets.all(5),
+        //padding: EdgeInsets.all(5),
+        decoration: BoxDecoration(
+            color: ThemesMode.isDarkMode?Colors.black87:Colors.white,
+            borderRadius: BorderRadius.circular(5),
+            boxShadow: [
+              BoxShadow(
                   color: Colors.grey.withOpacity(0.9),
                   blurRadius: 0.5,
                   spreadRadius: 0.5,
                   offset: Offset.zero
-                )
-              ]
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Icon(
-                  icon,
-                  size: 35,
-                  color: color,
-                ),
-                //SizedBox(height: responsiveHeight(10),),
-                Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold
-                  ),
-                ),
-              ],
-            )
+              )
+            ]
         ),
-      ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+              borderRadius: BorderRadius.circular(5),
+              onTap: onPressed,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Icon(
+                    icon,
+                    size: 35,
+                    color: color,
+                  ),
+                  //SizedBox(height: responsiveHeight(10),),
+                  Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold
+                    ),
+                  ),
+                ],
+              )
+          ),
+        )
     );
+
   }
 }
