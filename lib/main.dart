@@ -1,14 +1,11 @@
-//import 'package:admob_flutter/admob_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hive/hive.dart';
 import 'package:multi_task_calculator/services/shared_pref_services.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:multi_task_calculator/utils/provider.dart';
 import 'package:multi_task_calculator/utils/themes.dart';
 import 'package:multi_task_calculator/utils/themes_mode.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:multi_task_calculator/utils/router.dart' as router;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,13 +15,6 @@ Future<void> main() async {
 
   await Firebase.initializeApp();
 
-  final appDocDir = await getApplicationDocumentsDirectory();
-  // Hive..init(appDocDir.path)
-  //   ..registerAdapter(HistoryAdapter())
-  //   ..registerAdapter(MortgageDataAdapter())
-  //   ..registerAdapter(ResultDataAdapter());
-
-  //await Hive.openBox('history');
 
   //Admob.initialize();
 

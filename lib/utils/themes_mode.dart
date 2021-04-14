@@ -11,7 +11,7 @@ class ThemesMode {
         ? SystemUiOverlayStyle(
             systemNavigationBarColor: backgroundDark,
             systemNavigationBarIconBrightness: Brightness.light,
-            statusBarColor: textBlack,
+            statusBarColor: backgroundDark,
             statusBarBrightness: Brightness.light,
             statusBarIconBrightness: Brightness.light,
           )

@@ -25,7 +25,7 @@ class AppTheme {
       ),
       appBarTheme: AppBarTheme(
         elevation: 2,
-       color: Color(0xff131313)
+       color: backgroundDark//Color(0xff131313)
       ),
       accentIconTheme: IconThemeData(color: Colors.white),
     );
