@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:multi_task_calculator/pages/currency_calc_page/currency_calc_page.dart';
+import 'package:multi_task_calculator/pages/discount_calc/discount_calc_page.dart';
 import 'package:multi_task_calculator/pages/general_calc_page/general_calc_page.dart';
 import 'package:multi_task_calculator/pages/home_page/home_page.dart';
 import 'package:multi_task_calculator/pages/splash_page.dart';
 import 'package:multi_task_calculator/pages/about_page.dart';
 import 'package:multi_task_calculator/pages/feedback_page.dart';
 import 'package:multi_task_calculator/pages/help_page.dart';
+import 'package:multi_task_calculator/pages/tip_calc/tip_calc_page.dart';
 import 'package:multi_task_calculator/pages/update_check_page.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:page_transition/page_transition.dart';
@@ -31,7 +33,6 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case updateCheckPage:
       return PageTransition(child: UpdateCheckPage(), type: PageTransitionType.fade, settings: settings,);
       break;
-
     //Calculators
     case generalCalcPage:
       return PageTransition(child: GeneralCalcPage(), type: PageTransitionType.fade, settings: settings,);
@@ -43,10 +44,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return PageTransition(child: UpdateCheckPage(), type: PageTransitionType.fade, settings: settings,);
       break;
     case discountCalcPage:
-      return PageTransition(child: UpdateCheckPage(), type: PageTransitionType.fade, settings: settings,);
+      return PageTransition(child: DiscountCalcPage(), type: PageTransitionType.fade, settings: settings,);
       break;
     case tipCalcPage:
-      return PageTransition(child: UpdateCheckPage(), type: PageTransitionType.fade, settings: settings,);
+      return PageTransition(child: TipCalcPage(), type: PageTransitionType.fade, settings: settings,);
       break;
     case dateCalcPage:
       return PageTransition(child: UpdateCheckPage(), type: PageTransitionType.fade, settings: settings,);
