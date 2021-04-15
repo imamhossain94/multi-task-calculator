@@ -10,14 +10,13 @@ class BuildTextField extends StatelessWidget {
   final bool isEnabled;
   final Widget widget;
 
-  const BuildTextField({
-    @required this.title,
-    @required this.hint,
-    @required this.widget,
-    @required this.textController,
-    @required this.onPressedAction,
-    @required this.isEnabled
-  });
+  const BuildTextField(
+      {@required this.title,
+      @required this.hint,
+      @required this.widget,
+      @required this.textController,
+      @required this.onPressedAction,
+      @required this.isEnabled});
 
   @override
   Widget build(BuildContext context) {
@@ -33,38 +32,44 @@ class BuildTextField extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: TextStyle(fontSize: responsiveText(16), fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    fontSize: responsiveText(16), fontWeight: FontWeight.bold),
               ),
               //Spacer(),
             ],
           ),
           Container(
-            margin: EdgeInsets.only(top: responsiveHeight(8), bottom: responsiveHeight(5)),
+            margin: EdgeInsets.only(
+                top: responsiveHeight(8), bottom: responsiveHeight(5)),
             child: Row(
               children: [
-                Expanded(child: Container(
+                Expanded(
+                    child: Container(
                   //margin: EdgeInsets.only(top: responsiveHeight(8), bottom: responsiveHeight(5)),
-                  height:responsiveHeight(40),
+                  height: responsiveHeight(40),
                   decoration: BoxDecoration(
                     color: Colors.grey.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(5),
                   ),
                   child: TextField(
-                    enabled: isEnabled,
-                    controller: textController,
-                    decoration: InputDecoration(
-                      prefix: SizedBox(width: responsiveWidth(10),),
-                      border: InputBorder.none,
-                      hintText: hint,
-                    ),
-                    keyboardType: TextInputType.number,
-                    textInputAction: TextInputAction.done,
-                    autocorrect: false,
-                    obscureText: false,
-                    style: TextStyle(fontWeight: FontWeight.bold)
-                  ),
+                      enabled: isEnabled,
+                      controller: textController,
+                      decoration: InputDecoration(
+                        prefix: SizedBox(
+                          width: responsiveWidth(10),
+                        ),
+                        border: InputBorder.none,
+                        hintText: hint,
+                      ),
+                      keyboardType: TextInputType.number,
+                      textInputAction: TextInputAction.done,
+                      autocorrect: false,
+                      obscureText: false,
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                 )),
-                SizedBox(width: responsiveWidth(10),),
+                SizedBox(
+                  width: responsiveWidth(10),
+                ),
                 Material(
                   color: Colors.transparent,
                   child: InkWell(

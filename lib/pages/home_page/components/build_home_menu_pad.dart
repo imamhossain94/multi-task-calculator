@@ -93,7 +93,7 @@ class BuildHomeMenuPad extends StatelessWidget {
           BuildHomeMenuButton(
             title: 'Unit Price',
             icon: FontAwesomeIcons.balanceScale,
-            onPressed: () {},
+            onPressed: ()=> Navigator.pushNamed(context, unitPriceCalcPage),
             color: textGreen,
           ),
         ]),

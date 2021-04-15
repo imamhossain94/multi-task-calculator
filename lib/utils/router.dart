@@ -9,6 +9,7 @@ import 'package:multi_task_calculator/pages/about_page.dart';
 import 'package:multi_task_calculator/pages/feedback_page.dart';
 import 'package:multi_task_calculator/pages/help_page.dart';
 import 'package:multi_task_calculator/pages/tip_calc/tip_calc_page.dart';
+import 'package:multi_task_calculator/pages/unit_price_calc/unit_price_calc_page.dart';
 import 'package:multi_task_calculator/pages/update_check_page.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:page_transition/page_transition.dart';
@@ -72,7 +73,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return PageTransition(child: UpdateCheckPage(), type: PageTransitionType.fade, settings: settings,);
       break;
     case unitPriceCalcPage:
-      return PageTransition(child: UpdateCheckPage(), type: PageTransitionType.fade, settings: settings,);
+      return PageTransition(child: UnitPriceCalcPage(), type: PageTransitionType.fade, settings: settings,);
       break;
 
 
