@@ -4,6 +4,7 @@ import 'package:multi_task_calculator/pages/date_calc/date_calc_page.dart';
 import 'package:multi_task_calculator/pages/discount_calc/discount_calc_page.dart';
 import 'package:multi_task_calculator/pages/general_calc_page/general_calc_page.dart';
 import 'package:multi_task_calculator/pages/home_page/home_page.dart';
+import 'package:multi_task_calculator/pages/sales_tax_calc/sales_tax_calc_page.dart';
 import 'package:multi_task_calculator/pages/splash_page.dart';
 import 'package:multi_task_calculator/pages/about_page.dart';
 import 'package:multi_task_calculator/pages/feedback_page.dart';
@@ -67,7 +68,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return PageTransition(child: UpdateCheckPage(), type: PageTransitionType.fade, settings: settings,);
       break;
     case salesTaxCalcPage:
-      return PageTransition(child: UpdateCheckPage(), type: PageTransitionType.fade, settings: settings,);
+      return PageTransition(child: SalesTaxCalcPage(), type: PageTransitionType.fade, settings: settings,);
       break;
     case savingCalcPage:
       return PageTransition(child: UpdateCheckPage(), type: PageTransitionType.fade, settings: settings,);

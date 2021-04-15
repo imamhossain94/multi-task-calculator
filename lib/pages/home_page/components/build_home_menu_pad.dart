@@ -79,7 +79,7 @@ class BuildHomeMenuPad extends StatelessWidget {
           BuildHomeMenuButton(
             title: 'Sales Tax',
             icon: FontAwesomeIcons.fileInvoiceDollar,
-            onPressed: () {},
+            onPressed: ()=> Navigator.pushNamed(context, salesTaxCalcPage),
             color: textGreen,
           ),
           BuildHomeMenuButton(
