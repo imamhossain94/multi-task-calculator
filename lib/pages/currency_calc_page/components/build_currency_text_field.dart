@@ -43,8 +43,8 @@ class BuildCurrencyTextField extends StatelessWidget {
               children: [
                 Container(
                     //margin: EdgeInsets.only(top: responsiveHeight(8), bottom: responsiveHeight(5)),
-                    height: responsiveHeight(40),
-                    width: responsiveWidth(55),
+                    height: 40,
+                    width: 55,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: Colors.grey.withOpacity(0.3),
@@ -55,7 +55,7 @@ class BuildCurrencyTextField extends StatelessWidget {
                 SizedBox(width: responsiveWidth(10),),
                 Expanded(child: Container(
                   //margin: EdgeInsets.only(top: responsiveHeight(8), bottom: responsiveHeight(5)),
-                  height:responsiveHeight(40),
+                  height:40,
                   decoration: BoxDecoration(
                     color: Colors.grey.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(5),
@@ -82,8 +82,8 @@ class BuildCurrencyTextField extends StatelessWidget {
                     borderRadius: BorderRadius.circular(5),
                     onTap: onPressedAction,
                     child: Container(
-                      height: responsiveHeight(40),
-                      width: responsiveWidth(55),
+                      height: 40,
+                      width: 55,
                       decoration: BoxDecoration(
                         color: Colors.grey.withOpacity(0.3),
                         borderRadius: BorderRadius.circular(5),

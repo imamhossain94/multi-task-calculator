@@ -46,7 +46,7 @@ class BuildTextField extends StatelessWidget {
                 Expanded(
                     child: Container(
                   //margin: EdgeInsets.only(top: responsiveHeight(8), bottom: responsiveHeight(5)),
-                  height: responsiveHeight(40),
+                  height: 40,
                   decoration: BoxDecoration(
                     color: Colors.grey.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(5),
@@ -76,7 +76,7 @@ class BuildTextField extends StatelessWidget {
                     borderRadius: BorderRadius.circular(5),
                     onTap: onPressedAction,
                     child: Container(
-                      height: responsiveHeight(40),
+                      height: 40,
                       width: responsiveWidth(55),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(

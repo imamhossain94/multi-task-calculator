@@ -20,10 +20,10 @@ class BuildResultCard extends StatelessWidget {
     return Expanded(
       child: Container(
         margin: EdgeInsets.all(10),
-        padding: EdgeInsets.all(5),
+        padding: EdgeInsets.fromLTRB(5, 15, 5, 15),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-            color: ThemesMode.isDarkMode?Colors.black:textWhite,
+            color: ThemesMode.isDarkMode?Colors.black:backgroundLight,
             borderRadius: BorderRadius.circular(5),
             boxShadow: [
               BoxShadow(
@@ -45,7 +45,7 @@ class BuildResultCard extends StatelessWidget {
               style: TextStyle(fontSize: responsiveText(26), fontWeight: FontWeight.bold),
             ),
 
-            Divider(),
+            Divider(thickness: 0.09,),
 
             Text(
               title,

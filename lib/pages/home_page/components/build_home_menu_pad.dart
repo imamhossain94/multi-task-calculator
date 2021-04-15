@@ -59,13 +59,13 @@ class BuildHomeMenuPad extends StatelessWidget {
           BuildHomeMenuButton(
             title: 'Fuel Efficiency',
             icon: FontAwesomeIcons.commentDollar,
-            onPressed: () {},
+            onPressed: ()=> Navigator.pushNamed(context, fuelEfficiencyCalcPage),
             color: textRed,
           ),
           BuildHomeMenuButton(
             title: 'Health',
             icon: FontAwesomeIcons.heartbeat,
-            onPressed: () {},
+            onPressed: ()=> Navigator.pushNamed(context, healthCalcPage),
             color: textOrange,
           ),
         ]),
