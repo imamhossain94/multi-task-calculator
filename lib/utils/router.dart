@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:multi_task_calculator/pages/currency_calc_page/currency_calc_page.dart';
 import 'package:multi_task_calculator/pages/date_calc/date_calc_page.dart';
 import 'package:multi_task_calculator/pages/discount_calc/discount_calc_page.dart';
+import 'package:multi_task_calculator/pages/fuel_calc/fuel_cost_calc_page.dart';
 import 'package:multi_task_calculator/pages/general_calc_page/general_calc_page.dart';
 import 'package:multi_task_calculator/pages/home_page/home_page.dart';
 import 'package:multi_task_calculator/pages/sales_tax_calc/sales_tax_calc_page.dart';
@@ -59,7 +60,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return PageTransition(child: UpdateCheckPage(), type: PageTransitionType.fade, settings: settings,);
       break;
     case fuelCalcPage:
-      return PageTransition(child: UpdateCheckPage(), type: PageTransitionType.fade, settings: settings,);
+      return PageTransition(child: FuelCostCalcPage(), type: PageTransitionType.fade, settings: settings,);
       break;
     case healthCalcPage:
       return PageTransition(child: UpdateCheckPage(), type: PageTransitionType.fade, settings: settings,);

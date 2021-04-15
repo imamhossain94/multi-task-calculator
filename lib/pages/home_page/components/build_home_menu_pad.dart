@@ -51,9 +51,9 @@ class BuildHomeMenuPad extends StatelessWidget {
         ]),
         Row(children: <Widget>[
           BuildHomeMenuButton(
-            title: 'Fuel',
+            title: 'Fuel Cost',
             icon: FontAwesomeIcons.gasPump,
-            onPressed: () {},
+            onPressed: ()=> Navigator.pushNamed(context, fuelCalcPage),
             color: textYellow,
           ),
           BuildHomeMenuButton(
