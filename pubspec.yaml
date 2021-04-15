@@ -42,6 +42,7 @@ dependencies:
   #used to solve mathematical expression
   function_tree: ^0.8.12
   dio: ^4.0.0
+  flutter_holo_date_picker: ^0.3.4+1
 
 
   # The following adds the Cupertino Icons font to your application.

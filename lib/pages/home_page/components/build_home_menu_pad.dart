@@ -45,7 +45,7 @@ class BuildHomeMenuPad extends StatelessWidget {
           BuildHomeMenuButton(
             title: 'Date',
             icon: FontAwesomeIcons.calendarAlt,
-            onPressed: () {},
+            onPressed: ()=> Navigator.pushNamed(context, dateCalcPage),
             color: textMaroon,
           ),
         ]),

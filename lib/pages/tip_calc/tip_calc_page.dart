@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:multi_task_calculator/components/build_result_card.dart';
 import 'package:multi_task_calculator/components/build_text_field.dart';
 import 'package:multi_task_calculator/components/build_value_slider.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
@@ -243,86 +244,8 @@ class _TipCalcPageState extends State<TipCalcPage> {
 
               Row(
                 children: [
-                  Expanded(
-                    child: Container(
-                      margin: EdgeInsets.all(10),
-                      padding: EdgeInsets.all(5),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                          color: ThemesMode.isDarkMode?Colors.black:textWhite,
-                          borderRadius: BorderRadius.circular(5),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.grey.withOpacity(0.9),
-                                blurRadius: 0.5,
-                                spreadRadius: 0.5,
-                                offset: Offset.zero
-                            )
-                          ]
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-
-                          Text(
-                            finalAmount.toStringAsFixed(2),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: responsiveText(26), fontWeight: FontWeight.bold),
-                          ),
-
-                          Divider(),
-
-                          Text(
-                            'Final Amount',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: responsiveText(14), fontWeight: FontWeight.bold),
-                          ),
-
-                        ],
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      margin: EdgeInsets.all(10),
-                      padding: EdgeInsets.all(5),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                          color: ThemesMode.isDarkMode?Colors.black:textWhite,
-                          borderRadius: BorderRadius.circular(5),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.grey.withOpacity(0.9),
-                                blurRadius: 0.5,
-                                spreadRadius: 0.5,
-                                offset: Offset.zero
-                            )
-                          ]
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-
-                          Text(
-                            amountPerPerson.toStringAsFixed(2),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: responsiveText(26), fontWeight: FontWeight.bold),
-                          ),
-
-                          Divider(),
-
-                          Text(
-                            'Amount per Person',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: responsiveText(14), fontWeight: FontWeight.bold),
-                          ),
-
-                        ],
-                      ),
-                    ),
-                  ),
+                  BuildResultCard(title: 'Final Amount', value: finalAmount.toStringAsFixed(2),),
+                  BuildResultCard(title: 'Amount per Person', value: amountPerPerson.toStringAsFixed(2),),
                 ],
               ),
 
