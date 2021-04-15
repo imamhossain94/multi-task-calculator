@@ -9,6 +9,15 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+void resetPage(BuildContext context, Widget page) {
+  Navigator.pushReplacement(
+    context,
+    PageRouteBuilder(
+      transitionDuration: Duration.zero,
+      pageBuilder: (_, __, ___) => page,
+    ),
+  );
+}
 
 Future<bool> onRatingPressed(BuildContext context) async {
   return showDialog(

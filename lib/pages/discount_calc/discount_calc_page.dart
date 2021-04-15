@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:multi_task_calculator/components/build_text_field.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
+import 'package:multi_task_calculator/utils/extensions.dart';
 import 'package:multi_task_calculator/utils/screen_config.dart';
 import 'package:multi_task_calculator/utils/themes_mode.dart';
 
@@ -56,12 +57,14 @@ class _DiscountCalcPageState extends State<DiscountCalcPage> {
     discountPercentage = discountPercentageController.value.text;
     //Make null safety
     setState(() {
-      originalAmount = originalAmount.isEmpty?'0.0':originalAmount;
-      addedTax = addedTax.isEmpty?'0.0':addedTax;
-      discountPercentage = discountPercentage.isEmpty?'0.0':discountPercentage;
 
-      amountSaved = ((double.parse(originalAmount) * (double.parse(addedTax) / 100)) + double.parse(originalAmount)) * ((double.parse(discountPercentage) /100));
-      finalPrice = ((double.parse(originalAmount) * (double.parse(addedTax) / 100)) + double.parse(originalAmount)) - amountSaved;
+      double _originalAmount = double.tryParse(originalAmount)??0.0;
+      double _addedTax = double.tryParse(addedTax)??0.0;
+      double _discountPercentage = double.tryParse(discountPercentage)??0.0;
+
+
+      amountSaved = ((_originalAmount * _addedTax / 100) +_originalAmount) * ((_discountPercentage /100));
+      finalPrice = ((_originalAmount * (_addedTax / 100)) + _originalAmount) - amountSaved;
     });
   }
 
@@ -83,7 +86,7 @@ class _DiscountCalcPageState extends State<DiscountCalcPage> {
           elevation: 0,
           actions: [
             IconButton(
-              onPressed: null,
+              onPressed: ()=> resetPage(context, DiscountCalcPage()),
               icon: Icon(Icons.refresh),
               tooltip: 'Refresh',
             )

@@ -34,13 +34,12 @@ class _CurrencyCalcPageState extends State<CurrencyCalcPage> {
     fromCurrencyController.addListener((){
       setState(() {
         String  fromCurrencyValue = fromCurrencyController.value.text;
-        String nullFreeValue = fromCurrencyValue.isEmpty?'1.0':fromCurrencyValue;
         currencyRates = exchangeRateApi.conversionRates.getCurrencyRateLIst(
-            double.parse(nullFreeValue)
+            double.tryParse(fromCurrencyValue)??1.0
         );
         currencyRates.forEach((obj) {
           if(obj.code.toUpperCase() == toCurrency){
-            toCurrencyController.text = double.parse(obj.rates).toStringAsFixed(2);
+            toCurrencyController.text = (double.tryParse(obj.rates)??0.0).toStringAsFixed(2);
           }
         });
       });
@@ -65,15 +64,13 @@ class _CurrencyCalcPageState extends State<CurrencyCalcPage> {
       exchangeRateApi = exchangeRateApiResponse.exchangeRateApi;
       //print(exchangeRateApi.result);
       String  fromCurrencyValue = fromCurrencyController.value.text;
-      String nullFreeValue = fromCurrencyValue.isEmpty?'1.0':fromCurrencyValue;
-      currencyRates = exchangeRateApiResponse.exchangeRateApi.conversionRates.getCurrencyRateLIst(double.parse(nullFreeValue));
+      currencyRates = exchangeRateApiResponse.exchangeRateApi.conversionRates.getCurrencyRateLIst(double.tryParse(fromCurrencyValue)??1.0);
 
       currencyRates.forEach((obj) {
         if(obj.code.toUpperCase() == toCurrency){
           toCurrencyController.text = double.parse(obj.rates).toStringAsFixed(2);
         }
       });
-
       isLoading = false;
     });
   }
@@ -152,7 +149,7 @@ class _CurrencyCalcPageState extends State<CurrencyCalcPage> {
                           toCurrency = v;
                           currencyRates.forEach((obj) {
                             if(obj.code.toUpperCase() == toCurrency){
-                              toCurrencyController.text = double.parse(obj.rates).toStringAsFixed(2);
+                              toCurrencyController.text = (double.tryParse(obj.rates)??0.0).toStringAsFixed(2);
                             }
                           });
                         });
@@ -237,7 +234,7 @@ class _CurrencyCalcPageState extends State<CurrencyCalcPage> {
                                       Text(currencyRates[index].code.toUpperCase(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                                       Spacer(),
                                       //${currencyRates[index].symbol}
-                                      Text(double.parse(currencyRates[index].rates).toStringAsFixed(2), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                      Text((double.tryParse(currencyRates[index].rates)??0.0).toStringAsFixed(2), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                                     ],
                                   ),
                                   Text(currencyRates[index].definition,),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:multi_task_calculator/pages/general_calc_page/components/build_calc_pad.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
+import 'package:multi_task_calculator/utils/extensions.dart';
 import 'package:multi_task_calculator/utils/screen_config.dart';
 import 'package:multi_task_calculator/utils/themes_mode.dart';
 import 'package:function_tree/function_tree.dart';
@@ -114,7 +115,7 @@ class _GeneralCalcPageState extends State<GeneralCalcPage> {
                     showMoreMenu(context);
                   }else if(value == 'C'){
                     //Clear screen
-                    clearScreen(context);
+                    resetPage(context, GeneralCalcPage());
                   }else if((value == 'del') && (displayString != null)){
                     //Delete display character
                     if((len > 1)){
@@ -153,16 +154,6 @@ class _GeneralCalcPageState extends State<GeneralCalcPage> {
   void showMoreMenu(BuildContext context) {
     //
 
-  }
-  //Clear Screen
-  void clearScreen(BuildContext context) {
-    Navigator.pushReplacement(
-      context,
-      PageRouteBuilder(
-        transitionDuration: Duration.zero,
-        pageBuilder: (_, __, ___) => GeneralCalcPage(),
-      ),
-    );
   }
 
   String convertValue(String symbol){
