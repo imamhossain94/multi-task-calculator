@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:multi_task_calculator/pages/home_page/components/build_home_menu_button.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class BuildHomeMenuPad extends StatelessWidget {
   @override
@@ -25,7 +26,7 @@ class BuildHomeMenuPad extends StatelessWidget {
           BuildHomeMenuButton(
             title: 'Unit Converter',
             icon: FontAwesomeIcons.tag,
-            onPressed: () {},
+            onPressed: ()=> Navigator.pushNamed(context, unitConverterPage),
             color: textAmber,
           ),
         ]),
@@ -73,7 +74,13 @@ class BuildHomeMenuPad extends StatelessWidget {
           BuildHomeMenuButton(
             title: 'Loan',
             icon: FontAwesomeIcons.landmark,
-            onPressed: () {},
+            onPressed: () async{
+              if (await canLaunch(loanAppLink)) {
+                await launch(loanAppLink);
+              } else {
+                throw 'Could not launch $appLink';
+              }
+            },
             color: textBlue,
           ),
           BuildHomeMenuButton(

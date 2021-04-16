@@ -13,6 +13,8 @@ import 'package:multi_task_calculator/pages/about_page.dart';
 import 'package:multi_task_calculator/pages/feedback_page.dart';
 import 'package:multi_task_calculator/pages/help_page.dart';
 import 'package:multi_task_calculator/pages/tip_calc/tip_calc_page.dart';
+import 'package:multi_task_calculator/pages/unit_converter/unit_converter_child_page.dart';
+import 'package:multi_task_calculator/pages/unit_converter/unit_converter_page.dart';
 import 'package:multi_task_calculator/pages/unit_price_calc/unit_price_calc_page.dart';
 import 'package:multi_task_calculator/pages/update_check_page.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
@@ -47,7 +49,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return PageTransition(child: CurrencyCalcPage(), type: PageTransitionType.fade, settings: settings,);
       break;
     case unitConverterPage:
-      return PageTransition(child: UpdateCheckPage(), type: PageTransitionType.fade, settings: settings,);
+      return PageTransition(child: UnitConverterPage(), type: PageTransitionType.rightToLeft, settings: settings,);
+      break;
+    case unitConverterChildPage:
+      return PageTransition(child: UnitConverterChildPage(), type: PageTransitionType.fade, settings: settings,);
       break;
     case discountCalcPage:
       return PageTransition(child: DiscountCalcPage(), type: PageTransitionType.fade, settings: settings,);
@@ -79,9 +84,6 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case unitPriceCalcPage:
       return PageTransition(child: UnitPriceCalcPage(), type: PageTransitionType.fade, settings: settings,);
       break;
-
-
-
 
     default:
       return null;

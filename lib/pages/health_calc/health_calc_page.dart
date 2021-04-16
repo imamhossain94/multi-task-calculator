@@ -105,7 +105,7 @@ class _HealthCalcPageState extends State<HealthCalcPage> {
             IconButton(
               onPressed: ()=> resetPage(context, HealthCalcPage()),
               icon: Icon(Icons.refresh),
-              tooltip: 'Refresh',
+              tooltip: 'Reset',
             )
           ],
         ),
