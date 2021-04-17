@@ -42,6 +42,7 @@ const String generalCalcPage = 'general_calc_page';
 const String currencyCalcPage = 'currency_calc_page';
 const String unitConverterPage = 'unit_converter_page';
 const String unitConverterChildPage = 'unit_converter_child_page';
+const String numberBaseConverterPage = 'number_base_converter_page';
 const String discountCalcPage = 'discount_calc_page';
 const String tipCalcPage = 'tip_calc_page';
 const String dateCalcPage = 'date_calc_page';
@@ -214,7 +215,6 @@ const Map<String, dynamic> TemperatureUnitsList = {
 //All Storage Unit
 const Map<String, dynamic> StorageUnitsList = {
   'bit': DIGITAL_DATA.bit,
-  'nibble': DIGITAL_DATA.nibble,
   'kilobit': DIGITAL_DATA.kilobit,
   'megabit': DIGITAL_DATA.megabit,
   'gigabit': DIGITAL_DATA.gigabit,

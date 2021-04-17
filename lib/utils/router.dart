@@ -13,6 +13,7 @@ import 'package:multi_task_calculator/pages/about_page.dart';
 import 'package:multi_task_calculator/pages/feedback_page.dart';
 import 'package:multi_task_calculator/pages/help_page.dart';
 import 'package:multi_task_calculator/pages/tip_calc/tip_calc_page.dart';
+import 'package:multi_task_calculator/pages/unit_converter/number_base_converter_page.dart';
 import 'package:multi_task_calculator/pages/unit_converter/unit_converter_child_page.dart';
 import 'package:multi_task_calculator/pages/unit_converter/unit_converter_page.dart';
 import 'package:multi_task_calculator/pages/unit_price_calc/unit_price_calc_page.dart';
@@ -53,6 +54,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       break;
     case unitConverterChildPage:
       return PageTransition(child: UnitConverterChildPage(), type: PageTransitionType.fade, settings: settings,);
+      break;
+    case numberBaseConverterPage:
+      return PageTransition(child: NumberBaseConverterPage(), type: PageTransitionType.fade, settings: settings,);
       break;
     case discountCalcPage:
       return PageTransition(child: DiscountCalcPage(), type: PageTransitionType.fade, settings: settings,);

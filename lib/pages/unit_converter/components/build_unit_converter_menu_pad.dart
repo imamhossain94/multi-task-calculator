@@ -46,10 +46,10 @@ class BuildUnitConverterMenuPad extends StatelessWidget {
             color: textGreen,
           ),
           BuildHomeMenuButton(
-            title: 'Number',
-            icon: FontAwesomeIcons.sortNumericUp,
-            onPressed: ()=>changePage(context: context, selectedUnit: UnitConversionHelper.numberBaseUnit),
-            color: textMaroon,
+            title: 'Speed',
+            icon: FontAwesomeIcons.meteor,
+            onPressed: ()=>changePage(context: context, selectedUnit: UnitConversionHelper.speedUnit),
+            color: textOrange,
           ),
         ]),
         Row(children: <Widget>[
@@ -66,10 +66,10 @@ class BuildUnitConverterMenuPad extends StatelessWidget {
             color: textRed,
           ),
           BuildHomeMenuButton(
-            title: 'Speed',
-            icon: FontAwesomeIcons.meteor,
-            onPressed: ()=>changePage(context: context, selectedUnit: UnitConversionHelper.speedUnit),
-            color: textOrange,
+            title: 'Shoe Size',
+            icon: FontAwesomeIcons.shoePrints,
+            onPressed: ()=>changePage(context: context, selectedUnit: UnitConversionHelper.shoeSizeUnit),
+            color: Colors.cyan,
           ),
         ]),
         Row(children: <Widget>[
@@ -105,7 +105,26 @@ class BuildUnitConverterMenuPad extends StatelessWidget {
             onPressed: ()=>changePage(context: context, selectedUnit: UnitConversionHelper.weightUnit),
             color: textMaroon,
           ),
-
+          BuildHomeMenuButton(
+            title: 'Fuel Consumption',
+            icon: FontAwesomeIcons.oilCan,
+            onPressed: ()=>changePage(context: context, selectedUnit: UnitConversionHelper.weightUnit),
+            color: textBlue,
+          ),
+        ]),
+        Row(children: <Widget>[
+          BuildHomeMenuButton(
+            title: 'Torque',
+            icon: FontAwesomeIcons.tumblr,
+            onPressed: ()=>changePage(context: context, selectedUnit: UnitConversionHelper.torqueUnit),
+            color: textAmber,
+          ),
+          BuildHomeMenuButton(
+            title: 'Number Base',
+            icon: FontAwesomeIcons.sortNumericUp,
+            onPressed: ()=> Navigator.pushNamed(context, numberBaseConverterPage),
+            color: textMaroon,
+          ),
         ]),
       ]),
     );

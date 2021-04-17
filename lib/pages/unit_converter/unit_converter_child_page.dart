@@ -55,13 +55,21 @@ class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
 
   void updateResult() {
     fromUnit = fromUnit == null? allUnits.entries.elementAt(0).value:fromUnit;
-    toUnit = toUnit == null? allUnits.entries.elementAt(1).value.toString().replaceAll(removeString, ''):toUnit;
+    toUnit = toUnit == null? allUnits.entries.elementAt(1).value.toString().replaceAll(removeString, ''):toUnit.toString().replaceAll(removeString, '');
     fromUnitDisplay = fromUnit.toString().replaceAll(removeString, '');
     unitObj.convert(fromUnit, fromUnitValue);
     var units = unitObj.getAll();
     for (var unit in units) {
-      unitConversionList.add(UnitConversion(unitName: unit.name.toString().replaceAll(removeString, ''), unitCode: unit.symbol, unitValue: unit.value));
+      //if(unit.name != null &&  unit.symbol != null){
+        unitConversionList.add(UnitConversion(unitName: unit.name.toString().replaceAll(removeString, ''), unitCode: unit.symbol??unit.name.toString().replaceAll(removeString, ''), unitValue: unit.value));
+      //}
     }
+    unitConversionList.forEach((obj) {
+      print(obj.unitName);
+      if(obj.unitName == toUnit.toString()){
+        toUnitController.text = obj.unitValue.toStringAsFixed(2);
+      }
+    });
   }
 
   void getAllUnit() async{
@@ -95,61 +103,62 @@ class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
         unitObj = Length(significantFigures: 7, removeTrailingZeros: false);
         allUnits = LengthUnitsList;
         updateResult();
+      }else if(widget.selectedUnit == UnitConversionHelper.powerUnit){
+        removeString = 'POWER.';
+        unitObj = Power(significantFigures: 7, removeTrailingZeros: false);
+        allUnits = PowerUnitsList;
+        updateResult();
+      }else if(widget.selectedUnit == UnitConversionHelper.pressureUnit){
+        removeString = 'PRESSURE.';
+        unitObj = Pressure(significantFigures: 7, removeTrailingZeros: false);
+        allUnits = PressureUnitsList;
+        updateResult();
+      }else if(widget.selectedUnit == UnitConversionHelper.speedUnit){
+        removeString = 'SPEED.';
+        unitObj = Speed(significantFigures: 7, removeTrailingZeros: false);
+        allUnits = SpeedUnitsList;
+        updateResult();
+      }else if(widget.selectedUnit == UnitConversionHelper.storageUnit){
+        removeString = 'DIGITAL_DATA.';
+        unitObj = DigitalData(significantFigures: 7, removeTrailingZeros: false);
+        allUnits = StorageUnitsList;
+        updateResult();
+      }else if(widget.selectedUnit == UnitConversionHelper.temperatureUnit){
+        removeString = 'TEMPERATURE.';
+        unitObj = Temperature(significantFigures: 7, removeTrailingZeros: false);
+        allUnits = TemperatureUnitsList;
+        updateResult();
+      }else if(widget.selectedUnit == UnitConversionHelper.timeUnit){
+        removeString = 'TIME.';
+        unitObj = Time(significantFigures: 7, removeTrailingZeros: false);
+        allUnits = TimeUnitsList;
+        updateResult();
+      }else if(widget.selectedUnit == UnitConversionHelper.volumeUnit){
+        removeString = 'VOLUME.';
+        unitObj = Volume(significantFigures: 7, removeTrailingZeros: false);
+        allUnits = VolumeUnitsList;
+        updateResult();
+      }else if(widget.selectedUnit == UnitConversionHelper.weightUnit){
+        removeString = 'MASS.';
+        unitObj = Mass(significantFigures: 7, removeTrailingZeros: false);
+        allUnits = WeightUnitsList;
+        updateResult();
+      }else if(widget.selectedUnit == UnitConversionHelper.fuelUnit){
+        removeString = 'FUEL_CONSUMPTION.';
+        unitObj = FuelConsumption(significantFigures: 7, removeTrailingZeros: false);
+        allUnits = FuelUnitsList;
+        updateResult();
+      }else if(widget.selectedUnit == UnitConversionHelper.torqueUnit){
+        removeString = 'TORQUE.';
+        unitObj = Torque(significantFigures: 7, removeTrailingZeros: false);
+        allUnits = TorqueUnitsList;
+        updateResult();
+      }else if(widget.selectedUnit == UnitConversionHelper.shoeSizeUnit){
+        removeString = 'SHOE_SIZE.';
+        unitObj = ShoeSize(significantFigures: 7, removeTrailingZeros: false);
+        allUnits = ShoeSizeUnitsList;
+        updateResult();
       }
-      //else if(widget.selectedUnit == UnitConversionHelper.numberBaseUnit){
-      //   allUnits = NumberBaseUnitsList;
-      //   fromUnit = allUnits.entries.elementAt(0).key;
-      //   toUnit = allUnits.entries.elementAt(1).key;
-      //   unitConversionList = UnitConversionHelper().getNumberBaseConversionList(fromUnitValue, fromUnit);
-      // }else if(widget.selectedUnit == UnitConversionHelper.powerUnit){
-      //   allUnits = PowerUnitsList;
-      //   fromUnit = allUnits.entries.elementAt(0).key;
-      //   toUnit = allUnits.entries.elementAt(1).key;
-      //   unitConversionList = UnitConversionHelper().getPowerConversionList(fromUnitValue, fromUnit);
-      // }else if(widget.selectedUnit == UnitConversionHelper.pressureUnit){
-      //   allUnits = PressureUnitsList;
-      //   fromUnit = allUnits.entries.elementAt(0).key;
-      //   toUnit = allUnits.entries.elementAt(1).key;
-      //   unitConversionList = UnitConversionHelper().getPressureConversionList(fromUnitValue, fromUnit);
-      // }else if(widget.selectedUnit == UnitConversionHelper.speedUnit){
-      //   allUnits = SpeedUnitsList;
-      //   fromUnit = allUnits.entries.elementAt(0).key;
-      //   toUnit = allUnits.entries.elementAt(1).key;
-      //   unitConversionList = UnitConversionHelper().getSpeedConversionList(fromUnitValue, fromUnit);
-      // }else if(widget.selectedUnit == UnitConversionHelper.storageUnit){
-      //   allUnits = StorageUnitsList;
-      //   fromUnit = allUnits.entries.elementAt(0).key;
-      //   toUnit = allUnits.entries.elementAt(1).key;
-      //   unitConversionList = UnitConversionHelper().getStorageConversionList(fromUnitValue, fromUnit);
-      // }else if(widget.selectedUnit == UnitConversionHelper.temperatureUnit){
-      //   allUnits = TemperatureUnitsList;
-      //   fromUnit = allUnits.entries.elementAt(0).key;
-      //   toUnit = allUnits.entries.elementAt(1).key;
-      //   unitConversionList = UnitConversionHelper().getTemperatureConversionList(fromUnitValue, fromUnit);
-      // }else if(widget.selectedUnit == UnitConversionHelper.timeUnit){
-      //   allUnits = TimeUnitsList;
-      //   fromUnit = allUnits.entries.elementAt(0).key;
-      //   toUnit = allUnits.entries.elementAt(1).key;
-      //   unitConversionList = UnitConversionHelper().getTimeConversionList(fromUnitValue, fromUnit);
-      // }else if(widget.selectedUnit == UnitConversionHelper.volumeUnit){
-      //   allUnits = VolumeUnitsList;
-      //   fromUnit = allUnits.entries.elementAt(0).key;
-      //   toUnit = allUnits.entries.elementAt(1).key;
-      //   unitConversionList = UnitConversionHelper().getVolumeConversionList(fromUnitValue, fromUnit);
-      // }else if(widget.selectedUnit == UnitConversionHelper.weightUnit){
-      //   allUnits = WeightUnitsList;
-      //   fromUnit = allUnits.entries.elementAt(0).key;
-      //   toUnit = allUnits.entries.elementAt(1).key;
-      //   unitConversionList = UnitConversionHelper().getWeightConversionList(fromUnitValue, fromUnit);
-      // }
-
-      print(toUnit);
-      unitConversionList.forEach((obj) {
-        print(obj.unitName);
-        if(obj.unitName == toUnit.toString()){
-          toUnitController.text = obj.unitValue.toStringAsFixed(2);
-        }
-      });
 
       isLoading = false;
     });
@@ -173,7 +182,7 @@ class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
           elevation: 0,
           actions: [
             IconButton(
-              onPressed: ()=> resetPage(context, UnitConverterChildPage()),
+              onPressed: ()=> resetPage(context, UnitConverterChildPage(selectedUnit: widget.selectedUnit,)),
               icon: Icon(Icons.refresh),
               tooltip: 'Reset',
             )
@@ -226,7 +235,7 @@ class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
                       showUnitPicker(context, (v){
                         FocusScope.of(context).unfocus();
                         setState(() {
-                          toUnit = v.toString().replaceAll('ANGLE.', '');
+                          toUnit = v;
                           getAllUnit();
                         });
                       });
@@ -283,10 +292,12 @@ class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
                                 children: [
                                   Row(
                                     children: [
-                                      Text(unitConversionList[index].unitCode.toUpperCase(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                      Text(unitConversionList[index].unitCode??'', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                                       Spacer(),
                                       //${currencyRates[index].symbol}
-                                      Text(unitConversionList[index].unitValue.toStringAsFixed(2), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+
+                                      Text(unitConversionList[index].unitValue.toStringAsFixed(2),
+                                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                                     ],
                                   ),
                                   Text(unitConversionList[index].unitName.toString(),),
