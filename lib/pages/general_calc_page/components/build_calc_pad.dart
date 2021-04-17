@@ -98,7 +98,7 @@ class BuildCalcPad extends StatelessWidget {
               ),
               BuildCalcButton(
                 title: '×',
-                textColor: textBlue,
+                textColor: textMaroon,
                 onPressed: () {
                   onPressed('×');
                 },
@@ -127,7 +127,7 @@ class BuildCalcPad extends StatelessWidget {
               ),
               BuildCalcButton(
                 title: '–',
-                textColor: textOrange,
+                textColor: textMaroon,
                 onPressed: () {
                   onPressed('–');
                 },
@@ -156,7 +156,7 @@ class BuildCalcPad extends StatelessWidget {
               ),
               BuildCalcButton(
                 title: '+',
-                textColor: textRed,
+                textColor: textMaroon,
                 onPressed: () {
                   onPressed('+');
                 },

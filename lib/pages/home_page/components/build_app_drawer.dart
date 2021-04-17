@@ -34,6 +34,7 @@ class _BuildAppDrawerState extends State<BuildAppDrawer> {
       clipBehavior: Clip.antiAlias,
       margin: EdgeInsets.all(responsiveWidth(8)),
       decoration: BoxDecoration(
+        color: Colors.transparent,
           //color: ThemesMode.isDarkMode?Colors.black87:Colors.white,
           //border: Border.all(width: 0.5, color: Colors.black12),
           borderRadius: BorderRadius.circular(responsiveWidth(8)),
@@ -45,8 +46,9 @@ class _BuildAppDrawerState extends State<BuildAppDrawer> {
                 offset: Offset.zero)
           ]),
       child: Drawer(
+        elevation: 0.0,
         child: Container(
-          color: ThemesMode.isDarkMode?Colors.black87:Colors.white,
+          color: ThemesMode.isDarkMode?Colors.black87:backgroundLight.withOpacity(0.5),
           child: ListView(
             padding: EdgeInsets.only(left: 5, right: 5),
             children: [
@@ -67,7 +69,7 @@ class _BuildAppDrawerState extends State<BuildAppDrawer> {
               BuildDrawerBodyItem(
                   icon: Icon(
                     Icons.live_help_rounded,
-                    color: textRed,
+                    color: textMaroon,
                   ),
                   text: 'Help',
                   onTap: () {
@@ -87,7 +89,7 @@ class _BuildAppDrawerState extends State<BuildAppDrawer> {
               BuildDrawerBodyItem(
                   icon: Icon(
                     Icons.star_rate_rounded,
-                    color: textRed,
+                    color: textMaroon,
                   ),
                   text: 'Rate The App',
                   onTap: () {
@@ -120,7 +122,7 @@ class _BuildAppDrawerState extends State<BuildAppDrawer> {
               BuildDrawerBodyItem(
                   icon: Icon(
                       Icons.contact_mail,
-                      color: textRed,
+                      color: textMaroon,
                   ),
                   text: 'Send E-mail',
                   onTap: () async {
@@ -152,7 +154,7 @@ class _BuildAppDrawerState extends State<BuildAppDrawer> {
               BuildDrawerBodyItem(
                   icon: Icon(
                     Icons.verified_user_rounded,
-                    color: textRed,
+                    color: textMaroon,
                   ),
                   text: 'Version ${getAppVersion()}',
                   onTap: null

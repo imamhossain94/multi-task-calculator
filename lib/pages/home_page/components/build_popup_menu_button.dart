@@ -64,7 +64,7 @@ class BuildPopupMenuButton extends StatelessWidget {
               child: BuildPopUpMenuItem(
                 icon: Icon(
                   Icons.shopping_cart_rounded,
-                  color: textRed,
+                  color: textMaroon,
                 ),
                 text: 'Remove Ads',
               ),
@@ -91,7 +91,7 @@ class BuildPopupMenuButton extends StatelessWidget {
               child: BuildPopUpMenuItem(
                 icon: Icon(
                   Icons.shop_rounded,
-                  color: textRed,
+                  color: textMaroon,
                 ),
                 text: 'Other Apps', ),
               value: 4),
@@ -108,7 +108,7 @@ class BuildPopupMenuButton extends StatelessWidget {
               child: BuildPopUpMenuItem(
                 icon: Icon(
                   Icons.android_sharp,
-                  color: textRed,
+                  color: textMaroon,
                 ),
                 text: 'About',
               ),

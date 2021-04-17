@@ -15,7 +15,7 @@ class BuildHomeMenuPad extends StatelessWidget {
             title: 'General',
             icon:FontAwesomeIcons.calculator,
             onPressed: () => Navigator.pushNamed(context, generalCalcPage),
-            color: textRed,
+            color: textMaroon,
           ),
           BuildHomeMenuButton(
             title: 'Currency',
@@ -35,7 +35,7 @@ class BuildHomeMenuPad extends StatelessWidget {
             title: 'Discount',
             icon: FontAwesomeIcons.percentage,
             onPressed: ()=> Navigator.pushNamed(context, discountCalcPage),
-            color: textRed,
+            color: textMaroon,
           ),
           BuildHomeMenuButton(
             title: 'Tip',
@@ -61,7 +61,7 @@ class BuildHomeMenuPad extends StatelessWidget {
             title: 'Fuel Efficiency',
             icon: FontAwesomeIcons.commentDollar,
             onPressed: ()=> Navigator.pushNamed(context, fuelEfficiencyCalcPage),
-            color: textRed,
+            color: textMaroon,
           ),
           BuildHomeMenuButton(
             title: 'Health',
@@ -86,7 +86,7 @@ class BuildHomeMenuPad extends StatelessWidget {
           BuildHomeMenuButton(
             title: 'Savings',
             icon: FontAwesomeIcons.coins,
-            onPressed: () {},
+            onPressed: ()=> Navigator.pushNamed(context, savingCalcPage),
             color: textAmber,
           ),
         ]),

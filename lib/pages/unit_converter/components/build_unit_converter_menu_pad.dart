@@ -17,7 +17,7 @@ class BuildUnitConverterMenuPad extends StatelessWidget {
             title: 'Angle',
             icon:FontAwesomeIcons.superpowers,
             onPressed: ()=>changePage(context: context, selectedUnit: UnitConversionHelper.angleUnit),
-            color: textRed,
+            color: textMaroon,
           ),
           BuildHomeMenuButton(
             title: 'Area',
@@ -37,7 +37,7 @@ class BuildUnitConverterMenuPad extends StatelessWidget {
             title: 'Force',
             icon: FontAwesomeIcons.rocket,
             onPressed: ()=>changePage(context: context, selectedUnit: UnitConversionHelper.forceUnit),
-            color: textRed,
+            color: textMaroon,
           ),
           BuildHomeMenuButton(
             title: 'Length',
@@ -63,7 +63,7 @@ class BuildUnitConverterMenuPad extends StatelessWidget {
             title: 'Pressure',
             icon: FontAwesomeIcons.tachometerAlt,
             onPressed: ()=>changePage(context: context, selectedUnit: UnitConversionHelper.pressureUnit),
-            color: textRed,
+            color: textMaroon,
           ),
           BuildHomeMenuButton(
             title: 'Shoe Size',
