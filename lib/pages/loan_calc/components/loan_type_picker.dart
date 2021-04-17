@@ -1,28 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:multi_task_calculator/utils/screen_config.dart';
 import 'package:multi_task_calculator/utils/themes_mode.dart';
 
-class BuildGenderPicker extends StatefulWidget {
+class LoanTypePicker extends StatefulWidget {
   final String title;
   final ValueChanged<String> valueChanged;
 
-  BuildGenderPicker({
+  LoanTypePicker({
     @required this.title,
     @required this.valueChanged,
   });
 
   @override
-  _BuildGenderPickerState createState() => _BuildGenderPickerState();
+  _LoanTypePickerState createState() => _LoanTypePickerState();
 }
 
-class _BuildGenderPickerState extends State<BuildGenderPicker> {
-  bool isMale, isFemale;
+class _LoanTypePickerState extends State<LoanTypePicker> {
+  bool isMonthlyCost, isMaximumLoan;
 
   @override
   void initState() {
-    isMale = true;
-    isFemale = false;
+    isMonthlyCost = true;
+    isMaximumLoan = false;
     super.initState();
   }
 
@@ -52,31 +51,29 @@ class _BuildGenderPickerState extends State<BuildGenderPicker> {
             child: Row(
               children: [
                 buildGenderButton(
-                  title: 'Male',
-                  icon: FontAwesomeIcons.mars,
+                  title: 'Monthly Cost',
                   onPressed: (){
                     setState(() {
-                      isMale = true;
-                      isFemale = false;
+                      isMonthlyCost = true;
+                      isMaximumLoan = false;
                     });
-                    widget.valueChanged('Male');
+                    widget.valueChanged('Monthly Cost');
                   },
-                  active:isMale,
+                  active:isMonthlyCost,
                 ),
                 SizedBox(
                   width: responsiveWidth(10),
                 ),
                 buildGenderButton(
-                  title: 'Female',
-                  icon: FontAwesomeIcons.venus,
+                  title: 'Maximum Loan',
                   onPressed: (){
                     setState(() {
-                      isMale = false;
-                      isFemale = true;
+                      isMonthlyCost = false;
+                      isMaximumLoan = true;
                     });
-                    widget.valueChanged('Female');
+                    widget.valueChanged('Maximum Loan');
                   },
-                  active:isFemale,
+                  active:isMaximumLoan,
                 ),
               ],
             ),
@@ -86,7 +83,7 @@ class _BuildGenderPickerState extends State<BuildGenderPicker> {
     );
   }
 
-  Expanded buildGenderButton({String title, IconData icon, VoidCallback onPressed, bool active}) {
+  Expanded buildGenderButton({String title, VoidCallback onPressed, bool active}) {
     return Expanded(
       child: Material(
         color: Colors.transparent,
@@ -94,28 +91,20 @@ class _BuildGenderPickerState extends State<BuildGenderPicker> {
           borderRadius: BorderRadius.circular(5),
           onTap: onPressed,
           child: Container(
-            height: responsiveHeight(120),
+            padding: EdgeInsets.all(5),
             width: responsiveWidth(55),
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: ThemesMode.isDarkMode?Colors.grey.withOpacity(active ? 0.3 : 0.15):Colors.grey.withOpacity(active ? 0.3 : 0.07),
               borderRadius: BorderRadius.circular(5),
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Icon(
-                  icon,
-                  size: responsiveHeight(56),
-                ),
-                Text(title, style:
-                  TextStyle(
-                    fontSize: responsiveHeight(24),
-                    fontWeight: FontWeight.bold
-                  )
+            child: Text(
+                title,
+                style: TextStyle(
+                    fontSize: responsiveHeight(16),
+                    //fontWeight: FontWeight.bold
                 )
-              ],
-            ),
+            )
           ),
         ),
       ),

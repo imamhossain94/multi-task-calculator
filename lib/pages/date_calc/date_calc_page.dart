@@ -130,9 +130,9 @@ class _DateCalcPageState extends State<DateCalcPage> {
                             int days = toDate.difference(fromDate).inDays;
                             print(days);
                             setState(() {
-                              resultYears = (days~/365).toString();
-                              resultMonths = (days~/12).toString();
-                              resultDays = (days).toString();
+                              resultYears = (days~/365).floor().toString();
+                              resultMonths = ((days%365)~/12).toString();
+                              resultDays = (((days%365)%12)).toString();
                             });
                           }
                         );

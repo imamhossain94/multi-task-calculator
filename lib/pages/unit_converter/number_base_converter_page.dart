@@ -142,7 +142,7 @@ class _NumberBaseConverterPageState extends State<NumberBaseConverterPage> {
                   ),
                   BuildUnitTextField(
                     isEnabled: false,
-                    hint: toUnitController.text,
+                    hint: '0',
                     title: 'To Unit',
                     unitName: toUnit.toString(),
                     textController: toUnitController,

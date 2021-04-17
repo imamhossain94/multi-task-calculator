@@ -7,6 +7,7 @@ import 'package:multi_task_calculator/pages/fuel_calc/fuel_efficiency_calc_page.
 import 'package:multi_task_calculator/pages/general_calc_page/general_calc_page.dart';
 import 'package:multi_task_calculator/pages/health_calc/health_calc_page.dart';
 import 'package:multi_task_calculator/pages/home_page/home_page.dart';
+import 'package:multi_task_calculator/pages/loan_calc/loan_calc_page.dart';
 import 'package:multi_task_calculator/pages/sales_tax_calc/sales_tax_calc_page.dart';
 import 'package:multi_task_calculator/pages/splash_page.dart';
 import 'package:multi_task_calculator/pages/about_page.dart';
@@ -77,7 +78,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return PageTransition(child: HealthCalcPage(), type: PageTransitionType.fade, settings: settings,);
       break;
     case loanCalcPage:
-      return PageTransition(child: UpdateCheckPage(), type: PageTransitionType.fade, settings: settings,);
+      return PageTransition(child: LoanCalcPage(), type: PageTransitionType.fade, settings: settings,);
       break;
     case salesTaxCalcPage:
       return PageTransition(child: SalesTaxCalcPage(), type: PageTransitionType.fade, settings: settings,);

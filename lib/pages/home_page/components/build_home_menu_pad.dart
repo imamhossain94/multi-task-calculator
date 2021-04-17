@@ -74,13 +74,7 @@ class BuildHomeMenuPad extends StatelessWidget {
           BuildHomeMenuButton(
             title: 'Loan',
             icon: FontAwesomeIcons.landmark,
-            onPressed: () async{
-              if (await canLaunch(loanAppLink)) {
-                await launch(loanAppLink);
-              } else {
-                throw 'Could not launch $appLink';
-              }
-            },
+            onPressed: ()=> Navigator.pushNamed(context, loanCalcPage),
             color: textBlue,
           ),
           BuildHomeMenuButton(

@@ -176,7 +176,7 @@ class _HealthCalcPageState extends State<HealthCalcPage> {
                       isEnabled: true,
                       textController: ageController,
                       onPressedAction: null,
-                      widget: Text('y', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
+                      widget: Text('yrs', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
                   ],
                 ),
               ),
