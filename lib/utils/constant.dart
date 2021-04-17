@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:units_converter/units_converter.dart';
+
 
 const String appName = 'Multi-Task Calculator';
 const String appNameNewLine = 'Multi-Task\nCalculator';
@@ -105,77 +107,221 @@ const Map<String, String> appHelp = {
       "Try our mortgage calculator app to see how to calculate mortgage payment",
 };
 
-
 const Map<String, String> currencyCodeList = {
   "AED":"UAEDirham","AFN":"Afghani","ALL":"Lek","AMD":"ArmenianDram","ANG":"NetherlandsAntilleanGuilder","AOA":"Kwanza","ARS":"ArgentinePeso","AUD":"AustralianDollar","AWG":"ArubanFlorin","AZN":"AzerbaijanManat","BAM":"ConvertibleMark","BBD":"BarbadosDollar","BDT":"Taka","BGN":"BulgarianLev","BHD":"BahrainiDinar","BIF":"BurundiFranc","BMD":"BermudianDollar","BND":"BruneiDollar","BOB":"Boliviano","BOV":"Mvdol","BRL":"BrazilianReal","BSD":"BahamianDollar","BTN":"Ngultrum","BWP":"Pula","BYN":"BelarusianRuble","BZD":"BelizeDollar","CAD":"CanadianDollar","CDF":"CongoleseFranc","CHF":"SwissFranc","CLP":"ChileanPeso","CNY":"YuanRenminbi","COP":"ColombianPeso","CRC":"CostaRicanColon","CUC":"PesoConvertible","CUP":"CubanPeso","CVE":"CaboVerdeEscudo","CZK":"CzechKoruna","DJF":"DjiboutiFranc","DKK":"DanishKrone","DOP":"DominicanPeso","DZD":"AlgerianDinar","EGP":"EgyptianPound","ERN":"Nakfa","ETB":"EthiopianBirr","EUR":"Euro","FJD":"FijiDollar","FKP":"FalklandIslandsPound","GBP":"PoundSterling","GEL":"Lari","GHS":"GhanaCedi","GIP":"GibraltarPound","GMD":"Dalasi","GNF":"GuineanFranc","GTQ":"Quetzal","GYD":"GuyanaDollar","HKD":"HongKongDollar","HNL":"Lempira","HRK":"Kuna","HTG":"Gourde","HUF":"Forint","IDR":"Rupiah","ILS":"NewIsraeliSheqel","INR":"IndianRupee","IQD":"IraqiDinar","IRR":"IranianRial","ISK":"IcelandKrona","JMD":"JamaicanDollar","JOD":"JordanianDinar","JPY":"Yen","KES":"KenyanShilling","KGS":"Som","KHR":"Riel","KMF":"ComorianFranc","KPW":"NorthKoreanWon","KRW":"Won","KWD":"KuwaitiDinar","KYD":"CaymanIslandsDollar","KZT":"Tenge","LAK":"LaoKip","LBP":"LebanesePound","LKR":"SriLankaRupee","LRD":"LiberianDollar","LSL":"Loti","LYD":"LibyanDinar","MAD":"MoroccanDirham","MDL":"MoldovanLeu","MGA":"MalagasyAriary","MKD":"Denar","MMK":"Kyat","MNT":"Tugrik","MOP":"Pataca","MRU":"Ouguiya","MUR":"MauritiusRupee","MVR":"Rufiyaa","MWK":"MalawiKwacha","MXN":"MexicanPeso","MYR":"MalaysianRinggit","MZN":"MozambiqueMetical","NAD":"NamibiaDollar","NGN":"Naira","NIO":"CordobaOro","NOK":"NorwegianKrone","NPR":"NepaleseRupee","NZD":"NewZealandDollar","OMR":"RialOmani","PAB":"Balboa","PEN":"Sol","PGK":"Kina","PHP":"PhilippinePeso","PKR":"PakistanRupee","PLN":"Zloty","PYG":"Guarani","QAR":"QatariRial","RON":"RomanianLeu","RSD":"SerbianDinar","RUB":"RussianRuble","RWF":"RwandaFranc","SAR":"SaudiRiyal","SBD":"SolomonIslandsDollar","SCR":"SeychellesRupee","SDG":"SudanesePound","SEK":"SwedishKrona","SGD":"SingaporeDollar","SHP":"SaintHelenaPound","SLL":"Leone","SOS":"SomaliShilling","SRD":"SurinamDollar","SSP":"SouthSudanesePound","STN":"Dobra","SYP":"SyrianPound","SZL":"Lilangeni","THB":"Baht","TJS":"Somoni","TMT":"TurkmenistanNewManat","TND":"TunisianDinar","TOP":"Pa’anga","TRY":"TurkishLira","TTD":"TrinidadandTobagoDollar","TWD":"NewTaiwanDollar","TZS":"TanzanianShilling","UAH":"Hryvnia","UGX":"UgandaShilling","USD":"USDollar","UYU":"PesoUruguayo","UZS":"UzbekistanSum","VES":"BolívarSoberano","VND":"Dong","VUV":"Vatu","WST":"Tala","XAF":"CFAFrancBEAC","XCD":"EastCaribbeanDollar","XDR":"SDR(SpecialDrawingRight)","XOF":"CFAFrancBCEAO","XPF":"CFPFranc","YER":"YemeniRial","ZAR":"Rand","ZMW":"ZambianKwacha",
 };
 
+
 //All Angle Unit
-const Map<String, String> AngleUnitsList = {
-  "second":"arcs","minute":"arcm","degree":"deg","radian":"rad",
+const Map<String, dynamic> AngleUnitsList = {
+  'degree': ANGLE.degree,
+  'minutes': ANGLE.minutes,
+  'seconds': ANGLE.seconds,
+  'radians': ANGLE.radians,
 };
-
 //All Area Unit
-const Map<String, String> AreaUnitsList = {
-  "acre":"acre","squareCentimeter":"cm²","hectare":"ha","squareFoot":"ft²","squareInch":"inch²","squareKilometer":"km²","squareMeter":"m²","squareMicrometer":"μm²","squareMile":"mile²","squareMillimeter":"mm²","squareNanometer":"nm²","squareYard":"yd²",
+const Map<String, dynamic> AreaUnitsList = {
+  'are': AREA.are,
+  'acres': AREA.acres,
+  'hectares': AREA.hectares,
+  'square_kilometers': AREA.square_kilometers,
+  'square_millimeters': AREA.square_millimeters,
+  'square_yard': AREA.square_yard,
+  'square_miles': AREA.square_miles,
+  'square_feet': AREA.square_feet,
+  'square_inches': AREA.square_inches,
+  'square_centimeters': AREA.square_centimeters,
+  'square_meters': AREA.square_meters,
 };
-
 //All Energy Unit
-const Map<String, String> EnergyUnitsList = {
-  "attojoule":"aJ","calorie":"cal","electronVolt":"eV","femtojoule":"fJ","gigajoule":"GJ","gigawattHour":"GWh","kilocalorie":"kcal","kiloelectronVolt":"keV","kilojoule":"kJ","kiloton":"kt","kilowattHour":"KWh","megaelectronVolt":"meV","joule":"j","megawattHour":"MWh","microjoule":"µJ","millijoule":"mJ","picojoule":"pJ","ton":"t","wattHour":"Wh",
+const Map<String, dynamic> EnergyUnitsList = {
+  'joules': ENERGY.joules,
+  'calories': ENERGY.calories,
+  'kilowatt_hours': ENERGY.kilowatt_hours,
+  'electronvolts': ENERGY.electronvolts,
 };
-
 //All Force Unit
-const Map<String, String> ForceUnitsList = {
-  "attonewton":"aN","centinewton":"cN","decinewton":"dN","dekanewton":"daN","exanewton":"EN","femtonewton":"fN","giganewton":"GN","gramForce":"gf","hectonewton":"hN","kilogramForce":"kgf","kilonewton":"kN","kipForce":"klbf","meganewton":"MN","micronewton":"µN","millinewton":"mN","nanonewton":"nN","newton":"N","ounceForce":"ozf","petanewton":"PN","piconewton":"pN","poundForce":"lbf","teranewton":"TN","tonForce":"tfN",
+const Map<String, dynamic> ForceUnitsList = {
+  'newton': FORCE.newton,
+  'dyne': FORCE.dyne,
+  'pound_force': FORCE.pound_force,
+  'kilogram_force': FORCE.kilogram_force,
+  'poundal': FORCE.poundal,
 };
-
 //All Length Unit
-const Map<String, String> LengthUnitsList = {
-  "centimeter":"cm","foot":"ft","inch":"in","kilometer":"km","meter":"m","micrometer":"µm","mile":"mi","millimeter":"mm","nanometer":"nm","nauticalMile":"nmi","yard":"yd",
+const Map<String, dynamic> LengthUnitsList = {
+  'meters': LENGTH.meters,
+  'centimeters': LENGTH.centimeters,
+  'inches': LENGTH.inches,
+  'feet': LENGTH.feet,
+  'nautical_miles': LENGTH.nautical_miles,
+  'yards': LENGTH.yards,
+  'miles': LENGTH.miles,
+  'millimeters': LENGTH.millimeters,
+  'micrometers': LENGTH.micrometers,
+  'nanometers': LENGTH.nanometers,
+  'angstroms': LENGTH.angstroms,
+  'picometers': LENGTH.picometers,
+  'kilometers': LENGTH.kilometers,
+  'astronomical_units': LENGTH.astronomical_units,
+  'light_years': LENGTH.light_years,
+  'parsec': LENGTH.parsec,
 };
-
 //All Number Base Unit
-const Map<String, String> NumberBaseUnitsList = {
-  "binary":"b","decimal":"d","hexadecimal":"h","octal":"o",
+const Map<String, dynamic> NumberBaseUnitsList = {
+  'decimal': NUMERAL_SYSTEMS.decimal,
+  'hexadecimal': NUMERAL_SYSTEMS.hexadecimal,
+  'octal': NUMERAL_SYSTEMS.octal,
+  'binary': NUMERAL_SYSTEMS.binary,
 };
-
 //All Power Unit
-const Map<String, String> PowerUnitsList = {
-  "attowatt":"aW","centiwatt":"cW","deciwatt":"dW","dekawatt":"daW","exawatt":"EW","femtowatt":"fW","gigawatt":"GW","hectowatt":"hW","kilowatt":"kW","megawatt":"MW","milliwatt":"mW","petawatt":"PW","picowatt":"pW","terawatt":"TW","watt":"W",
+const Map<String, dynamic> PowerUnitsList = {
+  'watt': POWER.watt,
+  'milliwatt': POWER.milliwatt,
+  'kilowatt': POWER.kilowatt,
+  'megawatt': POWER.megawatt,
+  'gigawatt': POWER.gigawatt,
+  'european_horse_power': POWER.european_horse_power,
+  'imperial_horse_power': POWER.imperial_horse_power,
 };
-
 //All Pressure Unit
-const Map<String, String> PressureUnitsList = {
-  "centipascal":"cPa","dekapascal":"daPa","gigapascal":"GPa","hectopascal":"hPa","kilopascal":"kPa","megapascal":"MPa","microbar":"µbar","micropascal":"µPa","millibar":"millibar","millipascal":"mPa","pascal":"Pa","psi":"psi","torr":"torr",
+const Map<String, dynamic> PressureUnitsList = {
+  'pascal': PRESSURE.pascal,
+  'atmosphere': PRESSURE.atmosphere,
+  'bar': PRESSURE.bar,
+  'millibar': PRESSURE.millibar,
+  'psi': PRESSURE.psi,
+  'torr': PRESSURE.torr,
 };
-
 //All Speed Unit
-const Map<String, String> SpeedUnitsList = {
-  "beaufort":"beaufort","centimeterPerHour":"cm/h","centimeterPerMinute":"cm/m","centimeterPerSecond":"cm/s","footPerHour":"ft/h","footPerMinute":"ft/m","footPerSecond":"ft/s","kilometerPerHour":"km/h","kilometerPerMinute":"km/m","kilometerPerSecond":"km/s","knot":"knot","mach":"Ma","meterPerHour":"m/h","meterPerMinute":"m/m","meterPerSecond":"m/s","milePerHour":"mi/h","milePerMinute":"mi/m","milePerSecond":"mi/s","yardPerMinute":"yd/m","yardPerSecond":"yd/s",
+const Map<String, dynamic> SpeedUnitsList = {
+  'meters_per_second': SPEED.meters_per_second,
+  'kilometers_per_hour': SPEED.kilometers_per_hour,
+  'miles_per_hour': SPEED.miles_per_hour,
+  'knots': SPEED.knots,
+  'feets_per_second': SPEED.feets_per_second,
 };
-
-//All Storage Unit
-const Map<String, String> StorageUnitsList = {
-  "bit":"bit","byte":"byte","cd74Minute":"char","cd80Minute":"char","character":"char","dvd":"dvd","exabit":"Ebit","exabyte":"Ebyte","gigabit":"Gb","gigabyte":"GB","kilobit":"kb","kilobyte":"kB","megabit":"Mb","megabyte":"MB","nibble":"nibble","petabit":"Pbit","petabyte":"PB","terabit":"Tb","terabyte":"TB","word":"word",
-};
-
 //All Temperature Unit
-const Map<String, String> TemperatureUnitsList = {
-  "celsius":"°C","fahrenheit":"°F","kelvin":"°K",
+const Map<String, dynamic> TemperatureUnitsList = {
+  'fahrenheit': TEMPERATURE.fahrenheit,
+  'celsius': TEMPERATURE.celsius,
+  'kelvin': TEMPERATURE.kelvin,
+  'reamur': TEMPERATURE.reamur,
+  'romer': TEMPERATURE.romer,
+  'delisle': TEMPERATURE.delisle,
+  'rankine': TEMPERATURE.rankine,
 };
-
+//All Storage Unit
+const Map<String, dynamic> StorageUnitsList = {
+  'bit': DIGITAL_DATA.bit,
+  'nibble': DIGITAL_DATA.nibble,
+  'kilobit': DIGITAL_DATA.kilobit,
+  'megabit': DIGITAL_DATA.megabit,
+  'gigabit': DIGITAL_DATA.gigabit,
+  'terabit': DIGITAL_DATA.terabit,
+  'petabit': DIGITAL_DATA.petabit,
+  'exabit': DIGITAL_DATA.exabit,
+  'kibibit': DIGITAL_DATA.kibibit,
+  'mebibit': DIGITAL_DATA.mebibit,
+  'gibibit': DIGITAL_DATA.gibibit,
+  'tebibit': DIGITAL_DATA.tebibit,
+  'pebibit': DIGITAL_DATA.pebibit,
+  'exbibit': DIGITAL_DATA.exbibit,
+  'byte': DIGITAL_DATA.byte,
+  'kilobyte': DIGITAL_DATA.kilobyte,
+  'megabyte': DIGITAL_DATA.megabyte,
+  'gigabyte': DIGITAL_DATA.gigabyte,
+  'terabyte': DIGITAL_DATA.terabyte,
+  'petabyte': DIGITAL_DATA.petabyte,
+  'exabyte': DIGITAL_DATA.exabyte,
+  'kibibyte': DIGITAL_DATA.kibibyte,
+  'mebibyte': DIGITAL_DATA.mebibyte,
+  'gibibyte': DIGITAL_DATA.gibibyte,
+  'tebibyte': DIGITAL_DATA.tebibyte,
+  'pebibyte': DIGITAL_DATA.pebibyte,
+  'exbibyte': DIGITAL_DATA.exbibyte,
+};
 //All Time Unit
-const Map<String, String> TimeUnitsList = {
-  "second":"s","day":"d","microsecond":"μs","minute":"min","hour":"h","year":"y","month":"M","century":"C","decade":"dec","millisecond":"ms","nanosecond":"ns","picosecond":"ps","week":"w",
+const Map<String, dynamic> TimeUnitsList = {
+  'seconds': TIME.seconds,
+  'deciseconds': TIME.deciseconds,
+  'centiseconds': TIME.centiseconds,
+  'milliseconds': TIME.milliseconds,
+  'microseconds': TIME.microseconds,
+  'nanoseconds': TIME.nanoseconds,
+  'minutes': TIME.minutes,
+  'hours': TIME.hours,
+  'days': TIME.days,
+  'weeks': TIME.weeks,
+  'years_365': TIME.years_365,
+  'lustrum': TIME.lustrum,
+  'decades': TIME.decades,
+  'centuries': TIME.centuries,
+  'millennium': TIME.millennium,
 };
-
 //All Volume Unit
-const Map<String, String> VolumeUnitsList = {
-  "attoliter":"aL","barrelOil":"barrel","barrelUK":"barrel-uk","barrelUS":"barrel-us","centiliter":"cL","cubicCentimeter":"cm³","cubicFoot":"ft³","cubicInch":"inc³","cubicKilometer":"km³","cubicMeter":"m³","cubicMile":"mi³","cubicMillimeter":"mm³","cubicYard":"yd³","deciliter":"dl","dekaliter":"dal","exaliter":"El","femtoliter":"fl","gallonUS":"gal-us","gigaliter":"Gl","hectoliter":"hl","kiloliter":"kl","liter":"L","megaliter":"Ml","microliter":"μl","milliliter":"ml","nanoliter":"nl","petaliter":"Pl","picoliter":"pl","teraliter":"Tl",
+const Map<String, dynamic> VolumeUnitsList = {
+  'seconds': VOLUME.cubic_meters,
+  'liters': VOLUME.liters,
+  'imperial_gallons': VOLUME.imperial_gallons,
+  'us_gallons': VOLUME.us_gallons,
+  'imperial_pints': VOLUME.imperial_pints,
+  'us_pints': VOLUME.us_pints,
+  'milliliters': VOLUME.milliliters,
+  'tablespoons_us': VOLUME.tablespoons_us,
+  'australian_tablespoons': VOLUME.australian_tablespoons,
+  'cups': VOLUME.cups,
+  'cubic_centimeters': VOLUME.cubic_centimeters,
+  'cubic_feet': VOLUME.cubic_feet,
+  'cubic_inches': VOLUME.cubic_inches,
+  'cubic_millimeters': VOLUME.cubic_millimeters,
+  'imperial_fluid_ounces': VOLUME.imperial_fluid_ounces,
+  'us_fluid_ounces': VOLUME.us_fluid_ounces,
+  'imperial_gill': VOLUME.imperial_gill,
+  'us_gill': VOLUME.us_gill,
 };
-
 //All Weight Unit
-const Map<String, String> WeightUnitsList = {
-  "attogram":"ag","tonUK":"ton-uk","ton":"ton","carat":"carat","centigram":"cg","decigram":"dg","dekagram":"dag","exagram":"Eg","femtogram":"fg","gigagram":"Gg","gram":"g","hectogram":"hg","kilogram":"kg","kiloton":"kt","megagram":"Mg","microgram":"μg","milligram":"mg","nanogram":"ng","ounce":"oz","petagram":"Pg","picogram":"pg","pound":"lb","poundal":"pdl","quintal":"q","teragram":"Tg","tonUS":"ton-us",
+const Map<String, dynamic> WeightUnitsList = {
+  'grams': MASS.grams,
+  'ettograms': MASS.ettograms,
+  'kilograms': MASS.kilograms,
+  'pounds': MASS.pounds,
+  'ounces': MASS.ounces,
+  'quintals': MASS.quintals,
+  'tons': MASS.tons,
+  'milligrams': MASS.milligrams,
+  'uma': MASS.uma,
+  'carats': MASS.carats,
+  'centigrams': MASS.centigrams,
+  'pennyweights': MASS.pennyweights,
+  'troy_ounces': MASS.troy_ounces,
+  'stones': MASS.stones,
+};
+//All FuelConsumption Unit
+const Map<String, dynamic> FuelUnitsList = {
+  'kilometers_per_liter': FUEL_CONSUMPTION.kilometers_per_liter,
+  'liters_per_100_km': FUEL_CONSUMPTION.liters_per_100_km,
+  'miles_per_US_gallon': FUEL_CONSUMPTION.miles_per_US_gallon,
+  'miles_per_imperial_gallon': FUEL_CONSUMPTION.miles_per_imperial_gallon,
+};
+//All Torque Unit
+const Map<String, dynamic> TorqueUnitsList = {
+  'newton_meter': TORQUE.newton_meter,
+  'dyne_meter': TORQUE.dyne_meter,
+  'pound_force_feet': TORQUE.pound_force_feet,
+  'kilogram_force_meter': TORQUE.kilogram_force_meter,
+  'poundal_meter': TORQUE.poundal_meter,
+};
+//All ShoeSize Unit
+const Map<String, dynamic> ShoeSizeUnitsList = {
+  'centimeters': SHOE_SIZE.centimeters,
+  'inches': SHOE_SIZE.inches,
+  'eu_china': SHOE_SIZE.eu_china,
+  'uk_india_child': SHOE_SIZE.uk_india_child,
+  'uk_india_man': SHOE_SIZE.uk_india_man,
+  'uk_india_woman': SHOE_SIZE.uk_india_woman,
+  'usa_canada_child': SHOE_SIZE.usa_canada_child,
+  'usa_canada_man': SHOE_SIZE.usa_canada_man,
+  'usa_canada_woman': SHOE_SIZE.usa_canada_woman,
+  'japan': SHOE_SIZE.japan,
 };

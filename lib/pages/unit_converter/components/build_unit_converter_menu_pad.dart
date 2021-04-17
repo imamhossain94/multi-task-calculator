@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:multi_task_calculator/pages/home_page/components/build_home_menu_button.dart';
+import 'package:multi_task_calculator/pages/unit_converter/models/unit_converter_helper.dart';
+import 'package:multi_task_calculator/pages/unit_converter/unit_converter_child_page.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
-import 'package:unit_convert/unit_convert.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:page_transition/page_transition.dart';
 
 class BuildUnitConverterMenuPad extends StatelessWidget {
   @override
@@ -15,23 +16,19 @@ class BuildUnitConverterMenuPad extends StatelessWidget {
           BuildHomeMenuButton(
             title: 'Angle',
             icon:FontAwesomeIcons.superpowers,
-            onPressed: () {
-              Navigator.pushNamed(context, unitConverterChildPage);
-            },
+            onPressed: ()=>changePage(context: context, selectedUnit: UnitConversionHelper.angleUnit),
             color: textRed,
           ),
           BuildHomeMenuButton(
             title: 'Area',
             icon: FontAwesomeIcons.chartArea,
-            onPressed: () {
-
-            },
+            onPressed: ()=>changePage(context: context, selectedUnit: UnitConversionHelper.areaUnit),
             color: textBlue,
           ),
           BuildHomeMenuButton(
             title: 'Energy',
             icon: FontAwesomeIcons.chargingStation,
-            onPressed: ()=> {},
+            onPressed: ()=>changePage(context: context, selectedUnit: UnitConversionHelper.energyUnit),
             color: textAmber,
           ),
         ]),
@@ -39,19 +36,19 @@ class BuildUnitConverterMenuPad extends StatelessWidget {
           BuildHomeMenuButton(
             title: 'Force',
             icon: FontAwesomeIcons.rocket,
-            onPressed: ()=> {},
+            onPressed: ()=>changePage(context: context, selectedUnit: UnitConversionHelper.forceUnit),
             color: textRed,
           ),
           BuildHomeMenuButton(
             title: 'Length',
             icon: FontAwesomeIcons.rulerHorizontal,
-            onPressed: ()=> {},
+            onPressed: ()=>changePage(context: context, selectedUnit: UnitConversionHelper.lengthUnit),
             color: textGreen,
           ),
           BuildHomeMenuButton(
             title: 'Number',
             icon: FontAwesomeIcons.sortNumericUp,
-            onPressed: ()=> {},
+            onPressed: ()=>changePage(context: context, selectedUnit: UnitConversionHelper.numberBaseUnit),
             color: textMaroon,
           ),
         ]),
@@ -59,19 +56,19 @@ class BuildUnitConverterMenuPad extends StatelessWidget {
           BuildHomeMenuButton(
             title: 'Power',
             icon: FontAwesomeIcons.powerOff,
-            onPressed: ()=> {},
+            onPressed: ()=>changePage(context: context, selectedUnit: UnitConversionHelper.powerUnit),
             color: textYellow,
           ),
           BuildHomeMenuButton(
             title: 'Pressure',
             icon: FontAwesomeIcons.tachometerAlt,
-            onPressed: ()=> {},
+            onPressed: ()=>changePage(context: context, selectedUnit: UnitConversionHelper.pressureUnit),
             color: textRed,
           ),
           BuildHomeMenuButton(
             title: 'Speed',
             icon: FontAwesomeIcons.meteor,
-            onPressed: ()=> {},
+            onPressed: ()=>changePage(context: context, selectedUnit: UnitConversionHelper.speedUnit),
             color: textOrange,
           ),
         ]),
@@ -79,19 +76,19 @@ class BuildUnitConverterMenuPad extends StatelessWidget {
           BuildHomeMenuButton(
             title: 'Temperature',
             icon: FontAwesomeIcons.thermometerThreeQuarters,
-            onPressed: ()=> {},
+            onPressed: ()=>changePage(context: context, selectedUnit: UnitConversionHelper.temperatureUnit),
             color: textBlue,
           ),
           BuildHomeMenuButton(
             title: 'Storage',
             icon: FontAwesomeIcons.memory,
-            onPressed: ()=> {},
+            onPressed: ()=>changePage(context: context, selectedUnit: UnitConversionHelper.storageUnit),
             color: textGreen,
           ),
           BuildHomeMenuButton(
             title: 'Weight',
             icon: FontAwesomeIcons.weight,
-            onPressed: ()=> {},
+            onPressed: ()=>changePage(context: context, selectedUnit: UnitConversionHelper.weightUnit),
             color: textAmber,
           ),
         ]),
@@ -99,13 +96,13 @@ class BuildUnitConverterMenuPad extends StatelessWidget {
           BuildHomeMenuButton(
             title: 'Time',
             icon: FontAwesomeIcons.hourglassHalf,
-            onPressed: ()=> {},
+            onPressed: ()=>changePage(context: context, selectedUnit: UnitConversionHelper.timeUnit),
             color: textGreen,
           ),
           BuildHomeMenuButton(
             title: 'Volume',
             icon: FontAwesomeIcons.cube,
-            onPressed: ()=> {},
+            onPressed: ()=>changePage(context: context, selectedUnit: UnitConversionHelper.weightUnit),
             color: textMaroon,
           ),
 
@@ -113,6 +110,17 @@ class BuildUnitConverterMenuPad extends StatelessWidget {
       ]),
     );
   }
+
+  void changePage({BuildContext context, var selectedUnit}){
+      Navigator.push(context, PageTransition(
+          type: PageTransitionType.fade,
+          child: UnitConverterChildPage(selectedUnit: selectedUnit,),
+          inheritTheme: true,
+          ctx: context),
+      );
+  }
+
+
 }
 
 
