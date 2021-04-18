@@ -14,27 +14,23 @@ int getSavedTheme() {
 }
 
 String getAppVersion() {
-  return SharedPrefService.prefs.getString(appVersion) ?? '--';
+  return SharedPrefService.prefs.getString(appVersion) ?? '0';
 }
 
 //Currency
-void setCurrencyLastUpdate(String time) {
-  SharedPrefService.prefs.setString('time_last_update_utc', time.substring(0,16));
+void setAppPurchasedStatus(bool value) {
+  SharedPrefService.prefs.setBool('app_purchase_status', value);
 }
 
-String getCurrencyLastUpdate() {
-  String value = SharedPrefService.prefs.getString('time_last_update_utc');
-  return value;
+bool getAppPurchasedStatus() {
+  return SharedPrefService.prefs.getBool('app_purchase_status')??false;
 }
 
-void setCurrencyNextUpdate(String time) {
-  int value = int.parse('${time[5]}${time[5]}');
-  SharedPrefService.prefs.setInt('time_next_update_utc', value);
+
+void setAdFreeTime(String value) {
+  SharedPrefService.prefs.setString('ad_free_time', value);
 }
 
-int getCurrencyNextUpdate() {
-  int value = SharedPrefService.prefs.getInt('time_next_update_utc')??DateTime.now().day.toInt();
-  return value;
+String getAdFreeTime() {
+  return SharedPrefService.prefs.getString('ad_free_time')??DateTime.now().toString();
 }
-//Currency
-

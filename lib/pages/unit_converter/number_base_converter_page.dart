@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:multi_task_calculator/components/build_banner_ad.dart';
 import 'package:multi_task_calculator/pages/unit_converter/components/build_unit_text_field.dart';
 import 'package:multi_task_calculator/pages/unit_converter/models/unit_converter_helper.dart';
+import 'package:multi_task_calculator/services/google_ad_service.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:multi_task_calculator/utils/extensions.dart';
 import 'package:multi_task_calculator/utils/screen_config.dart';
@@ -25,8 +27,11 @@ class _NumberBaseConverterPageState extends State<NumberBaseConverterPage> {
   List<UnitConversion> unitConversionList = [];
   String fromUnitValue;
 
+  GoogleAdService _googleAdService = GoogleAdService();
+
   @override
   void initState() {
+    _googleAdService.initAd();
     fromUnitValue = '0';
     fromUnitController.text = '0';
     toUnitController.text = '0';
@@ -97,14 +102,17 @@ class _NumberBaseConverterPageState extends State<NumberBaseConverterPage> {
           elevation: 0,
           actions: [
             IconButton(
-              onPressed: ()=> resetPage(context, NumberBaseConverterPage()),
+              onPressed: () async {
+                await _googleAdService.showInterstitialAd();
+                resetPage(context, numberBaseConverterPage);
+              },
               icon: Icon(Icons.refresh),
               tooltip: 'Reset',
             )
           ],
         ),
         body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
               margin: EdgeInsets.all(10),
@@ -228,7 +236,8 @@ class _NumberBaseConverterPageState extends State<NumberBaseConverterPage> {
                     ],
                   )
               ),
-            )
+            ),
+            BuildBannerAd(width: ScreenConfig.screenWidth, height: 50,),
           ],
         ),
       ),

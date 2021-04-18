@@ -1,9 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:multi_task_calculator/components/build_banner_ad.dart';
 import 'package:multi_task_calculator/components/build_pop_up_munu_item.dart';
 import 'package:multi_task_calculator/pages/home_page/components/build_app_drawer.dart';
 import 'package:multi_task_calculator/pages/home_page/components/build_home_menu_pad.dart';
 import 'package:multi_task_calculator/pages/home_page/components/build_popup_menu_button.dart';
+import 'package:multi_task_calculator/services/shared_pref_services.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:multi_task_calculator/utils/extensions.dart';
 import 'package:multi_task_calculator/utils/screen_config.dart';
@@ -17,20 +22,52 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   GlobalKey<ScaffoldState> _key = new GlobalKey<ScaffoldState>();
 
+
+  String rewardSeconds;
+  bool isLoading;
+  Timer _timer;
+
   @override
   void initState() {
+    isLoading = false;
+    createTimer();
     super.initState();
   }
 
   @override
   void dispose() {
+    _timer.cancel();
     super.dispose();
   }
+
+  void createTimer() async{
+    _timer = Timer.periodic(Duration(seconds: 1), (Timer t)=>
+        setState((){
+          if(getAppPurchasedStatus() == true){
+            DateTime x = DateTime.now(), y = DateTime.tryParse(getAdFreeTime());
+            int seconds = x.difference(y).inSeconds;
+            rewardSeconds = seconds.toString();
+            if(seconds == 21600){
+              t.cancel();
+              rewardSeconds = null;
+              setAppPurchasedStatus(false);
+            }
+          }else{
+            rewardSeconds = null;
+            t.cancel();
+          }
+        })
+    );
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
     ThemesMode().init(context);
     ScreenConfig().init(context);
+
+    createTimer();
 
     return WillPopScope(
       onWillPop: () async {
@@ -83,21 +120,23 @@ class _HomePageState extends State<HomePage> {
                     ],
                   )
               ),
-              Container(
-                height: 60,
-                color: Colors.black12,
-              ),
+              rewardSeconds != null?
+                  Container(
+                    height: 50,
+                    width: ScreenConfig.screenWidth,
+                    alignment: Alignment.center,
+                    color: Colors.black12,
+                    child: Text(
+                        '${(21600-int.parse(rewardSeconds))~/60}m ${(21600-int.parse(rewardSeconds))%60}s'
+                    ),
+                  ):
+              BuildBannerAd(width: ScreenConfig.screenWidth, height: 50,),
             ],
           ),
-          // floatingActionButton: FloatingActionButton(
-          //   backgroundColor: ThemesMode.isDarkMode ? textWhite : textBlack,
-          //   foregroundColor: ThemesMode.isDarkMode ? textOrange : Colors.yellow,
-          //   tooltip: 'Rate The App',
-          //   onPressed: () {},
-          //   child: Icon(Icons.star),
-          // ),
         ),
       ),
     );
   }
+
 }
+

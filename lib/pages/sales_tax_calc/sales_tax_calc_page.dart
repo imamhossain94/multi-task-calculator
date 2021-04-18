@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:multi_task_calculator/components/build_banner_ad.dart';
 import 'package:multi_task_calculator/components/build_result_card.dart';
 import 'package:multi_task_calculator/components/build_text_field.dart';
+import 'package:multi_task_calculator/services/google_ad_service.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:multi_task_calculator/utils/extensions.dart';
 import 'package:multi_task_calculator/utils/screen_config.dart';
@@ -21,9 +23,11 @@ class _SalesTaxCalcPageState extends State<SalesTaxCalcPage> {
   String taxRate, originalPrice;
   double tax, totalPrice;
 
+  GoogleAdService _googleAdService = GoogleAdService();
 
   @override
   void initState() {
+    _googleAdService.initAd();
     tax = 0.0;
     totalPrice = 0.0;
     calculateDiscount();
@@ -79,63 +83,73 @@ class _SalesTaxCalcPageState extends State<SalesTaxCalcPage> {
           elevation: 0,
           actions: [
             IconButton(
-              onPressed: ()=> resetPage(context, SalesTaxCalcPage()),
+              onPressed: () async {
+                await _googleAdService.showInterstitialAd();
+                resetPage(context, salesTaxCalcPage);
+              },
               icon: Icon(Icons.refresh),
               tooltip: 'Refresh',
             )
           ],
         ),
-        body: SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                margin: EdgeInsets.all(10),
-                padding: EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                    color: ThemesMode.isDarkMode?Colors.black:textWhite,
-                    borderRadius: BorderRadius.circular(5),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.grey.withOpacity(0.9),
-                          blurRadius: 0.5,
-                          spreadRadius: 0.5,
-                          offset: Offset.zero
-                      )
-                    ]
-                ),
+        body: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    BuildTextField(
-                      title: 'Tax Rate',
-                      hint: '0.0',
-                      isEnabled: true,
-                      textController: taxRateController,
-                      onPressedAction: null,
-                      widget: Text('%', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-                    BuildTextField(
-                      title: 'Original Price',
-                      hint: '0.0',
-                      isEnabled: true,
-                      textController: originalPriceController,
-                      onPressedAction: null,
-                      widget: Text('\$', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
+                    Container(
+                      margin: EdgeInsets.all(10),
+                      padding: EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                          color: ThemesMode.isDarkMode?Colors.black:textWhite,
+                          borderRadius: BorderRadius.circular(5),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.grey.withOpacity(0.9),
+                                blurRadius: 0.5,
+                                spreadRadius: 0.5,
+                                offset: Offset.zero
+                            )
+                          ]
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          BuildTextField(
+                            title: 'Tax Rate',
+                            hint: '0.0',
+                            isEnabled: true,
+                            textController: taxRateController,
+                            onPressedAction: null,
+                            widget: Text('%', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
+                          BuildTextField(
+                            title: 'Original Price',
+                            hint: '0.0',
+                            isEnabled: true,
+                            textController: originalPriceController,
+                            onPressedAction: null,
+                            widget: Text('\$', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
+
+                        ],
+                      ),
+                    ),
+                    //Result
+                    Row(
+                      children: [
+                        BuildResultCard(title: 'Tax', value: tax.toStringAsFixed(2),),
+                        BuildResultCard(title: 'Total Price', value: totalPrice.toStringAsFixed(2),),
+                      ],
+                    ),
 
                   ],
                 ),
               ),
-              //Result
-              Row(
-                children: [
-                  BuildResultCard(title: 'Tax', value: tax.toStringAsFixed(2),),
-                  BuildResultCard(title: 'Total Price', value: totalPrice.toStringAsFixed(2),),
-                ],
-              ),
-
-            ],
-          ),
+            ),
+            BuildBannerAd(width: ScreenConfig.screenWidth, height: 50,),
+          ],
         ),
       ),
     );

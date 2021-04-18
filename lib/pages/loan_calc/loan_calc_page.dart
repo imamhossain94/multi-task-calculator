@@ -1,9 +1,11 @@
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:multi_task_calculator/components/build_banner_ad.dart';
 import 'package:multi_task_calculator/components/build_result_card.dart';
 import 'package:multi_task_calculator/components/build_text_field.dart';
 import 'package:multi_task_calculator/pages/loan_calc/components/loan_type_picker.dart';
+import 'package:multi_task_calculator/services/google_ad_service.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:multi_task_calculator/utils/extensions.dart';
 import 'package:multi_task_calculator/utils/screen_config.dart';
@@ -27,8 +29,11 @@ class _LoanCalcPageState extends State<LoanCalcPage> {
   double totalCostResult, monthlyPaymentResult, youCouldBorrow;
 
 
+  GoogleAdService _googleAdService = GoogleAdService();
+
   @override
   void initState() {
+    _googleAdService.initAd();
     totalCostResult = 0.0;
     monthlyPaymentResult = 0.0;
     youCouldBorrow = 0.0;
@@ -125,83 +130,93 @@ class _LoanCalcPageState extends State<LoanCalcPage> {
           elevation: 0,
           actions: [
             IconButton(
-              onPressed: ()=> resetPage(context, LoanCalcPage()),
+              onPressed: () async {
+                await _googleAdService.showInterstitialAd();
+                resetPage(context, loanCalcPage);
+              },
               icon: Icon(Icons.refresh_rounded),
               tooltip: 'Reset',
             )
           ],
         ),
-        body: SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                margin: EdgeInsets.all(10),
-                padding: EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                    color: ThemesMode.isDarkMode?Colors.black:textWhite,
-                    borderRadius: BorderRadius.circular(5),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.grey.withOpacity(0.9),
-                          blurRadius: 0.5,
-                          spreadRadius: 0.5,
-                          offset: Offset.zero
-                      )
-                    ]
-                ),
+        body: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    LoanTypePicker(
-                      title: 'Mortgage Type',
-                      valueChanged: (String value) {
-                        setState(() {
-                          print(value);
-                          mortgageType = value;
-                          updateResult();
-                        });
-                      },
-                    ),
-                    BuildTextField(
-                      title: mortgageType == 'Monthly Cost'?'Mortgage Amount':'Monthly Payment',
-                      hint: '0.0',
-                      isEnabled: true,
-                      textController: mortgageType == 'Monthly Cost'?mortgageAmountController:monthlyPaymentController,
-                      onPressedAction: null,
-                      widget: Text('\$', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-                    BuildTextField(
-                      title: 'Interest Rate',
-                      hint: '0.0',
-                      isEnabled: true,
-                      textController: interestRateController,
-                      onPressedAction: null,
-                      widget: Text('%', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
+                    Container(
+                      margin: EdgeInsets.all(10),
+                      padding: EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                          color: ThemesMode.isDarkMode?Colors.black:textWhite,
+                          borderRadius: BorderRadius.circular(5),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.grey.withOpacity(0.9),
+                                blurRadius: 0.5,
+                                spreadRadius: 0.5,
+                                offset: Offset.zero
+                            )
+                          ]
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          LoanTypePicker(
+                            title: 'Mortgage Type',
+                            valueChanged: (String value) {
+                              setState(() {
+                                print(value);
+                                mortgageType = value;
+                                updateResult();
+                              });
+                            },
+                          ),
+                          BuildTextField(
+                            title: mortgageType == 'Monthly Cost'?'Mortgage Amount':'Monthly Payment',
+                            hint: '0.0',
+                            isEnabled: true,
+                            textController: mortgageType == 'Monthly Cost'?mortgageAmountController:monthlyPaymentController,
+                            onPressedAction: null,
+                            widget: Text('\$', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
+                          BuildTextField(
+                            title: 'Interest Rate',
+                            hint: '0.0',
+                            isEnabled: true,
+                            textController: interestRateController,
+                            onPressedAction: null,
+                            widget: Text('%', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
 
-                    BuildTextField(
-                      title: 'Period',
-                      hint: '0',
-                      isEnabled: true,
-                      textController: periodController,
-                      onPressedAction: null,
-                      widget: Text('yrs', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
+                          BuildTextField(
+                            title: 'Period',
+                            hint: '0',
+                            isEnabled: true,
+                            textController: periodController,
+                            onPressedAction: null,
+                            widget: Text('yrs', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
+                        ],
+                      ),
+                    ),
+
+                    Row(
+                      children: [
+                        BuildResultCard(title: 'Total Cost', value: totalCostResult.toStringAsFixed(2),),
+                        mortgageType == 'Monthly Cost'?
+                        BuildResultCard(title: 'Monthly Payments', value: monthlyPaymentResult.toStringAsFixed(2),):
+                        BuildResultCard(title: 'You Could Borrow', value: youCouldBorrow.toStringAsFixed(2),),
+                      ],
+                    ),
+
+                    buildSuggestion(),
                   ],
                 ),
               ),
-
-              Row(
-                children: [
-                  BuildResultCard(title: 'Total Cost', value: totalCostResult.toStringAsFixed(2),),
-                  mortgageType == 'Monthly Cost'?
-                  BuildResultCard(title: 'Monthly Payments', value: monthlyPaymentResult.toStringAsFixed(2),):
-                  BuildResultCard(title: 'You Could Borrow', value: youCouldBorrow.toStringAsFixed(2),),
-                ],
-              ),
-
-              buildSuggestion(),
-            ],
-          ),
+            ),
+            BuildBannerAd(width: ScreenConfig.screenWidth, height: 50,),
+          ],
         ),
       ),
     );

@@ -53,8 +53,7 @@ const String loanCalcPage = 'loan_calc_page';
 const String salesTaxCalcPage = 'sales_tax_calc_page';
 const String savingCalcPage = 'saving_calc_page';
 const String unitPriceCalcPage = 'unit_calc_page';
-
-
+const String premiumPage = 'premium_page';
 
 
 const String appTheme = "Theme";

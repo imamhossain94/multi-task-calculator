@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:multi_task_calculator/components/build_banner_ad.dart';
 import 'package:multi_task_calculator/pages/unit_converter/components/build_unit_converter_menu_pad.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:multi_task_calculator/utils/screen_config.dart';
@@ -49,10 +50,7 @@ class _UnitConverterPageState extends State<UnitConverterPage> {
                   ],
                 )
             ),
-            Container(
-              height: 60,
-              color: Colors.black12,
-            ),
+            BuildBannerAd(width: ScreenConfig.screenWidth, height: 50,),
           ],
         ),
       ),

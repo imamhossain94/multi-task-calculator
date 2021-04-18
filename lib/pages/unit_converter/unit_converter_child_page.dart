@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:multi_task_calculator/components/build_banner_ad.dart';
 import 'package:multi_task_calculator/pages/unit_converter/components/build_unit_text_field.dart';
 import 'package:multi_task_calculator/pages/unit_converter/models/unit_converter_helper.dart';
+import 'package:multi_task_calculator/services/google_ad_service.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:multi_task_calculator/utils/extensions.dart';
 import 'package:multi_task_calculator/utils/screen_config.dart';
@@ -9,8 +11,12 @@ import 'package:units_converter/units_converter.dart';
 //import 'package:unit_convert/unit_convert.dart';
 
 class UnitConverterChildPage extends StatefulWidget {
-  final String selectedUnit;
-  const UnitConverterChildPage({Key key, this.selectedUnit}) : super(key: key);
+  // final String selectedUnit;
+  // const UnitConverterChildPage({Key key, this.selectedUnit}) : super(key: key);
+
+  final arguments;
+  const UnitConverterChildPage({this.arguments});
+
   @override
   _UnitConverterChildPageState createState() => _UnitConverterChildPageState();
 }
@@ -23,14 +29,20 @@ class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
   var unitObj;
   Map<String, dynamic> allUnits;
   dynamic fromUnit, toUnit;
-  String fromUnitDisplay, removeString;
+  String fromUnitDisplay, removeString, selectedUnit;
   bool isLoading = true;
 
   List<UnitConversion> unitConversionList = [];
   double fromUnitValue;
 
+  GoogleAdService _googleAdService = GoogleAdService();
+
   @override
   void initState() {
+    _googleAdService.initAd();
+
+    selectedUnit = widget.arguments['selectedUnit'];
+
     fromUnitValue = 0.0;
     fromUnitController.text = '0.0';
     toUnitController.text = '0.0';
@@ -78,82 +90,82 @@ class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
       unitConversionList.clear();
     });
     setState(() {
-      if(widget.selectedUnit == UnitConversionHelper.angleUnit){
+      if(selectedUnit == UnitConversionHelper.angleUnit){
         removeString = 'ANGLE.';
         unitObj = Angle(significantFigures: 7, removeTrailingZeros: false);
         allUnits = AngleUnitsList;
         updateResult();
-      }else if(widget.selectedUnit == UnitConversionHelper.areaUnit){
+      }else if(selectedUnit == UnitConversionHelper.areaUnit){
         removeString = 'AREA.';
         unitObj = Area(significantFigures: 7, removeTrailingZeros: false);
         allUnits = AreaUnitsList;
         updateResult();
-      }else if(widget.selectedUnit == UnitConversionHelper.energyUnit){
+      }else if(selectedUnit == UnitConversionHelper.energyUnit){
         removeString = 'ENERGY.';
         unitObj = Energy(significantFigures: 7, removeTrailingZeros: false);
         allUnits = EnergyUnitsList;
         updateResult();
-      } else if(widget.selectedUnit == UnitConversionHelper.forceUnit){
+      } else if(selectedUnit == UnitConversionHelper.forceUnit){
         removeString = 'FORCE.';
         unitObj = Force(significantFigures: 7, removeTrailingZeros: false);
         allUnits = ForceUnitsList;
         updateResult();
-      }else if(widget.selectedUnit == UnitConversionHelper.lengthUnit){
+      }else if(selectedUnit == UnitConversionHelper.lengthUnit){
         removeString = 'LENGTH.';
         unitObj = Length(significantFigures: 7, removeTrailingZeros: false);
         allUnits = LengthUnitsList;
         updateResult();
-      }else if(widget.selectedUnit == UnitConversionHelper.powerUnit){
+      }else if(selectedUnit == UnitConversionHelper.powerUnit){
         removeString = 'POWER.';
         unitObj = Power(significantFigures: 7, removeTrailingZeros: false);
         allUnits = PowerUnitsList;
         updateResult();
-      }else if(widget.selectedUnit == UnitConversionHelper.pressureUnit){
+      }else if(selectedUnit == UnitConversionHelper.pressureUnit){
         removeString = 'PRESSURE.';
         unitObj = Pressure(significantFigures: 7, removeTrailingZeros: false);
         allUnits = PressureUnitsList;
         updateResult();
-      }else if(widget.selectedUnit == UnitConversionHelper.speedUnit){
+      }else if(selectedUnit == UnitConversionHelper.speedUnit){
         removeString = 'SPEED.';
         unitObj = Speed(significantFigures: 7, removeTrailingZeros: false);
         allUnits = SpeedUnitsList;
         updateResult();
-      }else if(widget.selectedUnit == UnitConversionHelper.storageUnit){
+      }else if(selectedUnit == UnitConversionHelper.storageUnit){
         removeString = 'DIGITAL_DATA.';
         unitObj = DigitalData(significantFigures: 7, removeTrailingZeros: false);
         allUnits = StorageUnitsList;
         updateResult();
-      }else if(widget.selectedUnit == UnitConversionHelper.temperatureUnit){
+      }else if(selectedUnit == UnitConversionHelper.temperatureUnit){
         removeString = 'TEMPERATURE.';
         unitObj = Temperature(significantFigures: 7, removeTrailingZeros: false);
         allUnits = TemperatureUnitsList;
         updateResult();
-      }else if(widget.selectedUnit == UnitConversionHelper.timeUnit){
+      }else if(selectedUnit == UnitConversionHelper.timeUnit){
         removeString = 'TIME.';
         unitObj = Time(significantFigures: 7, removeTrailingZeros: false);
         allUnits = TimeUnitsList;
         updateResult();
-      }else if(widget.selectedUnit == UnitConversionHelper.volumeUnit){
+      }else if(selectedUnit == UnitConversionHelper.volumeUnit){
         removeString = 'VOLUME.';
         unitObj = Volume(significantFigures: 7, removeTrailingZeros: false);
         allUnits = VolumeUnitsList;
         updateResult();
-      }else if(widget.selectedUnit == UnitConversionHelper.weightUnit){
+      }else if(selectedUnit == UnitConversionHelper.weightUnit){
         removeString = 'MASS.';
         unitObj = Mass(significantFigures: 7, removeTrailingZeros: false);
         allUnits = WeightUnitsList;
         updateResult();
-      }else if(widget.selectedUnit == UnitConversionHelper.fuelUnit){
+      }else if(selectedUnit == UnitConversionHelper.fuelUnit){
         removeString = 'FUEL_CONSUMPTION.';
         unitObj = FuelConsumption(significantFigures: 7, removeTrailingZeros: false);
         allUnits = FuelUnitsList;
         updateResult();
-      }else if(widget.selectedUnit == UnitConversionHelper.torqueUnit){
+      }else if(selectedUnit == UnitConversionHelper.torqueUnit){
         removeString = 'TORQUE.';
         unitObj = Torque(significantFigures: 7, removeTrailingZeros: false);
         allUnits = TorqueUnitsList;
         updateResult();
-      }else if(widget.selectedUnit == UnitConversionHelper.shoeSizeUnit){
+      }else if(selectedUnit == UnitConversionHelper.shoeSizeUnit){
         removeString = 'SHOE_SIZE.';
         unitObj = ShoeSize(significantFigures: 7, removeTrailingZeros: false);
         allUnits = ShoeSizeUnitsList;
@@ -173,7 +185,7 @@ class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.selectedUnit,
+          title: Text(selectedUnit,
             style: TextStyle(
               fontFamily: fontAudioWide,
               fontSize: responsiveWidth(18)
@@ -182,14 +194,20 @@ class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
           elevation: 0,
           actions: [
             IconButton(
-              onPressed: ()=> resetPage(context, UnitConverterChildPage(selectedUnit: widget.selectedUnit,)),
+              onPressed: () async {
+                await _googleAdService.showInterstitialAd();
+                Navigator.popAndPushNamed(context, unitConverterChildPage, arguments: {
+                  'selectedUnit': selectedUnit,
+                });
+                //resetPage(context, unitConverterChildPage);
+              },
               icon: Icon(Icons.refresh),
               tooltip: 'Reset',
             )
           ],
         ),
         body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
               margin: EdgeInsets.all(10),
@@ -309,7 +327,8 @@ class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
                     ],
                   )
               ),
-            )
+            ),
+            BuildBannerAd(width: ScreenConfig.screenWidth, height: 50,),
           ],
         ),
       ),

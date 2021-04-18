@@ -1,9 +1,11 @@
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:multi_task_calculator/components/build_banner_ad.dart';
 import 'package:multi_task_calculator/components/build_result_card.dart';
 import 'package:multi_task_calculator/components/build_text_field.dart';
 import 'package:multi_task_calculator/pages/savings_calc/components/build_savings_value_picker.dart';
+import 'package:multi_task_calculator/services/google_ad_service.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:multi_task_calculator/utils/extensions.dart';
 import 'package:multi_task_calculator/utils/screen_config.dart';
@@ -27,8 +29,11 @@ class _SavingsCalcPageState extends State<SavingsCalcPage> {
   double savingsResult;
 
 
+  GoogleAdService _googleAdService = GoogleAdService();
+
   @override
   void initState() {
+    _googleAdService.initAd();
     savingsResult = 0.0;
     frequencies = MapEntry('Weekly', 7);
     calculateLoan();
@@ -72,7 +77,6 @@ class _SavingsCalcPageState extends State<SavingsCalcPage> {
       double _contribution = double.tryParse(contribution) ?? 0.0;
       double _interestRate = double.tryParse(interestRate)??0.0;
       int _timePeriod = int.tryParse(timePeriod)??0;
-
       double r = _interestRate/100/365;
       double C = _contribution;
       double P = _principal;
@@ -124,87 +128,97 @@ class _SavingsCalcPageState extends State<SavingsCalcPage> {
           elevation: 0,
           actions: [
             IconButton(
-              onPressed: ()=> resetPage(context, SavingsCalcPage()),
+              onPressed: () async {
+                await _googleAdService.showInterstitialAd();
+                resetPage(context, savingCalcPage);
+              },
               icon: Icon(Icons.refresh_rounded),
               tooltip: 'Reset',
             )
           ],
         ),
-        body: SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                margin: EdgeInsets.all(10),
-                padding: EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                    color: ThemesMode.isDarkMode?Colors.black:textWhite,
-                    borderRadius: BorderRadius.circular(5),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.grey.withOpacity(0.9),
-                          blurRadius: 0.5,
-                          spreadRadius: 0.5,
-                          offset: Offset.zero
-                      )
-                    ]
-                ),
+        body: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    BuildSavingsValuePicker(
-                      title: 'Frequency',
-                      frequencyName: frequencies.key,
-                      onPressedAction: () {
-                        pickFrequency(
-                          context: context,
-                            valueChanged:(value){
-                              setState(() {
-                                frequencies = value;
-                              });
-                            }
-                        );
-                      },
+                    Container(
+                      margin: EdgeInsets.all(10),
+                      padding: EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                          color: ThemesMode.isDarkMode?Colors.black:textWhite,
+                          borderRadius: BorderRadius.circular(5),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.grey.withOpacity(0.9),
+                                blurRadius: 0.5,
+                                spreadRadius: 0.5,
+                                offset: Offset.zero
+                            )
+                          ]
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          BuildSavingsValuePicker(
+                            title: 'Frequency',
+                            frequencyName: frequencies.key,
+                            onPressedAction: () {
+                              pickFrequency(
+                                context: context,
+                                  valueChanged:(value){
+                                    setState(() {
+                                      frequencies = value;
+                                    });
+                                  }
+                              );
+                            },
+                          ),
+                          BuildTextField(
+                            title: 'Principle',
+                            hint: '0.0',
+                            isEnabled: true,
+                            textController: principalController,
+                            onPressedAction: null,
+                            widget: Text('\$', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
+                          BuildTextField(
+                            title: 'Contribution',
+                            hint: '0.0',
+                            isEnabled: true,
+                            textController: contributionController,
+                            onPressedAction: null,
+                            widget: Text('\$', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
+                          BuildTextField(
+                            title: 'Interest Rate',
+                            hint: '0.0',
+                            isEnabled: true,
+                            textController: interestRateController,
+                            onPressedAction: null,
+                            widget: Text('%', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
+                          BuildTextField(
+                            title: 'Time Period',
+                            hint: '0',
+                            isEnabled: true,
+                            textController: timePeriodController,
+                            onPressedAction: null,
+                            widget: Text('yrs', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
+                        ],
+                      ),
                     ),
-                    BuildTextField(
-                      title: 'Principle',
-                      hint: '0.0',
-                      isEnabled: true,
-                      textController: principalController,
-                      onPressedAction: null,
-                      widget: Text('\$', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-                    BuildTextField(
-                      title: 'Contribution',
-                      hint: '0.0',
-                      isEnabled: true,
-                      textController: contributionController,
-                      onPressedAction: null,
-                      widget: Text('\$', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-                    BuildTextField(
-                      title: 'Interest Rate',
-                      hint: '0.0',
-                      isEnabled: true,
-                      textController: interestRateController,
-                      onPressedAction: null,
-                      widget: Text('%', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-                    BuildTextField(
-                      title: 'Time Period',
-                      hint: '0',
-                      isEnabled: true,
-                      textController: timePeriodController,
-                      onPressedAction: null,
-                      widget: Text('yrs', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
+                    Row(
+                      children: [
+                        BuildResultCard(title: 'Savings Result', value: savingsResult.toStringAsFixed(2),),
+                      ],
+                    ),
                   ],
                 ),
               ),
-              Row(
-                children: [
-                  BuildResultCard(title: 'Savings Result', value: savingsResult.toStringAsFixed(2),),
-                ],
-              ),
-            ],
-          ),
+            ),
+            BuildBannerAd(width: ScreenConfig.screenWidth, height: 50,),
+          ],
         ),
       ),
     );

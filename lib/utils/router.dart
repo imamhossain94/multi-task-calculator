@@ -8,6 +8,7 @@ import 'package:multi_task_calculator/pages/general_calc_page/general_calc_page.
 import 'package:multi_task_calculator/pages/health_calc/health_calc_page.dart';
 import 'package:multi_task_calculator/pages/home_page/home_page.dart';
 import 'package:multi_task_calculator/pages/loan_calc/loan_calc_page.dart';
+import 'package:multi_task_calculator/pages/premium_page.dart';
 import 'package:multi_task_calculator/pages/sales_tax_calc/sales_tax_calc_page.dart';
 import 'package:multi_task_calculator/pages/savings_calc/savings_calc_page.dart';
 import 'package:multi_task_calculator/pages/splash_page.dart';
@@ -55,7 +56,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return PageTransition(child: UnitConverterPage(), type: PageTransitionType.rightToLeft, settings: settings,);
       break;
     case unitConverterChildPage:
-      return PageTransition(child: UnitConverterChildPage(), type: PageTransitionType.fade, settings: settings,);
+      return PageTransition(child: UnitConverterChildPage(arguments: settings.arguments), type: PageTransitionType.fade, settings: settings,);
       break;
     case numberBaseConverterPage:
       return PageTransition(child: NumberBaseConverterPage(), type: PageTransitionType.fade, settings: settings,);
@@ -89,6 +90,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       break;
     case unitPriceCalcPage:
       return PageTransition(child: UnitPriceCalcPage(), type: PageTransitionType.fade, settings: settings,);
+      break;
+    case premiumPage:
+      return PageTransition(child: PremiumPage(), type: PageTransitionType.fade, settings: settings,);
       break;
 
     default:

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:multi_task_calculator/components/build_banner_ad.dart';
 import 'package:multi_task_calculator/components/build_result_card.dart';
 import 'package:multi_task_calculator/components/build_text_field.dart';
 import 'package:multi_task_calculator/components/build_value_slider.dart';
 import 'package:multi_task_calculator/pages/unit_price_calc/components/build_header_item.dart';
 import 'package:multi_task_calculator/pages/unit_price_calc/components/build_unit_price_row.dart';
+import 'package:multi_task_calculator/services/google_ad_service.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:multi_task_calculator/utils/extensions.dart';
 import 'package:multi_task_calculator/utils/screen_config.dart';
@@ -20,8 +22,11 @@ class _UnitPriceCalcPageState extends State<UnitPriceCalcPage> {
   TextEditingController tipAmountController = TextEditingController();
   TextEditingController taxAmountController = TextEditingController();
 
+  GoogleAdService _googleAdService = GoogleAdService();
+
   @override
   void initState() {
+    _googleAdService.initAd();
     super.initState();
   }
 
@@ -50,45 +55,55 @@ class _UnitPriceCalcPageState extends State<UnitPriceCalcPage> {
           elevation: 0,
           actions: [
             IconButton(
-              onPressed: () => resetPage(context, UnitPriceCalcPage()),
+              onPressed: () async {
+                await _googleAdService.showInterstitialAd();
+                resetPage(context, unitPriceCalcPage);
+              },
               icon: Icon(Icons.refresh_rounded),
               tooltip: 'Reset',
             )
           ],
         ),
-        body: SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                margin: EdgeInsets.all(10),
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                    color: ThemesMode.isDarkMode ? Colors.black : textWhite,
-                    borderRadius: BorderRadius.circular(5),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.grey.withOpacity(0.9),
-                          blurRadius: 0.5,
-                          spreadRadius: 0.5,
-                          offset: Offset.zero)
-                    ]),
+        body: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    buildUnitPriceHeader(),
-                    BuildUnitPriceRow(),
-                    BuildUnitPriceRow(),
-                    BuildUnitPriceRow(),
-                    BuildUnitPriceRow(),
-                    BuildUnitPriceRow(),
-                    BuildUnitPriceRow(),
+                    Container(
+                      margin: EdgeInsets.all(10),
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                          color: ThemesMode.isDarkMode ? Colors.black : textWhite,
+                          borderRadius: BorderRadius.circular(5),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.grey.withOpacity(0.9),
+                                blurRadius: 0.5,
+                                spreadRadius: 0.5,
+                                offset: Offset.zero)
+                          ]),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          buildUnitPriceHeader(),
+                          BuildUnitPriceRow(),
+                          BuildUnitPriceRow(),
+                          BuildUnitPriceRow(),
+                          BuildUnitPriceRow(),
+                          BuildUnitPriceRow(),
+                          BuildUnitPriceRow(),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+            BuildBannerAd(width: ScreenConfig.screenWidth, height: 50,),
+          ],
         ),
       ),
     );

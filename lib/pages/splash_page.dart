@@ -24,7 +24,6 @@ class _SplashPageState extends State<SplashPage> {
     checkForUpdate();
   }
 
-
   void checkForUpdate() async{
     Version latestAppVersion, currentAppVersion;
     bool forceUpdate;

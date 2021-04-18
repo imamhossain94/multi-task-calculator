@@ -83,9 +83,7 @@ class _BuildAppDrawerState extends State<BuildAppDrawer> {
                     color: textAmber,
                   ),
                   text: 'Premium',
-                  onTap: () {
-                    Share.share('Hey check out this android app $appLink');
-                  }),
+                  onTap: () => Navigator.pushNamed(context, premiumPage)),
               BuildDrawerBodyItem(
                   icon: Icon(
                     Icons.star_rate_rounded,

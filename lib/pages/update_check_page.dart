@@ -70,7 +70,7 @@ class _UpdateCheckPageState extends State<UpdateCheckPage> {
           //backgroundColor: Colors.white,
           appBar: AppBar(
             centerTitle: true,
-            elevation: 2,
+            elevation: 0,
             title: Text(
               'About',
               style: TextStyle(
@@ -144,10 +144,10 @@ class _UpdateCheckPageState extends State<UpdateCheckPage> {
     return Container(
       alignment: Alignment.center,
       child: Text(
-          'NO\nUPDATE\nAVAILABLE',
+          'NO UPDATE',
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: responsiveText(40),
+            fontSize: responsiveText(34),
             fontFamily: fontAudioWide,
             color: ThemesMode.isDarkMode?Colors.white12:Colors.black12
           )

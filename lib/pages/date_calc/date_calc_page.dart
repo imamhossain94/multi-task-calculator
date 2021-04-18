@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_holo_date_picker/flutter_holo_date_picker.dart';
+import 'package:multi_task_calculator/components/build_banner_ad.dart';
 import 'package:multi_task_calculator/components/build_result_card.dart';
 import 'package:multi_task_calculator/components/build_text_field.dart';
 import 'package:multi_task_calculator/components/build_value_slider.dart';
+import 'package:multi_task_calculator/services/google_ad_service.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:multi_task_calculator/utils/extensions.dart';
 import 'package:multi_task_calculator/utils/screen_config.dart';
@@ -23,8 +25,11 @@ class _DateCalcPageState extends State<DateCalcPage> {
 
   String resultYears, resultMonths, resultDays;
 
+  GoogleAdService _googleAdService = GoogleAdService();
+
   @override
   void initState() {
+    _googleAdService.initAd();
     resultYears = '0';
     resultMonths = '0';
     resultDays = '0';
@@ -62,105 +67,115 @@ class _DateCalcPageState extends State<DateCalcPage> {
           elevation: 0,
           actions: [
             IconButton(
-              onPressed: ()=> resetPage(context, DateCalcPage()),
+              onPressed: () async {
+                await _googleAdService.showInterstitialAd();
+                resetPage(context, dateCalcPage);
+              },
               icon: Icon(Icons.refresh_rounded),
               tooltip: 'Reset',
             )
           ],
         ),
-        body: SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                margin: EdgeInsets.all(10),
-                padding: EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                    color: ThemesMode.isDarkMode?Colors.black:textWhite,
-                    borderRadius: BorderRadius.circular(5),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.grey.withOpacity(0.9),
-                          blurRadius: 0.5,
-                          spreadRadius: 0.5,
-                          offset: Offset.zero
-                      )
-                    ]
-                ),
+        body: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    BuildTextField(
-                      title: 'From Date',
-                      hint: 'dd/mm/yyyy'.toUpperCase(),
-                      isEnabled: false,
-                      textController: fromDateController,
-                      onPressedAction: () async{
-                        pickDateTime(context: context,
+                    Container(
+                      margin: EdgeInsets.all(10),
+                      padding: EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                          color: ThemesMode.isDarkMode?Colors.black:textWhite,
+                          borderRadius: BorderRadius.circular(5),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.grey.withOpacity(0.9),
+                                blurRadius: 0.5,
+                                spreadRadius: 0.5,
+                                offset: Offset.zero
+                            )
+                          ]
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          BuildTextField(
                             title: 'From Date',
-                            valueChanged: (v){
-                              //print(v);
-                              fromDate = v;
-                              fromDateController.text = v.toString().substring(0,10);
-                              int days = toDate.difference(fromDate).inDays;
-                              print(days);
-                              setState(() {
-                                resultYears = (days~/365).floor().toString();
-                                resultMonths = ((days%365)~/12).toString();
-                                resultDays = (((days%365)%12)).toString();
-                              });
-                            }
-                        );
+                            hint: 'dd/mm/yyyy'.toUpperCase(),
+                            isEnabled: false,
+                            textController: fromDateController,
+                            onPressedAction: () async{
+                              pickDateTime(context: context,
+                                  title: 'From Date',
+                                  valueChanged: (v){
+                                    //print(v);
+                                    fromDate = v;
+                                    fromDateController.text = v.toString().substring(0,10);
+                                    int days = toDate.difference(fromDate).inDays;
+                                    print(days);
+                                    setState(() {
+                                      resultYears = (days~/365).floor().toString();
+                                      resultMonths = ((days%365)~/12).toString();
+                                      resultDays = (((days%365)%12)).toString();
+                                    });
+                                  }
+                              );
 
-                      },
-                      widget: Icon(Icons.date_range_rounded, size: responsiveText(18),),),
+                            },
+                            widget: Icon(Icons.date_range_rounded, size: responsiveText(18),),),
 
-                    BuildTextField(
-                      title: 'To Date',
-                      hint: 'dd/mm/yyyy'.toUpperCase(),
-                      isEnabled: false,
-                      textController: toDateController,
-                      onPressedAction: () async{
-                        pickDateTime(context: context,
-                          title: 'To Date',
-                          valueChanged: (v){
-                            toDate = v;
-                            toDateController.text = v.toString().substring(0,10);
-                            int days = toDate.difference(fromDate).inDays;
-                            print(days);
-                            setState(() {
-                              resultYears = (days~/365).floor().toString();
-                              resultMonths = ((days%365)~/12).toString();
-                              resultDays = (((days%365)%12)).toString();
-                            });
-                          }
-                        );
+                          BuildTextField(
+                            title: 'To Date',
+                            hint: 'dd/mm/yyyy'.toUpperCase(),
+                            isEnabled: false,
+                            textController: toDateController,
+                            onPressedAction: () async{
+                              pickDateTime(context: context,
+                                title: 'To Date',
+                                valueChanged: (v){
+                                  toDate = v;
+                                  toDateController.text = v.toString().substring(0,10);
+                                  int days = toDate.difference(fromDate).inDays;
+                                  print(days);
+                                  setState(() {
+                                    resultYears = (days~/365).floor().toString();
+                                    resultMonths = ((days%365)~/12).toString();
+                                    resultDays = (((days%365)%12)).toString();
+                                  });
+                                }
+                              );
 
-                        // print(toDate);
-                        // toDateController.text = toDate.toString();
-                        // int days = toDate.difference(fromDate).inHours;
-                        // print(days);
-                        // setState(() {
-                        //   resultYears = (days~/365).toString();
-                        //   resultMonths = (days~/12).toString();
-                        //   resultDays = (days).toString();
-                        // });
-                      },
-                      widget: Icon(Icons.date_range_rounded, size: responsiveText(18),),),
+                              // print(toDate);
+                              // toDateController.text = toDate.toString();
+                              // int days = toDate.difference(fromDate).inHours;
+                              // print(days);
+                              // setState(() {
+                              //   resultYears = (days~/365).toString();
+                              //   resultMonths = (days~/12).toString();
+                              //   resultDays = (days).toString();
+                              // });
+                            },
+                            widget: Icon(Icons.date_range_rounded, size: responsiveText(18),),),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        BuildResultCard(title: 'Years', value: resultYears,),
+                        BuildResultCard(title: 'Month', value: resultMonths,),
+                        BuildResultCard(title: 'Days', value: resultDays,),
+                      ],
+                    ),
+
                   ],
                 ),
               ),
-              Row(
-                children: [
-                  BuildResultCard(title: 'Years', value: resultYears,),
-                  BuildResultCard(title: 'Month', value: resultMonths,),
-                  BuildResultCard(title: 'Days', value: resultDays,),
-                ],
-              ),
-
-            ],
-          ),
+            ),
+            BuildBannerAd(width: 320, height: 250,),
+          ],
         ),
       ),
     );

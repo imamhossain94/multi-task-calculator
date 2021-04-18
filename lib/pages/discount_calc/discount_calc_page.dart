@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:multi_task_calculator/components/build_banner_ad.dart';
 import 'package:multi_task_calculator/components/build_result_card.dart';
 import 'package:multi_task_calculator/components/build_text_field.dart';
+import 'package:multi_task_calculator/services/google_ad_service.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:multi_task_calculator/utils/extensions.dart';
 import 'package:multi_task_calculator/utils/screen_config.dart';
@@ -14,7 +16,6 @@ class DiscountCalcPage extends StatefulWidget {
 
 class _DiscountCalcPageState extends State<DiscountCalcPage> {
 
-
   TextEditingController originalAmountController = TextEditingController();
   TextEditingController addedTaxController = TextEditingController();
   TextEditingController discountPercentageController = TextEditingController();
@@ -22,9 +23,11 @@ class _DiscountCalcPageState extends State<DiscountCalcPage> {
   String originalAmount, addedTax, discountPercentage;
   double amountSaved, finalPrice;
 
+  GoogleAdService _googleAdService = GoogleAdService();
 
   @override
   void initState() {
+    _googleAdService.initAd();
     amountSaved = 0.0;
     finalPrice = 0.0;
     calculateDiscount();
@@ -87,73 +90,84 @@ class _DiscountCalcPageState extends State<DiscountCalcPage> {
           elevation: 0,
           actions: [
             IconButton(
-              onPressed: ()=> resetPage(context, DiscountCalcPage()),
+              onPressed: () async {
+                await _googleAdService.showInterstitialAd();
+                resetPage(context, discountCalcPage);
+              },
               icon: Icon(Icons.refresh),
               tooltip: 'Refresh',
             )
           ],
         ),
-        body: SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                margin: EdgeInsets.all(10),
-                padding: EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                    color: ThemesMode.isDarkMode?Colors.black:textWhite,
-                    borderRadius: BorderRadius.circular(5),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.grey.withOpacity(0.9),
-                          blurRadius: 0.5,
-                          spreadRadius: 0.5,
-                          offset: Offset.zero
-                      )
-                    ]
-                ),
+        body: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    BuildTextField(
-                      title: 'Original Price',
-                      hint: '0.0',
-                      isEnabled: true,
-                      textController: originalAmountController,
-                      onPressedAction: null,
-                      widget: Text('\$', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-                    BuildTextField(
-                      title: 'Added Tax',
-                      hint: '0.0',
-                      isEnabled: true,
-                      textController: addedTaxController,
-                      onPressedAction: null,
-                      widget: Text('%', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-                    BuildTextField(
-                      title: 'Discount Percentage',
-                      hint: '0.0',
-                      isEnabled: true,
-                      textController: discountPercentageController,
-                      onPressedAction: null,
-                      widget: Text('%', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
+                    Container(
+                      margin: EdgeInsets.all(10),
+                      padding: EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                          color: ThemesMode.isDarkMode?Colors.black:textWhite,
+                          borderRadius: BorderRadius.circular(5),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.grey.withOpacity(0.9),
+                                blurRadius: 0.5,
+                                spreadRadius: 0.5,
+                                offset: Offset.zero
+                            )
+                          ]
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          BuildTextField(
+                            title: 'Original Price',
+                            hint: '0.0',
+                            isEnabled: true,
+                            textController: originalAmountController,
+                            onPressedAction: null,
+                            widget: Text('\$', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
+                          BuildTextField(
+                            title: 'Added Tax',
+                            hint: '0.0',
+                            isEnabled: true,
+                            textController: addedTaxController,
+                            onPressedAction: null,
+                            widget: Text('%', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
+                          BuildTextField(
+                            title: 'Discount Percentage',
+                            hint: '0.0',
+                            isEnabled: true,
+                            textController: discountPercentageController,
+                            onPressedAction: null,
+                            widget: Text('%', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
+                        ],
+                      ),
+                    ),
+                    //Result
+                    Row(
+                      children: [
+                        BuildResultCard(title: 'Amount Saved', value: amountSaved.toStringAsFixed(2),),
+                        BuildResultCard(title: 'Final Price', value: finalPrice.toStringAsFixed(2),),
+                      ],
+                    ),
                   ],
                 ),
               ),
-              //Result
-              Row(
-                children: [
-                  BuildResultCard(title: 'Amount Saved', value: amountSaved.toStringAsFixed(2),),
-                  BuildResultCard(title: 'Final Price', value: finalPrice.toStringAsFixed(2),),
-                ],
-              ),
-
-            ],
-          ),
+            ),
+            BuildBannerAd(width: ScreenConfig.screenWidth, height: 50,),
+          ],
         ),
       ),
     );
   }
+
+
 
 
 

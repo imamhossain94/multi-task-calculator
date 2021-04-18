@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:multi_task_calculator/components/build_banner_ad.dart';
 import 'package:multi_task_calculator/components/build_result_card.dart';
 import 'package:multi_task_calculator/components/build_text_field.dart';
 import 'package:multi_task_calculator/pages/health_calc/components/build_gender_picker.dart';
+import 'package:multi_task_calculator/services/google_ad_service.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:multi_task_calculator/utils/extensions.dart';
 import 'package:multi_task_calculator/utils/screen_config.dart';
@@ -22,8 +24,11 @@ class _HealthCalcPageState extends State<HealthCalcPage> {
   String height, weight, age, gender, status;
   double bmi, bmr;
 
+  GoogleAdService _googleAdService = GoogleAdService();
+
   @override
   void initState() {
+    _googleAdService.initAd();
     bmi = 0.0;
     bmr = 0.0;
     gender = 'Male';
@@ -114,107 +119,117 @@ class _HealthCalcPageState extends State<HealthCalcPage> {
           elevation: 0,
           actions: [
             IconButton(
-              onPressed: ()=> resetPage(context, HealthCalcPage()),
+              onPressed: () async {
+                await _googleAdService.showInterstitialAd();
+                resetPage(context, healthCalcPage);
+              },
               icon: Icon(Icons.refresh),
               tooltip: 'Reset',
             )
           ],
         ),
-        body: SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                margin: EdgeInsets.all(10),
-                padding: EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                    color: ThemesMode.isDarkMode?Colors.black:textWhite,
-                    borderRadius: BorderRadius.circular(5),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.grey.withOpacity(0.9),
-                          blurRadius: 0.5,
-                          spreadRadius: 0.5,
-                          offset: Offset.zero
-                      )
-                    ]
-                ),
+        body: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Container(
+                      margin: EdgeInsets.all(10),
+                      padding: EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                          color: ThemesMode.isDarkMode?Colors.black:textWhite,
+                          borderRadius: BorderRadius.circular(5),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.grey.withOpacity(0.9),
+                                blurRadius: 0.5,
+                                spreadRadius: 0.5,
+                                offset: Offset.zero
+                            )
+                          ]
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
 
-                    BuildGenderPicker(
-                      valueChanged: (String value) {
-                        print(value);
-                        setState(() {
-                          gender = value;
-                          updateResult();
-                        });
+                          BuildGenderPicker(
+                            valueChanged: (String value) {
+                              print(value);
+                              setState(() {
+                                gender = value;
+                                updateResult();
+                              });
 
-                      },
-                      title: 'Gender',
+                            },
+                            title: 'Gender',
+                          ),
+
+                          BuildTextField(
+                            title: 'Height',
+                            hint: '0.0',
+                            isEnabled: true,
+                            textController: heightController,
+                            onPressedAction: null,
+                            widget: Text('cm', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
+                          BuildTextField(
+                            title: 'Weight',
+                            hint: '0.0',
+                            isEnabled: true,
+                            textController: weightController,
+                            onPressedAction: null,
+                            widget: Text('kg', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
+                          BuildTextField(
+                            title: 'Age',
+                            hint: '0.0',
+                            isEnabled: true,
+                            textController: ageController,
+                            onPressedAction: null,
+                            widget: Text('yrs', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
+                        ],
+                      ),
+                    ),
+                    //Result
+                    Row(
+                      children: [
+                        BuildResultCard(title: 'BMI', value: '${bmi.toStringAsFixed(2)}',),
+                        BuildResultCard(title: 'BMR', value: '${bmr.toStringAsFixed(2)}',),
+                      ],
                     ),
 
-                    BuildTextField(
-                      title: 'Height',
-                      hint: '0.0',
-                      isEnabled: true,
-                      textController: heightController,
-                      onPressedAction: null,
-                      widget: Text('cm', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-                    BuildTextField(
-                      title: 'Weight',
-                      hint: '0.0',
-                      isEnabled: true,
-                      textController: weightController,
-                      onPressedAction: null,
-                      widget: Text('kg', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-                    BuildTextField(
-                      title: 'Age',
-                      hint: '0.0',
-                      isEnabled: true,
-                      textController: ageController,
-                      onPressedAction: null,
-                      widget: Text('yrs', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
+                   status != null?
+                    Container(
+                      margin: EdgeInsets.all(10),
+                      padding: EdgeInsets.fromLTRB(5, 15, 5, 15),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                          color: ThemesMode.isDarkMode?Colors.black:backgroundLight,
+                          borderRadius: BorderRadius.circular(5),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.grey.withOpacity(0.9),
+                                blurRadius: 0.5,
+                                spreadRadius: 0.5,
+                                offset: Offset.zero
+                            )
+                          ]
+                      ),
+                      child: Text(
+                        'Status: $status',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: responsiveText(26), fontWeight: FontWeight.bold),
+                      ),
+                    ):SizedBox(),
+
+
                   ],
                 ),
               ),
-              //Result
-              Row(
-                children: [
-                  BuildResultCard(title: 'BMI', value: '${bmi.toStringAsFixed(2)}',),
-                  BuildResultCard(title: 'BMR', value: '${bmr.toStringAsFixed(2)}',),
-                ],
-              ),
-
-             status != null?
-              Container(
-                margin: EdgeInsets.all(10),
-                padding: EdgeInsets.fromLTRB(5, 15, 5, 15),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                    color: ThemesMode.isDarkMode?Colors.black:backgroundLight,
-                    borderRadius: BorderRadius.circular(5),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.grey.withOpacity(0.9),
-                          blurRadius: 0.5,
-                          spreadRadius: 0.5,
-                          offset: Offset.zero
-                      )
-                    ]
-                ),
-                child: Text(
-                  'Status: $status',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: responsiveText(26), fontWeight: FontWeight.bold),
-                ),
-              ):SizedBox(),
-
-
-            ],
-          ),
+            ),
+            BuildBannerAd(width: ScreenConfig.screenWidth, height: 50,),
+          ],
         ),
       ),
     );

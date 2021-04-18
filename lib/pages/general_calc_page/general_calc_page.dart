@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:multi_task_calculator/components/build_banner_ad.dart';
 import 'package:multi_task_calculator/pages/general_calc_page/components/build_calc_pad.dart';
+import 'package:multi_task_calculator/services/google_ad_service.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:multi_task_calculator/utils/extensions.dart';
 import 'package:multi_task_calculator/utils/screen_config.dart';
@@ -15,8 +17,11 @@ class _GeneralCalcPageState extends State<GeneralCalcPage> {
 
   String displayString='0', mathString='0', outputString='';
 
+  GoogleAdService _googleAdService = GoogleAdService();
+
   @override
   void initState() {
+    _googleAdService.initAd();
     //inputString = '0';
     super.initState();
   }
@@ -44,13 +49,7 @@ class _GeneralCalcPageState extends State<GeneralCalcPage> {
                 ),
                 tooltip: 'History',
                 onPressed: () async {
-                  // bool result = await onDeletePressed(context);
-                  // if (result) {
-                  //   setState(() {
-                  //     box.clear();
-                  //     _history.clear();
-                  //   });
-                  // }
+                  await _googleAdService.showInterstitialAd();
                 })
           ],
         ),
@@ -114,8 +113,7 @@ class _GeneralCalcPageState extends State<GeneralCalcPage> {
                     //Open advanced menu
                     showMoreMenu(context);
                   }else if(value == 'C'){
-                    //Clear screen
-                    resetPage(context, GeneralCalcPage());
+                    resetPage(context, generalCalcPage);
                   }else if((value == 'del') && (displayString != null)){
                     //Delete display character
                     if((len > 1)){
@@ -144,6 +142,8 @@ class _GeneralCalcPageState extends State<GeneralCalcPage> {
                 });
               },
             ),
+            SizedBox(height: 5,),
+            BuildBannerAd(width: ScreenConfig.screenWidth, height: 50,),
           ],
         ),
       ),

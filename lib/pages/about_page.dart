@@ -46,7 +46,7 @@ class _AboutPageState extends State<AboutPage> {
           //backgroundColor: Colors.white,
           appBar: AppBar(
             centerTitle: true,
-            elevation: 2,
+            elevation: 0.5,
             title: Text(
               'About',
               style: TextStyle(

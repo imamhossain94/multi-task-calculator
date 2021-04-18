@@ -131,12 +131,9 @@ class BuildUnitConverterMenuPad extends StatelessWidget {
   }
 
   void changePage({BuildContext context, var selectedUnit}){
-      Navigator.push(context, PageTransition(
-          type: PageTransitionType.fade,
-          child: UnitConverterChildPage(selectedUnit: selectedUnit,),
-          inheritTheme: true,
-          ctx: context),
-      );
+    Navigator.pushNamed(context, unitConverterChildPage, arguments: {
+      'selectedUnit': selectedUnit,
+    });
   }
 
 

@@ -26,7 +26,7 @@ class BuildPopupMenuButton extends StatelessWidget {
         if(index == 0){
           themeChoiceDialogue(context);
         }else if(index == 1){
-
+          Navigator.pushNamed(context, premiumPage);
         }else if(index == 2){
           onRatingPressed(context);
         }else if(index == 3){
