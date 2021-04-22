@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -22,38 +21,43 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   GlobalKey<ScaffoldState> _key = new GlobalKey<ScaffoldState>();
 
-
-  String rewardSeconds;
-  bool isLoading;
   Timer _timer;
+  //int rewardTime = 21600; //21600 second 360 minute or 6h
+  //int rewardTime = 14400; //14400 second 240 minute or 4h
+  int rewardSeconds; //120 second 2 minute ; uncomment for test
+
 
   @override
   void initState() {
-    isLoading = false;
     createTimer();
     super.initState();
   }
 
   @override
   void dispose() {
-    _timer.cancel();
+    if(_timer != null) {
+      _timer.cancel();
+    }
     super.dispose();
   }
 
   void createTimer() async{
     _timer = Timer.periodic(Duration(seconds: 1), (Timer t)=>
         setState((){
-          if(getAppPurchasedStatus() == true){
+          if(getAdFreeTime() != 'zero'){
             DateTime x = DateTime.now(), y = DateTime.tryParse(getAdFreeTime());
             int seconds = x.difference(y).inSeconds;
-            rewardSeconds = seconds.toString();
-            if(seconds == 21600){
+            rewardSeconds = seconds;
+            if(seconds >= rewardTime){
               t.cancel();
               rewardSeconds = null;
+              setAdFreeTime('zero');
               setAppPurchasedStatus(false);
             }
           }else{
-            rewardSeconds = null;
+            //rewardSeconds = null;
+            setAdFreeTime('zero');
+            setAppPurchasedStatus(false);
             t.cancel();
           }
         })
@@ -127,10 +131,10 @@ class _HomePageState extends State<HomePage> {
                     alignment: Alignment.center,
                     color: Colors.black12,
                     child: Text(
-                        '${(21600-int.parse(rewardSeconds))~/60}m ${(21600-int.parse(rewardSeconds))%60}s'
+                        '${(rewardTime-rewardSeconds)~/60}m ${(rewardTime-rewardSeconds)%60}s'
                     ),
                   ):
-              BuildBannerAd(width: ScreenConfig.screenWidth, height: 50,),
+              BuildBannerAd(),
             ],
           ),
         ),

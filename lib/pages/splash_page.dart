@@ -45,9 +45,9 @@ class _SplashPageState extends State<SplashPage> {
 
     if(latestAppVersion > currentAppVersion){
       if(forceUpdate){
-        emergencyUpdateDialogue(context);
+        emergencyUpdateDialogue(context, latestAppVersion.toString());
       }else{
-        if(!await appUpdateDialogue(context)){
+        if(!await appUpdateDialogue(context, latestAppVersion.toString())){
           Navigator.pushReplacementNamed(context, homePage);
         }
       }

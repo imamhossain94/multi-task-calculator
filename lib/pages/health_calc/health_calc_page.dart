@@ -24,11 +24,9 @@ class _HealthCalcPageState extends State<HealthCalcPage> {
   String height, weight, age, gender, status;
   double bmi, bmr;
 
-  GoogleAdService _googleAdService = GoogleAdService();
 
   @override
   void initState() {
-    _googleAdService.initAd();
     bmi = 0.0;
     bmr = 0.0;
     gender = 'Male';
@@ -120,7 +118,7 @@ class _HealthCalcPageState extends State<HealthCalcPage> {
           actions: [
             IconButton(
               onPressed: () async {
-                await _googleAdService.showInterstitialAd();
+                await showInterstitialAd();
                 resetPage(context, healthCalcPage);
               },
               icon: Icon(Icons.refresh),
@@ -222,13 +220,11 @@ class _HealthCalcPageState extends State<HealthCalcPage> {
                         style: TextStyle(fontSize: responsiveText(26), fontWeight: FontWeight.bold),
                       ),
                     ):SizedBox(),
-
-
                   ],
                 ),
               ),
             ),
-            BuildBannerAd(width: ScreenConfig.screenWidth, height: 50,),
+            BuildBannerAd(),
           ],
         ),
       ),

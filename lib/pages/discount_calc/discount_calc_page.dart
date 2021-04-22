@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:multi_task_calculator/components/build_banner_ad.dart';
 import 'package:multi_task_calculator/components/build_result_card.dart';
 import 'package:multi_task_calculator/components/build_text_field.dart';
@@ -23,11 +24,8 @@ class _DiscountCalcPageState extends State<DiscountCalcPage> {
   String originalAmount, addedTax, discountPercentage;
   double amountSaved, finalPrice;
 
-  GoogleAdService _googleAdService = GoogleAdService();
-
   @override
   void initState() {
-    _googleAdService.initAd();
     amountSaved = 0.0;
     finalPrice = 0.0;
     calculateDiscount();
@@ -91,7 +89,7 @@ class _DiscountCalcPageState extends State<DiscountCalcPage> {
           actions: [
             IconButton(
               onPressed: () async {
-                await _googleAdService.showInterstitialAd();
+                await showInterstitialAd();
                 resetPage(context, discountCalcPage);
               },
               icon: Icon(Icons.refresh),
@@ -160,7 +158,7 @@ class _DiscountCalcPageState extends State<DiscountCalcPage> {
                 ),
               ),
             ),
-            BuildBannerAd(width: ScreenConfig.screenWidth, height: 50,),
+            BuildBannerAd(),
           ],
         ),
       ),

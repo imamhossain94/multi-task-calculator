@@ -249,7 +249,7 @@ class _CurrencyCalcPageState extends State<CurrencyCalcPage> {
 
               ),
             ),
-            BuildBannerAd(width: ScreenConfig.screenWidth, height: 50,),
+            BuildBannerAd(),
           ],
         ),
       ),

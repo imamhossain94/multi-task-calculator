@@ -28,12 +28,8 @@ class _SavingsCalcPageState extends State<SavingsCalcPage> {
   MapEntry<String, int> frequencies;
   double savingsResult;
 
-
-  GoogleAdService _googleAdService = GoogleAdService();
-
   @override
   void initState() {
-    _googleAdService.initAd();
     savingsResult = 0.0;
     frequencies = MapEntry('Weekly', 7);
     calculateLoan();
@@ -129,7 +125,7 @@ class _SavingsCalcPageState extends State<SavingsCalcPage> {
           actions: [
             IconButton(
               onPressed: () async {
-                await _googleAdService.showInterstitialAd();
+                await showInterstitialAd();
                 resetPage(context, savingCalcPage);
               },
               icon: Icon(Icons.refresh_rounded),
@@ -217,7 +213,7 @@ class _SavingsCalcPageState extends State<SavingsCalcPage> {
                 ),
               ),
             ),
-            BuildBannerAd(width: ScreenConfig.screenWidth, height: 50,),
+            BuildBannerAd(),
           ],
         ),
       ),
@@ -271,11 +267,10 @@ class _SavingsCalcPageState extends State<SavingsCalcPage> {
                       padding: const EdgeInsets.only(left: 15),
                       child: Row(
                         children: [
-                          Text('Select Currency', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          Text('Select Frequency', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                           Spacer(),
                           IconButton(icon: Icon(Icons.close), onPressed: (){
                             Navigator.pop(context, false);
-                            return 'USD';
                           })
                         ],
                       )
@@ -306,7 +301,7 @@ class _SavingsCalcPageState extends State<SavingsCalcPage> {
                                     children: [
                                       Text(frequencyList[index].entries.elementAt(0).key, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                                       Spacer(),
-                                      Text(frequencyList[index].entries.elementAt(0).value.toString(), style: TextStyle()),
+                                      Text(frequencyList[index].entries.elementAt(0).value.toString() + ' Days', style: TextStyle()),
                                     ],
                                   ),
                                 )

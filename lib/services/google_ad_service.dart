@@ -3,38 +3,54 @@ import 'package:multi_task_calculator/services/shared_pref_services.dart';
 
 class GoogleAdService {
 
-  InterstitialAd _interstitialAd;
-  bool _interstitialReady = false;
+  static InterstitialAd interstitialAd;
+  static bool interstitialReady = false;
 
-  RewardedAd _rewardedAd;
-  bool _rewardedReady = false;
+  static RewardedAd rewardedAd;
+  static bool rewardedReady = false;
 
-  void initAd() async {
-    MobileAds.instance.initialize().then((InitializationStatus status) {
-      MobileAds.instance
-          .updateRequestConfiguration(RequestConfiguration(
-          tagForChildDirectedTreatment:
-          TagForChildDirectedTreatment.unspecified))
-          .then((void value) {
-        createInterstitialAd();
-        createRewardedAd();
+
+  void initInterstitialAd() async {
+    if(!getAppPurchasedStatus()){
+      MobileAds.instance.initialize().then((InitializationStatus status) {
+        MobileAds.instance
+            .updateRequestConfiguration(RequestConfiguration(
+            tagForChildDirectedTreatment:
+            TagForChildDirectedTreatment.unspecified))
+            .then((void value) {
+          createInterstitialAd();
+        });
       });
-    });
+    }
+  }
+
+  void initRewardedAd() async {
+    if(!getAppPurchasedStatus()){
+      MobileAds.instance.initialize().then((InitializationStatus status) {
+        MobileAds.instance
+            .updateRequestConfiguration(RequestConfiguration(
+            tagForChildDirectedTreatment:
+            TagForChildDirectedTreatment.unspecified))
+            .then((void value) {
+          createRewardedAd();
+        });
+      });
+    }
   }
 
   void createInterstitialAd() {
-    _interstitialAd ??= InterstitialAd(
+    interstitialAd ??= InterstitialAd(
       adUnitId: InterstitialAd.testAdUnitId,
       request: AdRequest(),
       listener: AdListener(
         onAdLoaded: (Ad ad) {
           print('${ad.runtimeType} loaded.');
-          _interstitialReady = true;
+          interstitialReady = true;
         },
         onAdFailedToLoad: (Ad ad, LoadAdError error) {
           print('${ad.runtimeType} failed to load: $error.');
           ad.dispose();
-          _interstitialAd = null;
+          interstitialAd = null;
           createInterstitialAd();
         },
         onAdOpened: (Ad ad) => print('${ad.runtimeType} onAdOpened.'),
@@ -49,20 +65,20 @@ class GoogleAdService {
     )..load();
   }
 
-
   void createRewardedAd() {
-    _rewardedAd ??= RewardedAd(
+    rewardedAd ??= RewardedAd(
       adUnitId: RewardedAd.testAdUnitId,
       request: AdRequest(),
       listener: AdListener(
           onAdLoaded: (Ad ad) {
             print('${ad.runtimeType} loaded.');
-            _rewardedReady = true;
+            rewardedReady = true;
+
           },
           onAdFailedToLoad: (Ad ad, LoadAdError error) {
             print('${ad.runtimeType} failed to load: $error');
             ad.dispose();
-            _rewardedAd = null;
+            rewardedAd = null;
             createRewardedAd();
           },
           onAdOpened: (Ad ad) => print('${ad.runtimeType} onAdOpened.'),
@@ -85,26 +101,31 @@ class GoogleAdService {
     )..load();
   }
 
+}
 
 
-  Future<bool> showInterstitialAd() async{
-    if (!_interstitialReady) return false;
-    _interstitialAd.show();
-    _interstitialReady = false;
-    _interstitialAd = null;
-    _interstitialAd?.dispose();
+Future<bool> showInterstitialAd() async{
+  if(!getAppPurchasedStatus()){
+    if (!GoogleAdService.interstitialReady) return false;
+    GoogleAdService.interstitialAd.show();
+    GoogleAdService.interstitialReady = false;
+    GoogleAdService.interstitialAd = null;
+    GoogleAdService.interstitialAd?.dispose();
     return true;
+  }else{
+    return false;
   }
+}
 
-  Future<bool> showRewardedAd() async{
-    if (!_rewardedReady) return false;
-    _rewardedAd.show();
-    _rewardedReady = false;
-    _rewardedAd = null;
-    _rewardedAd?.dispose();
+Future<bool> showRewardedAd() async{
+  if(!getAppPurchasedStatus()){
+    if (!GoogleAdService.rewardedReady) return false;
+    GoogleAdService.rewardedAd.show();
+    GoogleAdService.rewardedReady = false;
+    GoogleAdService.rewardedAd = null;
+    GoogleAdService.rewardedAd?.dispose();
     return true;
+  }else{
+    return false;
   }
-
-
-
 }

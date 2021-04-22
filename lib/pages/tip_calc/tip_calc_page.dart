@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:multi_task_calculator/components/build_banner_ad.dart';
 import 'package:multi_task_calculator/components/build_result_card.dart';
 import 'package:multi_task_calculator/components/build_text_field.dart';
-import 'package:multi_task_calculator/components/build_value_slider.dart';
 import 'package:multi_task_calculator/services/google_ad_service.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:multi_task_calculator/utils/extensions.dart';
@@ -26,11 +25,9 @@ class _TipCalcPageState extends State<TipCalcPage> {
   double finalAmount, amountPerPerson, tipPercentage, taxPercentage;
   bool tipAmountDollar = true, taxAmountDollar = true;
 
-  GoogleAdService _googleAdService = GoogleAdService();
 
   @override
   void initState() {
-    _googleAdService.initAd();
     finalAmount = 0.0;
     amountPerPerson = 0.0;
     calculateTip();
@@ -139,7 +136,7 @@ class _TipCalcPageState extends State<TipCalcPage> {
           actions: [
             IconButton(
               onPressed: () async {
-                await _googleAdService.showInterstitialAd();
+                await showInterstitialAd();
                 resetPage(context, tipCalcPage);
               },
               icon: Icon(Icons.refresh_rounded),
@@ -259,7 +256,7 @@ class _TipCalcPageState extends State<TipCalcPage> {
                 ),
               ),
             ),
-            BuildBannerAd(width: ScreenConfig.screenWidth, height: 50,),
+            BuildBannerAd(),
           ],
         ),
       ),

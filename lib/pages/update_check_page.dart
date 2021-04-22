@@ -72,7 +72,7 @@ class _UpdateCheckPageState extends State<UpdateCheckPage> {
             centerTitle: true,
             elevation: 0,
             title: Text(
-              'About',
+              'Software Update',
               style: TextStyle(
                   fontSize: responsiveText(22),
                   fontFamily: fontAudioWide,
@@ -173,7 +173,7 @@ class _UpdateCheckPageState extends State<UpdateCheckPage> {
           Padding(
             padding: const EdgeInsets.fromLTRB(15, 20, 15, 25),
             child: Text(
-                'Please update this app to continue with the new version: 1.0.2',
+                'Please update this app to continue with the new version: $latestAppVersion',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontSize: responsiveText(16),
@@ -217,7 +217,7 @@ class _UpdateCheckPageState extends State<UpdateCheckPage> {
           Padding(
             padding: const EdgeInsets.fromLTRB(15, 20, 15, 25),
             child: Text(
-                'A newer version (1.0.2) of this app is available',
+                'A newer version ($latestAppVersion) of this app is available',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontSize: responsiveText(16),

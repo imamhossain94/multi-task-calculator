@@ -94,25 +94,28 @@ class _BuildGenderPickerState extends State<BuildGenderPicker> {
           borderRadius: BorderRadius.circular(5),
           onTap: onPressed,
           child: Container(
-            height: responsiveHeight(120),
+            //height: responsiveHeight(120),
             width: responsiveWidth(55),
+            padding: EdgeInsets.fromLTRB(5, 5, 15, 5),
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: ThemesMode.isDarkMode?Colors.grey.withOpacity(active ? 0.3 : 0.15):Colors.grey.withOpacity(active ? 0.3 : 0.07),
               borderRadius: BorderRadius.circular(5),
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Icon(
                   icon,
-                  size: responsiveHeight(56),
+                  size: responsiveHeight(26),
                 ),
-                Text(title, style:
-                  TextStyle(
-                    fontSize: responsiveHeight(24),
-                    fontWeight: FontWeight.bold
-                  )
+                Expanded(
+                  child: Text(title, textAlign: TextAlign.center, style:
+                    TextStyle(
+                      fontSize: responsiveHeight(18),
+                      fontWeight: FontWeight.bold
+                    )
+                  ),
                 )
               ],
             ),

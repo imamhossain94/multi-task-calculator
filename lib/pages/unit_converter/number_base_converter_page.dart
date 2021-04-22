@@ -27,11 +27,8 @@ class _NumberBaseConverterPageState extends State<NumberBaseConverterPage> {
   List<UnitConversion> unitConversionList = [];
   String fromUnitValue;
 
-  GoogleAdService _googleAdService = GoogleAdService();
-
   @override
   void initState() {
-    _googleAdService.initAd();
     fromUnitValue = '0';
     fromUnitController.text = '0';
     toUnitController.text = '0';
@@ -103,7 +100,7 @@ class _NumberBaseConverterPageState extends State<NumberBaseConverterPage> {
           actions: [
             IconButton(
               onPressed: () async {
-                await _googleAdService.showInterstitialAd();
+                await showInterstitialAd();
                 resetPage(context, numberBaseConverterPage);
               },
               icon: Icon(Icons.refresh),
@@ -237,7 +234,7 @@ class _NumberBaseConverterPageState extends State<NumberBaseConverterPage> {
                   )
               ),
             ),
-            BuildBannerAd(width: ScreenConfig.screenWidth, height: 50,),
+            BuildBannerAd(),
           ],
         ),
       ),

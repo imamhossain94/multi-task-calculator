@@ -23,11 +23,9 @@ class _SalesTaxCalcPageState extends State<SalesTaxCalcPage> {
   String taxRate, originalPrice;
   double tax, totalPrice;
 
-  GoogleAdService _googleAdService = GoogleAdService();
 
   @override
   void initState() {
-    _googleAdService.initAd();
     tax = 0.0;
     totalPrice = 0.0;
     calculateDiscount();
@@ -84,7 +82,7 @@ class _SalesTaxCalcPageState extends State<SalesTaxCalcPage> {
           actions: [
             IconButton(
               onPressed: () async {
-                await _googleAdService.showInterstitialAd();
+                await showInterstitialAd();
                 resetPage(context, salesTaxCalcPage);
               },
               icon: Icon(Icons.refresh),
@@ -148,7 +146,7 @@ class _SalesTaxCalcPageState extends State<SalesTaxCalcPage> {
                 ),
               ),
             ),
-            BuildBannerAd(width: ScreenConfig.screenWidth, height: 50,),
+            BuildBannerAd(),
           ],
         ),
       ),

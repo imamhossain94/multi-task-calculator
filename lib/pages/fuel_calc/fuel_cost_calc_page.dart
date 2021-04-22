@@ -25,11 +25,9 @@ class _FuelCostCalcPageState extends State<FuelCostCalcPage> {
 
   double estimatedCost, estimatedAmountOfFuel;
 
-  GoogleAdService _googleAdService = GoogleAdService();
 
   @override
   void initState() {
-    _googleAdService.initAd();
     estimatedCost = 0.0;
     estimatedAmountOfFuel = 0.0;
     calculateDiscount();
@@ -93,7 +91,7 @@ class _FuelCostCalcPageState extends State<FuelCostCalcPage> {
           actions: [
             IconButton(
               onPressed: () async {
-                await _googleAdService.showInterstitialAd();
+                await showInterstitialAd();
                 resetPage(context, fuelCalcPage);
               },
               icon: Icon(Icons.refresh),
@@ -163,7 +161,7 @@ class _FuelCostCalcPageState extends State<FuelCostCalcPage> {
                 ),
               ),
             ),
-            BuildBannerAd(width: ScreenConfig.screenWidth, height: 50,),
+            BuildBannerAd(),
           ],
         ),
       ),

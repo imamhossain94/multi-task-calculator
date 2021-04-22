@@ -370,7 +370,7 @@ Future<bool> onDeletePressed(BuildContext context) async {
 }
 
 //Emergency Update Dialogue
-Future<bool> emergencyUpdateDialogue(BuildContext context) async {
+Future<bool> emergencyUpdateDialogue(BuildContext context, String version) async {
   ThemesMode().init(context);
   ScreenConfig().init(context);
 
@@ -432,7 +432,7 @@ Future<bool> emergencyUpdateDialogue(BuildContext context) async {
                     height: responsiveHeight(10),
                   ),
                   Text(
-                    'Please update the app to continue.',
+                    'Please update this app to continue with the new version: $version',
                     textAlign: TextAlign.start,
                     style: TextStyle(
                       fontSize: responsiveText(16),
@@ -493,7 +493,7 @@ Future<bool> emergencyUpdateDialogue(BuildContext context) async {
 }
 
 //App Update Dialogue
-Future<bool> appUpdateDialogue(BuildContext context) async {
+Future<bool> appUpdateDialogue(BuildContext context, String version) async {
   ThemesMode().init(context);
   ScreenConfig().init(context);
 
@@ -555,7 +555,7 @@ Future<bool> appUpdateDialogue(BuildContext context) async {
                     height: responsiveHeight(10),
                   ),
                   Text(
-                    'A newer version of the app is available.',
+                    'A newer version ($version) of this app is available',
                     textAlign: TextAlign.start,
                     style: TextStyle(
                       fontSize: responsiveText(16),

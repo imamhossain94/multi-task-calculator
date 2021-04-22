@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPrefService {
   static SharedPreferences prefs;
-  void init() async {
+  Future init() async {
     prefs = await SharedPreferences.getInstance();
   }
 }
@@ -23,7 +23,8 @@ void setAppPurchasedStatus(bool value) {
 }
 
 bool getAppPurchasedStatus() {
-  return SharedPrefService.prefs.getBool('app_purchase_status')??false;
+  bool result = SharedPrefService.prefs.getBool('app_purchase_status',)??false;
+  return result;
 }
 
 
@@ -32,5 +33,6 @@ void setAdFreeTime(String value) {
 }
 
 String getAdFreeTime() {
-  return SharedPrefService.prefs.getString('ad_free_time')??DateTime.now().toString();
+  String result = SharedPrefService.prefs.getString('ad_free_time')??'zero';
+  return result;
 }

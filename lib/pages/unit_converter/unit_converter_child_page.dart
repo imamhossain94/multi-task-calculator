@@ -4,7 +4,6 @@ import 'package:multi_task_calculator/pages/unit_converter/components/build_unit
 import 'package:multi_task_calculator/pages/unit_converter/models/unit_converter_helper.dart';
 import 'package:multi_task_calculator/services/google_ad_service.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
-import 'package:multi_task_calculator/utils/extensions.dart';
 import 'package:multi_task_calculator/utils/screen_config.dart';
 import 'package:multi_task_calculator/utils/themes_mode.dart';
 import 'package:units_converter/units_converter.dart';
@@ -35,14 +34,9 @@ class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
   List<UnitConversion> unitConversionList = [];
   double fromUnitValue;
 
-  GoogleAdService _googleAdService = GoogleAdService();
-
   @override
   void initState() {
-    _googleAdService.initAd();
-
     selectedUnit = widget.arguments['selectedUnit'];
-
     fromUnitValue = 0.0;
     fromUnitController.text = '0.0';
     toUnitController.text = '0.0';
@@ -195,7 +189,7 @@ class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
           actions: [
             IconButton(
               onPressed: () async {
-                await _googleAdService.showInterstitialAd();
+                await showInterstitialAd();
                 Navigator.popAndPushNamed(context, unitConverterChildPage, arguments: {
                   'selectedUnit': selectedUnit,
                 });
@@ -328,7 +322,7 @@ class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
                   )
               ),
             ),
-            BuildBannerAd(width: ScreenConfig.screenWidth, height: 50,),
+            BuildBannerAd(),
           ],
         ),
       ),

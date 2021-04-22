@@ -50,7 +50,7 @@ class _UnitConverterPageState extends State<UnitConverterPage> {
                   ],
                 )
             ),
-            BuildBannerAd(width: ScreenConfig.screenWidth, height: 50,),
+            BuildBannerAd(),
           ],
         ),
       ),

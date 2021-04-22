@@ -22,11 +22,8 @@ class _UnitPriceCalcPageState extends State<UnitPriceCalcPage> {
   TextEditingController tipAmountController = TextEditingController();
   TextEditingController taxAmountController = TextEditingController();
 
-  GoogleAdService _googleAdService = GoogleAdService();
-
   @override
   void initState() {
-    _googleAdService.initAd();
     super.initState();
   }
 
@@ -56,7 +53,7 @@ class _UnitPriceCalcPageState extends State<UnitPriceCalcPage> {
           actions: [
             IconButton(
               onPressed: () async {
-                await _googleAdService.showInterstitialAd();
+                await showInterstitialAd();
                 resetPage(context, unitPriceCalcPage);
               },
               icon: Icon(Icons.refresh_rounded),
@@ -67,42 +64,55 @@ class _UnitPriceCalcPageState extends State<UnitPriceCalcPage> {
         body: Column(
           children: [
             Expanded(
-              child: SingleChildScrollView(
-                physics: BouncingScrollPhysics(),
+              child: Container(
+                margin: EdgeInsets.all(10),
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                    color: ThemesMode.isDarkMode ? Colors.black : textWhite,
+                    borderRadius: BorderRadius.circular(5),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.grey.withOpacity(0.9),
+                          blurRadius: 0.5,
+                          spreadRadius: 0.5,
+                          offset: Offset.zero)
+                    ]),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      margin: EdgeInsets.all(10),
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                          color: ThemesMode.isDarkMode ? Colors.black : textWhite,
-                          borderRadius: BorderRadius.circular(5),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.grey.withOpacity(0.9),
-                                blurRadius: 0.5,
-                                spreadRadius: 0.5,
-                                offset: Offset.zero)
-                          ]),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          buildUnitPriceHeader(),
-                          BuildUnitPriceRow(),
-                          BuildUnitPriceRow(),
-                          BuildUnitPriceRow(),
-                          BuildUnitPriceRow(),
-                          BuildUnitPriceRow(),
-                          BuildUnitPriceRow(),
-                        ],
+                    buildUnitPriceHeader(),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        physics: BouncingScrollPhysics(),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            BuildUnitPriceRow(),
+                            BuildUnitPriceRow(),
+                            BuildUnitPriceRow(),
+                            BuildUnitPriceRow(),
+                            BuildUnitPriceRow(),
+                            BuildUnitPriceRow(),
+                            BuildUnitPriceRow(),
+                            BuildUnitPriceRow(),
+                            BuildUnitPriceRow(),
+                            BuildUnitPriceRow(),
+                            BuildUnitPriceRow(),
+                            BuildUnitPriceRow(),
+                            BuildUnitPriceRow(),
+                            BuildUnitPriceRow(),
+                            BuildUnitPriceRow(),
+                            BuildUnitPriceRow(),
+                            BuildUnitPriceRow(),
+                            BuildUnitPriceRow(),
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-            BuildBannerAd(width: ScreenConfig.screenWidth, height: 50,),
+            BuildBannerAd(),
           ],
         ),
       ),

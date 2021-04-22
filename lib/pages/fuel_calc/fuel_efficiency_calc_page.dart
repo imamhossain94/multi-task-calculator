@@ -24,11 +24,9 @@ class _FuelEfficiencyCalcPageState extends State<FuelEfficiencyCalcPage> {
   String mileageBefore, refuelledGasoline, mileageAfter;
   double calculatedFuelEfficiency;
 
-  GoogleAdService _googleAdService = GoogleAdService();
 
   @override
   void initState() {
-    _googleAdService.initAd();
     calculatedFuelEfficiency = 0.0;
     calculateDiscount();
     super.initState();
@@ -90,7 +88,7 @@ class _FuelEfficiencyCalcPageState extends State<FuelEfficiencyCalcPage> {
           actions: [
             IconButton(
               onPressed: () async {
-                await _googleAdService.showInterstitialAd();
+                await showInterstitialAd();
                 resetPage(context, fuelEfficiencyCalcPage);
               },
               icon: Icon(Icons.refresh),
@@ -158,7 +156,7 @@ class _FuelEfficiencyCalcPageState extends State<FuelEfficiencyCalcPage> {
                 ),
               ),
             ),
-            BuildBannerAd(width: ScreenConfig.screenWidth, height: 50,),
+            BuildBannerAd(),
           ],
         ),
       ),

@@ -19,7 +19,7 @@ class BuildHeaderItem extends StatelessWidget {
     return Expanded(
       child: Container(
           margin: EdgeInsets.all(5),
-          height: responsiveHeight(40),
+          height: 40,
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: Colors.grey.withOpacity(0.3),

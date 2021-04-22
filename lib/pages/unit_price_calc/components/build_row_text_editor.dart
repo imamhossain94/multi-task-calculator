@@ -20,7 +20,7 @@ class BuildRowTextEditor extends StatelessWidget {
     return Expanded(
       child: Container(
         margin: EdgeInsets.all(5),
-        height: responsiveHeight(40),
+        height: 40,
         decoration: BoxDecoration(
           color: Colors.grey.withOpacity(0.3),
           borderRadius: BorderRadius.circular(5),

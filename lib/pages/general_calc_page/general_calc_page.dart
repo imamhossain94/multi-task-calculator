@@ -17,11 +17,9 @@ class _GeneralCalcPageState extends State<GeneralCalcPage> {
 
   String displayString='0', mathString='0', outputString='';
 
-  GoogleAdService _googleAdService = GoogleAdService();
 
   @override
   void initState() {
-    _googleAdService.initAd();
     //inputString = '0';
     super.initState();
   }
@@ -49,7 +47,7 @@ class _GeneralCalcPageState extends State<GeneralCalcPage> {
                 ),
                 tooltip: 'History',
                 onPressed: () async {
-                  await _googleAdService.showInterstitialAd();
+                  await showInterstitialAd();
                 })
           ],
         ),
@@ -143,7 +141,7 @@ class _GeneralCalcPageState extends State<GeneralCalcPage> {
               },
             ),
             SizedBox(height: 5,),
-            BuildBannerAd(width: ScreenConfig.screenWidth, height: 50,),
+            BuildBannerAd(),
           ],
         ),
       ),

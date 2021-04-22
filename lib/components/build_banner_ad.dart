@@ -5,18 +5,11 @@ import 'package:multi_task_calculator/utils/screen_config.dart';
 
 
 class BuildBannerAd extends StatefulWidget {
-  final double height, width;
-  BuildBannerAd({
-    @required this.height,
-    @required this.width
-  });
-
   @override
   _BuildBannerAdState createState() => _BuildBannerAdState();
 }
 
 class _BuildBannerAdState extends State<BuildBannerAd> {
-
   BannerAd _bannerAd;
   bool purchaseStatus;
 
@@ -26,7 +19,6 @@ class _BuildBannerAdState extends State<BuildBannerAd> {
     if(!purchaseStatus){
       initBannerAds();
     }
-
     super.initState();
   }
 
@@ -43,7 +35,7 @@ class _BuildBannerAdState extends State<BuildBannerAd> {
     _bannerAd = BannerAd(
       adUnitId: BannerAd.testAdUnitId,
       request: AdRequest(),
-      size: AdSize(width: widget.width.toInt(), height: widget.height.toInt()),
+      size: AdSize.banner,
       listener: AdListener(
         onAdLoaded: (Ad ad) {
           print('$BannerAd loaded.');
@@ -56,7 +48,6 @@ class _BuildBannerAdState extends State<BuildBannerAd> {
         onApplicationExit: (Ad ad) => print('$BannerAd onApplicationExit.'),
       ),
     );
-
     _bannerAd?.load();
   }
 

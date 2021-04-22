@@ -10,8 +10,8 @@ const String appVersion = 'app_version';
 const String developerName = 'Md. Imam Hossain';
 const String designerName = 'Md. Imam Hossain';
 
-const String feedbackMail = 'mailto:haldercalvin00@gmail.com';
-const String contactMail = 'mailto:haldercalvin00@gmail.com';
+const String feedbackMail = 'mailto:imamagun94@gmail.com';
+const String contactMail = 'mailto:imamagun94@gmail.com';
 
 const String appId = '';
 const String bannerAdUnitId = 'ca-app-pub-3940256099942544/1033173712';
@@ -61,6 +61,7 @@ const String dark = "Dark";
 const String light = "Light";
 const String systemDefault = "System default";
 const List<String> themes = ["System default", "Light", "Dark"];
+const int rewardTime = 300;
 
 const backgroundLight = Color(0xffFAFAFA);
 Color backgroundDark = Color(0xff212121);

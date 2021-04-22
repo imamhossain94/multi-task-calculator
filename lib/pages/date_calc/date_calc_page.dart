@@ -25,11 +25,9 @@ class _DateCalcPageState extends State<DateCalcPage> {
 
   String resultYears, resultMonths, resultDays;
 
-  GoogleAdService _googleAdService = GoogleAdService();
 
   @override
   void initState() {
-    _googleAdService.initAd();
     resultYears = '0';
     resultMonths = '0';
     resultDays = '0';
@@ -68,7 +66,7 @@ class _DateCalcPageState extends State<DateCalcPage> {
           actions: [
             IconButton(
               onPressed: () async {
-                await _googleAdService.showInterstitialAd();
+                await showInterstitialAd();
                 resetPage(context, dateCalcPage);
               },
               icon: Icon(Icons.refresh_rounded),
@@ -174,7 +172,7 @@ class _DateCalcPageState extends State<DateCalcPage> {
                 ),
               ),
             ),
-            BuildBannerAd(width: 320, height: 250,),
+            BuildBannerAd(),
           ],
         ),
       ),

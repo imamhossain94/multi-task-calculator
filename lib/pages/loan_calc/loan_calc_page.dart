@@ -29,11 +29,8 @@ class _LoanCalcPageState extends State<LoanCalcPage> {
   double totalCostResult, monthlyPaymentResult, youCouldBorrow;
 
 
-  GoogleAdService _googleAdService = GoogleAdService();
-
   @override
   void initState() {
-    _googleAdService.initAd();
     totalCostResult = 0.0;
     monthlyPaymentResult = 0.0;
     youCouldBorrow = 0.0;
@@ -131,7 +128,7 @@ class _LoanCalcPageState extends State<LoanCalcPage> {
           actions: [
             IconButton(
               onPressed: () async {
-                await _googleAdService.showInterstitialAd();
+                await showInterstitialAd();
                 resetPage(context, loanCalcPage);
               },
               icon: Icon(Icons.refresh_rounded),
@@ -215,7 +212,7 @@ class _LoanCalcPageState extends State<LoanCalcPage> {
                 ),
               ),
             ),
-            BuildBannerAd(width: ScreenConfig.screenWidth, height: 50,),
+            BuildBannerAd(),
           ],
         ),
       ),

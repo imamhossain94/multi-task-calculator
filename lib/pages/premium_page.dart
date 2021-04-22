@@ -19,9 +19,11 @@ class _PremiumPageState extends State<PremiumPage> {
 
   GoogleAdService _googleAdService = GoogleAdService();
 
-  String rewardSeconds;
   bool isLoading;
   Timer _timer;
+  //int rewardTime = 21600; //21600 second 360 minute or 6h
+  //int rewardTime = 14400; //14400 second 240 minute or 4h
+  int rewardSeconds; //120 second 2 minute ; uncomment for test
 
   @override
   void initState() {
@@ -32,28 +34,61 @@ class _PremiumPageState extends State<PremiumPage> {
 
   @override
   void dispose() {
-    _timer.cancel();
+    if(_timer != null) {
+      _timer.cancel();
+    }
     super.dispose();
   }
 
   void createTimer() async{
     _timer = Timer.periodic(Duration(seconds: 1), (Timer t)=>
-      setState((){
-        if(getAppPurchasedStatus() == true){
-          DateTime x = DateTime.now(), y = DateTime.tryParse(getAdFreeTime());
-          int seconds = x.difference(y).inSeconds;
-          rewardSeconds = seconds.toString();
-          if(seconds == 21600){
+        setState((){
+          if(getAdFreeTime() != 'zero'){
+            DateTime x = DateTime.now(), y = DateTime.tryParse(getAdFreeTime());
+            int seconds = x.difference(y).inSeconds;
+            rewardSeconds = seconds;
+            if(seconds >= rewardTime){
+              t.cancel();
+              rewardSeconds = null;
+              setAdFreeTime('zero');
+              setAppPurchasedStatus(false);
+            }
+          }else{
             t.cancel();
             rewardSeconds = null;
+            setAdFreeTime('zero');
             setAppPurchasedStatus(false);
           }
-        }else{
-          rewardSeconds = null;
-          t.cancel();
-        }
-      })
+        })
     );
+  }
+
+
+  void playAd() async{
+
+    setState(() {
+      isLoading = true;
+    });
+    await Future.delayed(Duration(seconds: 2), () async{
+      bool x = await showRewardedAd();
+      if(x){
+        Navigator.pop(context);
+      }else{
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Error loading ad!!. Try Again?"),
+          action: SnackBarAction(
+            label: 'Try Again',
+            textColor: Colors.yellow,
+            onPressed: () {
+              playAd();
+            },
+          ),
+        ));
+      }
+    });
+    setState(() {
+      isLoading = false;
+    });
 
   }
 
@@ -82,11 +117,11 @@ class _PremiumPageState extends State<PremiumPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
 
-                rewardSeconds != null?buildClockCard(title: 'You are enjoying 360 minutes ad free version.', time: 'Remaining\n'
-                    '${(21600-int.parse(rewardSeconds))~/60}:${(21600-int.parse(rewardSeconds))%60}'
+                rewardSeconds != null?buildClockCard(title: 'You are enjoying ${rewardTime~/60} minutes ad free version.', time: 'Remaining\n'
+                    '${(rewardTime-rewardSeconds)~/60}m ${(rewardTime-rewardSeconds)%60}s'
                 ):getAppPurchasedStatus() == true?Expanded(child: Center(child: SizedBox(height:40, width: 40,child: CircularProgressIndicator()))):
                     buildCard(title: Text(
-                    'Watch a full video ad to remove all the bottom banner and Interstitial ads for 360 minutes for free.',
+                    'Watch a full video ad to remove all the bottom banner and Interstitial ads for ${rewardTime~/60} minutes for free.',
                     textAlign: TextAlign.justify,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -95,19 +130,7 @@ class _PremiumPageState extends State<PremiumPage> {
                   ),
                   actionWidget: isLoading?SizedBox(height:40, width: 40,child: CircularProgressIndicator()):Icon(FontAwesomeIcons.play, size: responsiveWidth(34),),
                   buttonText: 'Watch Now',
-                  voidCallback: () async{
-                    setState(() {
-                      isLoading = true;
-                    });
-                    _googleAdService.initAd();
-                    await Future.delayed(Duration(seconds: 5), () async{
-                       await _googleAdService.showRewardedAd();
-                    });
-                    setState(() {
-                      isLoading = false;
-                      resetPage(context, premiumPage);
-                    });
-                  }
+                  voidCallback: playAd,
                 ),
 
                 buildCard(
@@ -256,7 +279,7 @@ class _PremiumPageState extends State<PremiumPage> {
                         color: Colors.grey.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(5),
                       ),
-                      child: Text('$time s', style: TextStyle(
+                      child: Text(time, style: TextStyle(
                         fontSize: responsiveText(40), fontWeight: FontWeight.bold,
                         color: Colors.grey.withOpacity(0.7),
                       ),
