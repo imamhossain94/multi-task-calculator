@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:multi_task_calculator/components/build_banner_ad.dart';
 import 'package:multi_task_calculator/pages/currency_calc_page/model/exchange_rate_api_response.dart';
 import 'package:multi_task_calculator/services/currency_api.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
@@ -249,7 +248,7 @@ class _CurrencyCalcPageState extends State<CurrencyCalcPage> {
 
               ),
             ),
-            BuildBannerAd(),
+            //BuildBannerAd(),
           ],
         ),
       ),

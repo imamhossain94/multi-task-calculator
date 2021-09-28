@@ -1,11 +1,9 @@
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:multi_task_calculator/components/build_banner_ad.dart';
 import 'package:multi_task_calculator/components/build_result_card.dart';
 import 'package:multi_task_calculator/components/build_text_field.dart';
 import 'package:multi_task_calculator/pages/loan_calc/components/loan_type_picker.dart';
-import 'package:multi_task_calculator/services/google_ad_service.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:multi_task_calculator/utils/extensions.dart';
 import 'package:multi_task_calculator/utils/screen_config.dart';
@@ -128,7 +126,7 @@ class _LoanCalcPageState extends State<LoanCalcPage> {
           actions: [
             IconButton(
               onPressed: () async {
-                await showInterstitialAd();
+                //await showInterstitialAd();
                 resetPage(context, loanCalcPage);
               },
               icon: Icon(Icons.refresh_rounded),
@@ -212,7 +210,7 @@ class _LoanCalcPageState extends State<LoanCalcPage> {
                 ),
               ),
             ),
-            BuildBannerAd(),
+            //BuildBannerAd(),
           ],
         ),
       ),

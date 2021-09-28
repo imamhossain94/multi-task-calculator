@@ -100,7 +100,7 @@ class _NumberBaseConverterPageState extends State<NumberBaseConverterPage> {
           actions: [
             IconButton(
               onPressed: () async {
-                await showInterstitialAd();
+                //await showInterstitialAd();
                 resetPage(context, numberBaseConverterPage);
               },
               icon: Icon(Icons.refresh),
@@ -234,7 +234,7 @@ class _NumberBaseConverterPageState extends State<NumberBaseConverterPage> {
                   )
               ),
             ),
-            BuildBannerAd(),
+            //BuildBannerAd(),
           ],
         ),
       ),

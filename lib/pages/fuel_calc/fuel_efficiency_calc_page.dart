@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:multi_task_calculator/components/build_banner_ad.dart';
 import 'package:multi_task_calculator/components/build_result_card.dart';
 import 'package:multi_task_calculator/components/build_text_field.dart';
-import 'package:multi_task_calculator/services/google_ad_service.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:multi_task_calculator/utils/extensions.dart';
 import 'package:multi_task_calculator/utils/screen_config.dart';
@@ -88,7 +86,7 @@ class _FuelEfficiencyCalcPageState extends State<FuelEfficiencyCalcPage> {
           actions: [
             IconButton(
               onPressed: () async {
-                await showInterstitialAd();
+                //await showInterstitialAd();
                 resetPage(context, fuelEfficiencyCalcPage);
               },
               icon: Icon(Icons.refresh),
@@ -156,7 +154,7 @@ class _FuelEfficiencyCalcPageState extends State<FuelEfficiencyCalcPage> {
                 ),
               ),
             ),
-            BuildBannerAd(),
+            //BuildBannerAd(),
           ],
         ),
       ),

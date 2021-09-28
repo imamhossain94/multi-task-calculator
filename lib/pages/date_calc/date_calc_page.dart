@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_holo_date_picker/flutter_holo_date_picker.dart';
-import 'package:multi_task_calculator/components/build_banner_ad.dart';
 import 'package:multi_task_calculator/components/build_result_card.dart';
 import 'package:multi_task_calculator/components/build_text_field.dart';
-import 'package:multi_task_calculator/components/build_value_slider.dart';
-import 'package:multi_task_calculator/services/google_ad_service.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:multi_task_calculator/utils/extensions.dart';
 import 'package:multi_task_calculator/utils/screen_config.dart';
@@ -66,7 +63,7 @@ class _DateCalcPageState extends State<DateCalcPage> {
           actions: [
             IconButton(
               onPressed: () async {
-                await showInterstitialAd();
+                //await showInterstitialAd();
                 resetPage(context, dateCalcPage);
               },
               icon: Icon(Icons.refresh_rounded),
@@ -172,7 +169,7 @@ class _DateCalcPageState extends State<DateCalcPage> {
                 ),
               ),
             ),
-            BuildBannerAd(),
+            //BuildBannerAd(),
           ],
         ),
       ),

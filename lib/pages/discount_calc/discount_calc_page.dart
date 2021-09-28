@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:multi_task_calculator/components/build_banner_ad.dart';
 import 'package:multi_task_calculator/components/build_result_card.dart';
 import 'package:multi_task_calculator/components/build_text_field.dart';
-import 'package:multi_task_calculator/services/google_ad_service.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:multi_task_calculator/utils/extensions.dart';
 import 'package:multi_task_calculator/utils/screen_config.dart';
@@ -89,7 +86,7 @@ class _DiscountCalcPageState extends State<DiscountCalcPage> {
           actions: [
             IconButton(
               onPressed: () async {
-                await showInterstitialAd();
+                //await showInterstitialAd();
                 resetPage(context, discountCalcPage);
               },
               icon: Icon(Icons.refresh),
@@ -158,7 +155,7 @@ class _DiscountCalcPageState extends State<DiscountCalcPage> {
                 ),
               ),
             ),
-            BuildBannerAd(),
+            //BuildBannerAd(),
           ],
         ),
       ),

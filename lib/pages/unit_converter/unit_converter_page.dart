@@ -50,7 +50,7 @@ class _UnitConverterPageState extends State<UnitConverterPage> {
                   ],
                 )
             ),
-            BuildBannerAd(),
+            //BuildBannerAd(),
           ],
         ),
       ),
