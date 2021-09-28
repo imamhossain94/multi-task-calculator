@@ -127,7 +127,7 @@ class _LoanCalcPageState extends State<LoanCalcPage> {
             IconButton(
               onPressed: () async {
                 //await showInterstitialAd();
-                resetPage(context, loanCalcPage);
+                resetPage(context, LoanCalcPage());
               },
               icon: Icon(Icons.refresh_rounded),
               tooltip: 'Reset',

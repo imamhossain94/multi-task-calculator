@@ -123,7 +123,7 @@ class _SavingsCalcPageState extends State<SavingsCalcPage> {
             IconButton(
               onPressed: () async {
                 //await showInterstitialAd();
-                resetPage(context, savingCalcPage);
+                resetPage(context, SavingsCalcPage());
               },
               icon: Icon(Icons.refresh_rounded),
               tooltip: 'Reset',

@@ -90,7 +90,7 @@ class _FuelCostCalcPageState extends State<FuelCostCalcPage> {
             IconButton(
               onPressed: () async {
                 //await showInterstitialAd();
-                resetPage(context, fuelCalcPage);
+                resetPage(context, FuelCostCalcPage());
               },
               icon: Icon(Icons.refresh),
               tooltip: 'Refresh',

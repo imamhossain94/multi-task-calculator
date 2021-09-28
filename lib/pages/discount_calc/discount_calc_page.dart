@@ -87,7 +87,7 @@ class _DiscountCalcPageState extends State<DiscountCalcPage> {
             IconButton(
               onPressed: () async {
                 //await showInterstitialAd();
-                resetPage(context, discountCalcPage);
+                resetPage(context, DiscountCalcPage());
               },
               icon: Icon(Icons.refresh),
               tooltip: 'Refresh',

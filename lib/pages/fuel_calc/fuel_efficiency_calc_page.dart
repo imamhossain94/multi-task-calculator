@@ -87,7 +87,7 @@ class _FuelEfficiencyCalcPageState extends State<FuelEfficiencyCalcPage> {
             IconButton(
               onPressed: () async {
                 //await showInterstitialAd();
-                resetPage(context, fuelEfficiencyCalcPage);
+                resetPage(context, FuelEfficiencyCalcPage());
               },
               icon: Icon(Icons.refresh),
               tooltip: 'Refresh',

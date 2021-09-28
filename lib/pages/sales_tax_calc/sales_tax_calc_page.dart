@@ -81,7 +81,7 @@ class _SalesTaxCalcPageState extends State<SalesTaxCalcPage> {
             IconButton(
               onPressed: () async {
                 //await showInterstitialAd();
-                resetPage(context, salesTaxCalcPage);
+                resetPage(context, SalesTaxCalcPage());
               },
               icon: Icon(Icons.refresh),
               tooltip: 'Refresh',

@@ -135,7 +135,7 @@ class _TipCalcPageState extends State<TipCalcPage> {
             IconButton(
               onPressed: () async {
                 //await showInterstitialAd();
-                resetPage(context, tipCalcPage);
+                resetPage(context, TipCalcPage());
               },
               icon: Icon(Icons.refresh_rounded),
               tooltip: 'Reset',

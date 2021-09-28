@@ -54,7 +54,7 @@ class _UnitPriceCalcPageState extends State<UnitPriceCalcPage> {
             IconButton(
               onPressed: () async {
                 //await showInterstitialAd();
-                resetPage(context, unitPriceCalcPage);
+                resetPage(context, UnitPriceCalcPage());
               },
               icon: Icon(Icons.refresh_rounded),
               tooltip: 'Reset',

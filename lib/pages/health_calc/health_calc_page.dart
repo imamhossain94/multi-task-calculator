@@ -117,7 +117,7 @@ class _HealthCalcPageState extends State<HealthCalcPage> {
             IconButton(
               onPressed: () async {
                 //await showInterstitialAd();
-                resetPage(context, healthCalcPage);
+                resetPage(context, HealthCalcPage());
               },
               icon: Icon(Icons.refresh),
               tooltip: 'Reset',

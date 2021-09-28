@@ -64,7 +64,7 @@ class _DateCalcPageState extends State<DateCalcPage> {
             IconButton(
               onPressed: () async {
                 //await showInterstitialAd();
-                resetPage(context, dateCalcPage);
+                resetPage(context, DateCalcPage());
               },
               icon: Icon(Icons.refresh_rounded),
               tooltip: 'Reset',

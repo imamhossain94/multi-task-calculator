@@ -110,7 +110,7 @@ class _GeneralCalcPageState extends State<GeneralCalcPage> {
                     //Open advanced menu
                     showMoreMenu(context);
                   }else if(value == 'C'){
-                    resetPage(context, generalCalcPage);
+                    resetPage(context, GeneralCalcPage());
                   }else if((value == 'del') && (displayString != null)){
                     //Delete display character
                     if((len > 1)){
