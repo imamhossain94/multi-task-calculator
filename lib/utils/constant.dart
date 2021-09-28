@@ -19,7 +19,7 @@ const String interstitialAsUnitId = 'ca-app-pub-3940256099942544/1033173712';
 const String appStoreIdentifier = 'com.myairtelapp';
 
 const String appLink =
-    'https://play.google.com/store/apps/details?id=com.myairtelapp';
+    'https://play.google.com/store/apps/details?id=com.newagedevs.multicalc';
 const String storeLink =
     'https://play.google.com/store/apps/developer?id=NewAgeDevs';
 
