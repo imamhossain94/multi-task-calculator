@@ -2,7 +2,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:multi_task_calculator/services/google_ad_service.dart';
 import 'package:multi_task_calculator/services/shared_pref_services.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:multi_task_calculator/utils/provider.dart';
@@ -20,8 +19,8 @@ Future<void> main() async {
 
   Future<SharedPreferences> prefs = SharedPreferences.getInstance();
   await SharedPrefService().init();
-  GoogleAdService().initInterstitialAd();
-  GoogleAdService().initRewardedAd();
+  // GoogleAdService().initInterstitialAd();
+  // GoogleAdService().initRewardedAd();
 
   prefs.then((value) {
     runApp(
