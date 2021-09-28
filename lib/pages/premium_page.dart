@@ -17,7 +17,7 @@ class PremiumPage extends StatefulWidget {
 
 class _PremiumPageState extends State<PremiumPage> {
 
-  GoogleAdService _googleAdService = GoogleAdService();
+  //GoogleAdService _googleAdService = GoogleAdService();
 
   bool isLoading;
   Timer _timer;
@@ -70,21 +70,21 @@ class _PremiumPageState extends State<PremiumPage> {
       isLoading = true;
     });
     await Future.delayed(Duration(seconds: 2), () async{
-      bool x = await showRewardedAd();
-      if(x){
-        Navigator.pop(context);
-      }else{
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Error loading ad!!. Try Again?"),
-          action: SnackBarAction(
-            label: 'Try Again',
-            textColor: Colors.yellow,
-            onPressed: () {
-              playAd();
-            },
-          ),
-        ));
-      }
+      // bool x = await showRewardedAd();
+      // if(x){
+      //   Navigator.pop(context);
+      // }else{
+      //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      //     content: Text("Error loading ad!!. Try Again?"),
+      //     action: SnackBarAction(
+      //       label: 'Try Again',
+      //       textColor: Colors.yellow,
+      //       onPressed: () {
+      //         playAd();
+      //       },
+      //     ),
+      //   ));
+      // }
     });
     setState(() {
       isLoading = false;
