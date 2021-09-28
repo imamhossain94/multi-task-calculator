@@ -24,7 +24,7 @@ const String storeLink =
     'https://play.google.com/store/apps/developer?id=NewAgeDevs';
 
 const String loanAppLink =
-    'https://play.google.com/store/apps/details?id=com.myairtelapp';
+    'https://play.google.com/store/apps/details?id=com.newagedevs.mortgage_calculator';
 
 const String appIconLight = 'assets/images/ic_launcher_light.png';
 
