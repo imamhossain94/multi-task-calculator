@@ -797,3 +797,14 @@ Future<bool> themeChoiceDialogue(BuildContext context) async {
     },
   );
 }
+
+void showMessage(BuildContext context, String title, String message){
+  Flushbar(
+    flushbarPosition: FlushbarPosition.BOTTOM,
+    borderRadius: BorderRadius.circular(10),
+    margin: EdgeInsets.all(10),
+    title: title,
+    message: message,
+    duration: Duration(seconds: 3),
+  )..show(context);
+}
