@@ -12,7 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  url_launcher: ^6.0.3
+  url_launcher: ^6.0.9
   in_app_purchase: ^0.5.2
   share: ^2.0.1
   flutter_email_sender: ^5.0.0

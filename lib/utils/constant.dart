@@ -11,7 +11,7 @@ const String developerName = 'Md. Imam Hossain';
 const String designerName = 'Md. Imam Hossain';
 
 const String feedbackMail = 'mailto:imamagun94@gmail.com';
-const String contactMail = 'mailto:imamagun94@gmail.com';
+const String contactMail = 'imamagun94@gmail.com';
 
 const String appId = '';
 const String bannerAdUnitId = 'ca-app-pub-3940256099942544/1033173712';
