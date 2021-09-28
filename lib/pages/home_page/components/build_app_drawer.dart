@@ -77,13 +77,13 @@ class _BuildAppDrawerState extends State<BuildAppDrawer> {
                     Navigator.pushNamed(context, helpPage);
                   }),
               Divider(),
-              BuildDrawerBodyItem(
-                  icon: Icon(
-                    Icons.shopping_cart_rounded,
-                    color: textAmber,
-                  ),
-                  text: 'Premium',
-                  onTap: () => Navigator.pushNamed(context, premiumPage)),
+              // BuildDrawerBodyItem(
+              //     icon: Icon(
+              //       Icons.shopping_cart_rounded,
+              //       color: textAmber,
+              //     ),
+              //     text: 'Premium',
+              //     onTap: () => Navigator.pushNamed(context, premiumPage)),
               BuildDrawerBodyItem(
                   icon: Icon(
                     Icons.star_rate_rounded,
