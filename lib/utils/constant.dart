@@ -21,7 +21,7 @@ const String appStoreIdentifier = 'com.myairtelapp';
 const String appLink =
     'https://play.google.com/store/apps/details?id=com.myairtelapp';
 const String storeLink =
-    'https://play.google.com/store/apps/dev?id=5602309161373665584&hl=it&gl=US';
+    'https://play.google.com/store/apps/developer?id=NewAgeDevs';
 
 const String loanAppLink =
     'https://play.google.com/store/apps/details?id=com.myairtelapp';

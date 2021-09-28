@@ -14,32 +14,11 @@ class AboutPage extends StatefulWidget {
 }
 
 class _AboutPageState extends State<AboutPage> {
-  List<String> features;
-
-
-  Map<int, int> widgetFlax(){
-    int len = features.length;
-    if(len == 1){
-      return {1: 14, 2:11};
-    }else if(len == 2){
-      return {1: 12, 2:11};
-    }else if(len == 4){
-      return {1: 11, 2:13};
-    }else if(len == 5){
-      return {1: 12, 2:16};
-    }else if(len == 6){
-      return {1: 12, 2:18};
-    }else{
-      return {1: 1, 2:1};
-    }
-  }
-
 
   @override
   Widget build(BuildContext context) {
     ScreenConfig().init(context);
     ThemesMode().init(context);
-    features = appFeature;
 
     return SafeArea(
       child: Scaffold(
@@ -61,29 +40,21 @@ class _AboutPageState extends State<AboutPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Expanded(
-                  flex: responsiveHeight((widgetFlax()[1]).toDouble()).toInt(),
+                  flex: responsiveHeight(5).toInt(),
                   child: BuildAppLogo()
                 ),
                 Expanded(
-                  flex: responsiveHeight((widgetFlax()[2]).toDouble()).toInt(),
+                  flex: responsiveHeight(5).toInt(),
                   child: SingleChildScrollView(
                     physics: BouncingScrollPhysics(),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        buildHeader('Feature'),
-                        Container(
-                          padding: EdgeInsets.fromLTRB(responsiveWidth(30), responsiveWidth(10), responsiveWidth(30), responsiveWidth(10)),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: buildFeatureList(),
-                          ),
-                        ),
                         buildHeader('Development'),
                         buildDescription('Android Engineering', developerName),
                         buildDescription('UI Design', designerName),
+                        buildDescription('Icon Used', 'flaticon, fontawesome'),
                         buildHeaderClickable('Other App', () async{
                           if (await canLaunch(storeLink)) {
                             await launch(storeLink);
@@ -92,12 +63,9 @@ class _AboutPageState extends State<AboutPage> {
                           }
                         }),
                         SizedBox(height: responsiveHeight(8),),
+
                         buildHeaderClickable('$appName: ${getAppVersion()}', () async{
-                          if (await canLaunch(appLink)) {
-                            await launch(appLink);
-                          } else {
-                            throw 'Could not launch $appLink';
-                          }
+
                         }),
                       ],
                     ),
@@ -110,18 +78,6 @@ class _AboutPageState extends State<AboutPage> {
   }
 
 
-  List<Widget> buildFeatureList() {
-    return features.map((feature) {
-      return Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: Text(
-          feature,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: responsiveText(14)),
-        ),
-      );
-    }).toList();
-  }
 
   Container buildHeader(String title) {
     return Container(
