@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:multi_task_calculator/components/build_banner_ad.dart';
 import 'package:multi_task_calculator/components/build_pop_up_munu_item.dart';
@@ -12,6 +13,7 @@ import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:multi_task_calculator/utils/extensions.dart';
 import 'package:multi_task_calculator/utils/screen_config.dart';
 import 'package:multi_task_calculator/utils/themes_mode.dart';
+import 'package:share/share.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -110,7 +112,13 @@ class _HomePageState extends State<HomePage> {
                   fontSize: responsiveText(18)),
             ),
             actions: [
-              BuildPopupMenuButton(),
+              //BuildPopupMenuButton(),
+              IconButton(
+                  onPressed: () {
+                    Share.share('Hey check out this android app $appLink');
+                  },
+                  icon: FaIcon(FontAwesomeIcons.shareAlt)
+              )
             ],
           ),
           drawer: BuildAppDrawer(),
