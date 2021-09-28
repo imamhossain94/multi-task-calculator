@@ -15,7 +15,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
-  MobileAds.instance.initialize();
+ // MobileAds.instance.initialize();
 
   Future<SharedPreferences> prefs = SharedPreferences.getInstance();
   await SharedPrefService().init();
