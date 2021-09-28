@@ -1,3 +1,4 @@
+import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_task_calculator/components/build_rating_view.dart';
@@ -9,9 +10,17 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-void resetPage(BuildContext context, String routeName) {
-  Navigator.popAndPushNamed(context, routeName);
+void resetPage(BuildContext context, Widget widget) {
+  Navigator.pushReplacement(
+    context,
+    PageRouteBuilder(
+      transitionDuration: Duration.zero,
+      pageBuilder: (_, __, ___) => widget,
+    ),
+  );
 }
+
+
 
 Future<bool> onRatingPressed(BuildContext context) async {
   return showDialog(

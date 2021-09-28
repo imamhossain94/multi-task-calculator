@@ -46,6 +46,7 @@ class _GeneralCalcPageState extends State<GeneralCalcPage> {
                 tooltip: 'History',
                 onPressed: () async {
                   //await showInterstitialAd();
+                  showMessage(context, null, "Coming soon");
                 })
           ],
         ),
