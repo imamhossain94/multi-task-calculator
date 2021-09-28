@@ -113,8 +113,11 @@ class _DateCalcPageState extends State<DateCalcPage> {
                                     print(days);
                                     setState(() {
                                       resultYears = (days~/365).floor().toString();
-                                      resultMonths = ((days%365)~/12).toString();
-                                      resultDays = (((days%365)%12)).toString();
+                                      resultMonths = ((days%365)~/30.417).toString();
+                                      resultDays = (((days%365)%30.417).toInt()).toString();
+                                      // resultYears = (days~/365).floor().toString();
+                                      // resultMonths = ((days%365)~/12).toString();
+                                      // resultDays = (((days%365)%12)).toString();
                                     });
                                   }
                               );
