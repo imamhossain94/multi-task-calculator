@@ -23,49 +23,49 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   GlobalKey<ScaffoldState> _key = new GlobalKey<ScaffoldState>();
 
-  Timer _timer;
-  //int rewardTime = 21600; //21600 second 360 minute or 6h
-  //int rewardTime = 14400; //14400 second 240 minute or 4h
-  int rewardSeconds; //120 second 2 minute ; uncomment for test
-
-
-  @override
-  void initState() {
-    createTimer();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    if(_timer != null) {
-      _timer.cancel();
-    }
-    super.dispose();
-  }
-
-  void createTimer() async{
-    _timer = Timer.periodic(Duration(seconds: 1), (Timer t)=>
-        setState((){
-          if(getAdFreeTime() != 'zero'){
-            DateTime x = DateTime.now(), y = DateTime.tryParse(getAdFreeTime());
-            int seconds = x.difference(y).inSeconds;
-            rewardSeconds = seconds;
-            if(seconds >= rewardTime){
-              t.cancel();
-              rewardSeconds = null;
-              setAdFreeTime('zero');
-              setAppPurchasedStatus(false);
-            }
-          }else{
-            //rewardSeconds = null;
-            setAdFreeTime('zero');
-            setAppPurchasedStatus(false);
-            t.cancel();
-          }
-        })
-    );
-  }
-
+  // Timer _timer;
+  // //int rewardTime = 21600; //21600 second 360 minute or 6h
+  // //int rewardTime = 14400; //14400 second 240 minute or 4h
+  // int rewardSeconds; //120 second 2 minute ; uncomment for test
+  //
+  //
+  // @override
+  // void initState() {
+  //   createTimer();
+  //   super.initState();
+  // }
+  //
+  // @override
+  // void dispose() {
+  //   if(_timer != null) {
+  //     _timer.cancel();
+  //   }
+  //   super.dispose();
+  // }
+  //
+  // void createTimer() async{
+  //   _timer = Timer.periodic(Duration(seconds: 1), (Timer t)=>
+  //       setState((){
+  //         if(getAdFreeTime() != 'zero'){
+  //           DateTime x = DateTime.now(), y = DateTime.tryParse(getAdFreeTime());
+  //           int seconds = x.difference(y).inSeconds;
+  //           rewardSeconds = seconds;
+  //           if(seconds >= rewardTime){
+  //             t.cancel();
+  //             rewardSeconds = null;
+  //             setAdFreeTime('zero');
+  //             setAppPurchasedStatus(false);
+  //           }
+  //         }else{
+  //           //rewardSeconds = null;
+  //           setAdFreeTime('zero');
+  //           setAppPurchasedStatus(false);
+  //           t.cancel();
+  //         }
+  //       })
+  //   );
+  // }
+  //
 
 
   @override
@@ -73,7 +73,7 @@ class _HomePageState extends State<HomePage> {
     ThemesMode().init(context);
     ScreenConfig().init(context);
 
-    createTimer();
+    //createTimer();
 
     return WillPopScope(
       onWillPop: () async {
@@ -132,17 +132,17 @@ class _HomePageState extends State<HomePage> {
                     ],
                   )
               ),
-              rewardSeconds != null?
-                  Container(
-                    height: 50,
-                    width: ScreenConfig.screenWidth,
-                    alignment: Alignment.center,
-                    color: Colors.black12,
-                    child: Text(
-                        '${(rewardTime-rewardSeconds)~/60}m ${(rewardTime-rewardSeconds)%60}s'
-                    ),
-                  ):
-              BuildBannerAd(),
+              // rewardSeconds != null?
+              //     Container(
+              //       height: 50,
+              //       width: ScreenConfig.screenWidth,
+              //       alignment: Alignment.center,
+              //       color: Colors.black12,
+              //       child: Text(
+              //           '${(rewardTime-rewardSeconds)~/60}m ${(rewardTime-rewardSeconds)%60}s'
+              //       ),
+              //     ):
+              // BuildBannerAd(),
             ],
           ),
         ),
