@@ -129,6 +129,7 @@ class _HomePageState extends State<HomePage> {
           drawerScrimColor: Colors.transparent,
           appBar: AppBar(
             elevation: 0,
+            backgroundColor: Colors.transparent,
             leading: Builder(
               builder: (BuildContext context) {
                 return IconButton(
