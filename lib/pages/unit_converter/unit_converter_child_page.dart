@@ -191,7 +191,7 @@ class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
           actions: [
             IconButton(
               onPressed: () async {
-                //await showInterstitialAd();
+                await showInterstitialAd();
                 // Navigator.popAndPushNamed(context, unitConverterChildPage, arguments: {
                 //   'selectedUnit': selectedUnit,
                 // });

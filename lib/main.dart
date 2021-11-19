@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:multi_task_calculator/services/shared_pref_services.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:multi_task_calculator/utils/provider.dart';
@@ -10,16 +11,16 @@ import 'package:provider/provider.dart';
 import 'package:multi_task_calculator/utils/router.dart' as router;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'services/google_ad_service.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
- // MobileAds.instance.initialize();
-
+  MobileAds.instance.initialize();
   Future<SharedPreferences> prefs = SharedPreferences.getInstance();
   await SharedPrefService().init();
-  // GoogleAdService().initInterstitialAd();
-  // GoogleAdService().initRewardedAd();
+  await GoogleAdService().init();
+
 
   prefs.then((value) {
     runApp(

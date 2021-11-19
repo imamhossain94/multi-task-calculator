@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:multi_task_calculator/pages/home_page/components/build_home_menu_button.dart';
 import 'package:multi_task_calculator/pages/unit_converter/models/unit_converter_helper.dart';
-import 'package:multi_task_calculator/pages/unit_converter/unit_converter_child_page.dart';
+import 'package:multi_task_calculator/services/google_ad_service.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
-import 'package:page_transition/page_transition.dart';
 
 class BuildUnitConverterMenuPad extends StatelessWidget {
   @override
@@ -122,7 +121,10 @@ class BuildUnitConverterMenuPad extends StatelessWidget {
           BuildHomeMenuButton(
             title: 'Number Base',
             icon: FontAwesomeIcons.sortNumericUp,
-            onPressed: ()=> Navigator.pushNamed(context, numberBaseConverterPage),
+            onPressed: () async {
+              await showInterstitialAd();
+              Navigator.pushNamed(context, numberBaseConverterPage);
+            },
             color: textMaroon,
           ),
         ]),
@@ -130,7 +132,8 @@ class BuildUnitConverterMenuPad extends StatelessWidget {
     );
   }
 
-  void changePage({BuildContext context, var selectedUnit}){
+  void changePage({BuildContext context, var selectedUnit}) async{
+    await showInterstitialAd();
     Navigator.pushNamed(context, unitConverterChildPage, arguments: {
       'selectedUnit': selectedUnit,
     });

@@ -36,3 +36,17 @@ String getAdFreeTime() {
   String result = SharedPrefService.prefs.getString('ad_free_time')??'zero';
   return result;
 }
+
+bool setCardClick() {
+  int counter = getCardClick();
+  if(counter>=5) counter = 0;
+  else counter ++;
+  SharedPrefService.prefs.setInt('itemClick', counter);
+  print("counter: "+ counter.toString());
+  return getAppPurchasedStatus()?false:counter==0?true:false;
+}
+
+int getCardClick() {
+  int result = SharedPrefService.prefs.getInt('itemClick',)??0;
+  return result;
+}

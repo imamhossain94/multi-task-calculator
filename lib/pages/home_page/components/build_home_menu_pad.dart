@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:multi_task_calculator/pages/home_page/components/build_home_menu_button.dart';
+import 'package:multi_task_calculator/services/google_ad_service.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -14,19 +15,28 @@ class BuildHomeMenuPad extends StatelessWidget {
           BuildHomeMenuButton(
             title: 'General',
             icon:FontAwesomeIcons.calculator,
-            onPressed: () => Navigator.pushNamed(context, generalCalcPage),
+            onPressed: () async {
+              await showInterstitialAd();
+              Navigator.pushNamed(context, generalCalcPage);
+            },
             color: textMaroon,
           ),
           BuildHomeMenuButton(
             title: 'Currency',
             icon: FontAwesomeIcons.funnelDollar,
-            onPressed: ()=> Navigator.pushNamed(context, currencyCalcPage),
+            onPressed: () async {
+              await showInterstitialAd();
+              Navigator.pushNamed(context, currencyCalcPage);
+            },
             color: textBlue,
           ),
           BuildHomeMenuButton(
             title: 'Unit Converter',
             icon: FontAwesomeIcons.tag,
-            onPressed: ()=> Navigator.pushNamed(context, unitConverterPage),
+            onPressed: () async {
+              await showInterstitialAd();
+              Navigator.pushNamed(context, unitConverterPage);
+            },
             color: textAmber,
           ),
         ]),
@@ -34,19 +44,28 @@ class BuildHomeMenuPad extends StatelessWidget {
           BuildHomeMenuButton(
             title: 'Discount',
             icon: FontAwesomeIcons.percentage,
-            onPressed: ()=> Navigator.pushNamed(context, discountCalcPage),
+            onPressed: () async {
+              await showInterstitialAd();
+              Navigator.pushNamed(context, discountCalcPage);
+            },
             color: textMaroon,
           ),
           BuildHomeMenuButton(
             title: 'Tip',
             icon: FontAwesomeIcons.wallet,
-            onPressed: ()=> Navigator.pushNamed(context, tipCalcPage),
+            onPressed: () async {
+              await showInterstitialAd();
+              Navigator.pushNamed(context, tipCalcPage);
+            },
             color: textGreen,
           ),
           BuildHomeMenuButton(
             title: 'Date',
             icon: FontAwesomeIcons.calendarAlt,
-            onPressed: ()=> Navigator.pushNamed(context, dateCalcPage),
+            onPressed: () async {
+              await showInterstitialAd();
+              Navigator.pushNamed(context, dateCalcPage);
+            },
             color: textMaroon,
           ),
         ]),
@@ -54,19 +73,28 @@ class BuildHomeMenuPad extends StatelessWidget {
           BuildHomeMenuButton(
             title: 'Fuel Cost',
             icon: FontAwesomeIcons.gasPump,
-            onPressed: ()=> Navigator.pushNamed(context, fuelCalcPage),
+            onPressed: () async {
+              await showInterstitialAd();
+              Navigator.pushNamed(context, fuelCalcPage);
+            },
             color: textYellow,
           ),
           BuildHomeMenuButton(
             title: 'Fuel Efficiency',
             icon: FontAwesomeIcons.commentDollar,
-            onPressed: ()=> Navigator.pushNamed(context, fuelEfficiencyCalcPage),
+            onPressed: () async {
+              await showInterstitialAd();
+              Navigator.pushNamed(context, fuelEfficiencyCalcPage);
+            },
             color: textMaroon,
           ),
           BuildHomeMenuButton(
             title: 'Health',
             icon: FontAwesomeIcons.heartbeat,
-            onPressed: ()=> Navigator.pushNamed(context, healthCalcPage),
+            onPressed: () async {
+              await showInterstitialAd();
+              Navigator.pushNamed(context, healthCalcPage);
+            },
             color: textOrange,
           ),
         ]),
@@ -74,19 +102,28 @@ class BuildHomeMenuPad extends StatelessWidget {
           BuildHomeMenuButton(
             title: 'Loan',
             icon: FontAwesomeIcons.landmark,
-            onPressed: ()=> Navigator.pushNamed(context, loanCalcPage),
+            onPressed: () async {
+              await showInterstitialAd();
+              Navigator.pushNamed(context, loanCalcPage);
+            },
             color: textBlue,
           ),
           BuildHomeMenuButton(
             title: 'Sales Tax',
             icon: FontAwesomeIcons.fileInvoiceDollar,
-            onPressed: ()=> Navigator.pushNamed(context, salesTaxCalcPage),
+            onPressed: () async {
+              await showInterstitialAd();
+              Navigator.pushNamed(context, salesTaxCalcPage);
+            },
             color: textGreen,
           ),
           BuildHomeMenuButton(
             title: 'Savings',
             icon: FontAwesomeIcons.coins,
-            onPressed: ()=> Navigator.pushNamed(context, savingCalcPage),
+            onPressed: () async {
+              await showInterstitialAd();
+              Navigator.pushNamed(context, savingCalcPage);
+            },
             color: textAmber,
           ),
         ]),
@@ -94,7 +131,10 @@ class BuildHomeMenuPad extends StatelessWidget {
           BuildHomeMenuButton(
             title: 'Unit Price',
             icon: FontAwesomeIcons.balanceScale,
-            onPressed: ()=> Navigator.pushNamed(context, unitPriceCalcPage),
+            onPressed: () async {
+              await showInterstitialAd();
+              Navigator.pushNamed(context, unitPriceCalcPage);
+            },
             color: textGreen,
           ),
 

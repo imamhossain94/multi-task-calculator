@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:multi_task_calculator/components/build_banner_ad.dart';
 import 'package:multi_task_calculator/pages/general_calc_page/components/build_calc_pad.dart';
+import 'package:multi_task_calculator/services/google_ad_service.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:multi_task_calculator/utils/extensions.dart';
 import 'package:multi_task_calculator/utils/screen_config.dart';
@@ -47,7 +48,7 @@ class _GeneralCalcPageState extends State<GeneralCalcPage> {
                 ),
                 tooltip: 'History',
                 onPressed: () async {
-                  //await showInterstitialAd();
+                  await showInterstitialAd();
                   showMessage(context, null, "Coming soon");
                 })
           ],

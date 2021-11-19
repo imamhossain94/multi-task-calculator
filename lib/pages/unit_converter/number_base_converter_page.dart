@@ -101,7 +101,7 @@ class _NumberBaseConverterPageState extends State<NumberBaseConverterPage> {
           actions: [
             IconButton(
               onPressed: () async {
-                //await showInterstitialAd();
+                await showInterstitialAd();
                 resetPage(context, NumberBaseConverterPage());
               },
               icon: Icon(Icons.refresh),

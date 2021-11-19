@@ -16,7 +16,7 @@ const String contactMail = 'mailto:imamagun94@gmail.com';
 // Test ads id
 const String id_app = 'ca-app-pub-3940256099942544~3347511713';
 const String id_banner = 'ca-app-pub-3940256099942544/6300978111';
-const String ic_interstitial = '	ca-app-pub-3940256099942544/1033173712';
+const String ic_interstitial = 'ca-app-pub-3940256099942544/1033173712';
 
 // Real ads id
 // const String id_app = '';
