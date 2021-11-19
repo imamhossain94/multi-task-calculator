@@ -4,6 +4,7 @@ import 'package:multi_task_calculator/pages/unit_converter/components/build_unit
 import 'package:multi_task_calculator/pages/unit_converter/models/unit_converter_helper.dart';
 import 'package:multi_task_calculator/services/google_ad_service.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
+import 'package:multi_task_calculator/utils/extensions.dart';
 import 'package:multi_task_calculator/utils/screen_config.dart';
 import 'package:multi_task_calculator/utils/themes_mode.dart';
 import 'package:units_converter/units_converter.dart';
@@ -191,10 +192,12 @@ class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
             IconButton(
               onPressed: () async {
                 //await showInterstitialAd();
-                Navigator.popAndPushNamed(context, unitConverterChildPage, arguments: {
+                // Navigator.popAndPushNamed(context, unitConverterChildPage, arguments: {
+                //   'selectedUnit': selectedUnit,
+                // });
+                resetPage(context, UnitConverterChildPage(arguments: {
                   'selectedUnit': selectedUnit,
-                });
-                //resetPage(context, unitConverterChildPage);
+                }));
               },
               icon: Icon(Icons.refresh),
               tooltip: 'Reset',
