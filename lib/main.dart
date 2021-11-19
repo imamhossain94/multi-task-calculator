@@ -1,7 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:multi_task_calculator/services/shared_pref_services.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:multi_task_calculator/utils/provider.dart';
@@ -63,7 +62,7 @@ class _MultiTaskCalculatorState extends State<MultiTaskCalculator> {
       theme: AppTheme().lightTheme(),
       darkTheme: AppTheme().darkTheme(),
       themeMode: themeNotifier.getThemeMode(),
-      initialRoute: splashPage,
+      initialRoute: homePage,
       onGenerateRoute: router.generateRoute,
     );
   }

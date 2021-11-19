@@ -53,3 +53,14 @@ flutter:
     - family: Audiowide
       fonts:
         - asset: fonts/Audiowide-Regular.ttf
+
+flutter_native_splash:
+  # flutter pub run flutter_native_splash:create
+  # flutter pub run flutter_native_splash:remove
+
+  color: "#E3EBEC"
+  image: assets/images/ic_launcher_light.png
+  color_dark: "#212230"
+  image_dark: assets/images/ic_launcher_light.png
+  android_gravity: center
+  fullscreen: true

@@ -11,7 +11,6 @@ import 'package:multi_task_calculator/pages/loan_calc/loan_calc_page.dart';
 import 'package:multi_task_calculator/pages/premium_page.dart';
 import 'package:multi_task_calculator/pages/sales_tax_calc/sales_tax_calc_page.dart';
 import 'package:multi_task_calculator/pages/savings_calc/savings_calc_page.dart';
-import 'package:multi_task_calculator/pages/splash_page.dart';
 import 'package:multi_task_calculator/pages/about_page.dart';
 import 'package:multi_task_calculator/pages/feedback_page.dart';
 import 'package:multi_task_calculator/pages/help_page.dart';
@@ -27,9 +26,6 @@ import 'package:page_transition/page_transition.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
-    case splashPage:
-      return PageTransition(child: SplashPage(), type: PageTransitionType.fade, settings: settings,);
-      break;
     case homePage:
       return PageTransition(child: HomePage(), type: PageTransitionType.fade, settings: settings,);
       break;

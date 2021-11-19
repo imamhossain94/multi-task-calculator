@@ -31,7 +31,6 @@ const String appIconLight = 'assets/images/ic_launcher_light.png';
 const String fontAudioWide = 'Audiowide';
 
 //Route
-const String splashPage = 'splash_page';
 const String homePage = 'home_page';
 const String helpPage = 'help_page';
 const String aboutPage = 'about_page';
