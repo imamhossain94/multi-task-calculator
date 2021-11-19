@@ -19,9 +19,9 @@ const String contactMail = 'mailto:imamagun94@gmail.com';
 // const String ic_interstitial = 'ca-app-pub-3940256099942544/1033173712';
 
 // Real ads id
-const String id_app = '';
-const String id_banner = '';
-const String ic_interstitial = '';
+const String id_app = 'ca-app-pub-4061500537427923~1513034907';
+const String id_banner = 'ca-app-pub-4061500537427923/1659857645';
+const String ic_interstitial = 'ca-app-pub-4061500537427923/7088795214';
 
 const String appStoreIdentifier = 'com.newagedevs.multicalc';
 

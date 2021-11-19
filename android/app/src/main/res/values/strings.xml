@@ -1,5 +1,6 @@
 <resources>
     <string name="appName" translatable="false">MultiCalc</string>
     <string name="applicationId">ca-app-pub-4061500537427923~1513034907</string>
+<!--    <string name="applicationId">ca-app-pub-3940256099942544~3347511713</string>-->
 
 </resources>
