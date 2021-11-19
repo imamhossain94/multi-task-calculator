@@ -113,6 +113,7 @@ class _HealthCalcPageState extends State<HealthCalcPage> {
             ),
           ),
           elevation: 0,
+          backgroundColor: Colors.transparent,
           actions: [
             IconButton(
               onPressed: () async {

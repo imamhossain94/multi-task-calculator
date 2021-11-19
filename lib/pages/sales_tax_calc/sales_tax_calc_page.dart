@@ -77,6 +77,7 @@ class _SalesTaxCalcPageState extends State<SalesTaxCalcPage> {
             ),
           ),
           elevation: 0,
+          backgroundColor: Colors.transparent,
           actions: [
             IconButton(
               onPressed: () async {

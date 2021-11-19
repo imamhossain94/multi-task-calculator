@@ -119,6 +119,7 @@ class _SavingsCalcPageState extends State<SavingsCalcPage> {
             ),
           ),
           elevation: 0,
+          backgroundColor: Colors.transparent,
           actions: [
             IconButton(
               onPressed: () async {

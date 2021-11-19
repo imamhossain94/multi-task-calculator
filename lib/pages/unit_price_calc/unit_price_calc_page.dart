@@ -50,6 +50,7 @@ class _UnitPriceCalcPageState extends State<UnitPriceCalcPage> {
                 fontFamily: fontAudioWide, fontSize: responsiveWidth(18)),
           ),
           elevation: 0,
+          backgroundColor: Colors.transparent,
           actions: [
             IconButton(
               onPressed: () async {

@@ -86,6 +86,7 @@ class _FuelCostCalcPageState extends State<FuelCostCalcPage> {
             ),
           ),
           elevation: 0,
+          backgroundColor: Colors.transparent,
           actions: [
             IconButton(
               onPressed: () async {

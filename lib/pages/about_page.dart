@@ -25,7 +25,8 @@ class _AboutPageState extends State<AboutPage> {
           //backgroundColor: Colors.white,
           appBar: AppBar(
             centerTitle: true,
-            elevation: 0.5,
+            elevation: 0.0,
+            backgroundColor: Colors.transparent,
             title: Text(
               'About',
               style: TextStyle(
@@ -40,9 +41,13 @@ class _AboutPageState extends State<AboutPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Expanded(
-                  flex: responsiveHeight(5).toInt(),
-                  child: BuildAppLogo()
+                    flex: responsiveHeight(5).toInt(),
+                    child: Container(
+                        color: ThemesMode.isDarkMode?Colors.black26:Colors.grey[200],
+                        child: BuildAppLogo()
+                    )
                 ),
+                SizedBox(height: 10,),
                 Expanded(
                   flex: responsiveHeight(5).toInt(),
                   child: SingleChildScrollView(

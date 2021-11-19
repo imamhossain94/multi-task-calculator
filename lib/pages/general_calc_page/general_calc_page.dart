@@ -38,6 +38,7 @@ class _GeneralCalcPageState extends State<GeneralCalcPage> {
             ),
           ),
           elevation: 0,
+          backgroundColor: Colors.transparent,
           actions: [
             IconButton(
                 icon: Icon(

@@ -123,6 +123,7 @@ class _LoanCalcPageState extends State<LoanCalcPage> {
             ),
           ),
           elevation: 0,
+          backgroundColor: Colors.transparent,
           actions: [
             IconButton(
               onPressed: () async {

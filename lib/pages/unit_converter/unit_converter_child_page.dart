@@ -186,6 +186,7 @@ class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
             ),
           ),
           elevation: 0,
+          backgroundColor: Colors.transparent,
           actions: [
             IconButton(
               onPressed: () async {

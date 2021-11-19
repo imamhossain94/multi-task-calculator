@@ -131,6 +131,7 @@ class _TipCalcPageState extends State<TipCalcPage> {
             ),
           ),
           elevation: 0,
+          backgroundColor: Colors.transparent,
           actions: [
             IconButton(
               onPressed: () async {

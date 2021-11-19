@@ -103,6 +103,7 @@ class _PremiumPageState extends State<PremiumPage> {
           appBar: AppBar(
             centerTitle: true,
             elevation: 0,
+            backgroundColor: Colors.transparent,
             title: Text(
               'Premium version',
               style: TextStyle(

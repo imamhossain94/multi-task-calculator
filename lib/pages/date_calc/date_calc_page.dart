@@ -60,6 +60,7 @@ class _DateCalcPageState extends State<DateCalcPage> {
             ),
           ),
           elevation: 0,
+          backgroundColor: Colors.transparent,
           actions: [
             IconButton(
               onPressed: () async {

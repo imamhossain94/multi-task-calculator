@@ -83,6 +83,7 @@ class _FuelEfficiencyCalcPageState extends State<FuelEfficiencyCalcPage> {
             ),
           ),
           elevation: 0,
+          backgroundColor: Colors.transparent,
           actions: [
             IconButton(
               onPressed: () async {

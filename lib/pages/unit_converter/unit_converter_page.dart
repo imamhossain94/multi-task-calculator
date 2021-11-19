@@ -32,6 +32,7 @@ class _UnitConverterPageState extends State<UnitConverterPage> {
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
+          backgroundColor: Colors.transparent,
           title: Text(
             'Unit Converter',
             style: TextStyle(

@@ -91,6 +91,7 @@ class _CurrencyCalcPageState extends State<CurrencyCalcPage> {
             ),
           ),
           elevation: 0,
+          backgroundColor: Colors.transparent,
           actions: [
             IconButton(
               onPressed: ()=> getExchangeRate(),

@@ -71,6 +71,7 @@ class _UpdateCheckPageState extends State<UpdateCheckPage> {
           appBar: AppBar(
             centerTitle: true,
             elevation: 0,
+            backgroundColor: Colors.transparent,
             title: Text(
               'Software Update',
               style: TextStyle(

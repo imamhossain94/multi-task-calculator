@@ -13,7 +13,8 @@ class HelpPage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          elevation: 2,
+          elevation: 0,
+          backgroundColor: Colors.transparent,
           title: Text('Help',
             style: TextStyle(
                 fontSize: responsiveText(22),
