@@ -125,28 +125,28 @@ const Map<String, dynamic> AreaUnitsList = {
   'are': AREA.are,
   'acres': AREA.acres,
   'hectares': AREA.hectares,
-  'square_kilometers': AREA.square_kilometers,
-  'square_millimeters': AREA.square_millimeters,
-  'square_yard': AREA.square_yard,
-  'square_miles': AREA.square_miles,
-  'square_feet': AREA.square_feet,
-  'square_inches': AREA.square_inches,
-  'square_centimeters': AREA.square_centimeters,
-  'square_meters': AREA.square_meters,
+  'square_kilometers': AREA.squareKilometers,
+  'square_millimeters': AREA.squareMillimeters,
+  'square_yard': AREA.squareYard,
+  'square_miles': AREA.squareMiles,
+  'square_feet': AREA.squareFeet,
+  'square_inches': AREA.squareInches,
+  'square_centimeters': AREA.squareCentimeters,
+  'square_meters': AREA.squareMeters,
 };
 //All Energy Unit
 const Map<String, dynamic> EnergyUnitsList = {
   'joules': ENERGY.joules,
   'calories': ENERGY.calories,
-  'kilowatt_hours': ENERGY.kilowatt_hours,
+  'kilowatt_hours': ENERGY.kilowattHours,
   'electronvolts': ENERGY.electronvolts,
 };
 //All Force Unit
 const Map<String, dynamic> ForceUnitsList = {
   'newton': FORCE.newton,
   'dyne': FORCE.dyne,
-  'pound_force': FORCE.pound_force,
-  'kilogram_force': FORCE.kilogram_force,
+  'pound_force': FORCE.poundForce,
+  'kilogram_force': FORCE.kilogramForce,
   'poundal': FORCE.poundal,
 };
 //All Length Unit
@@ -155,7 +155,7 @@ const Map<String, dynamic> LengthUnitsList = {
   'centimeters': LENGTH.centimeters,
   'inches': LENGTH.inches,
   'feet': LENGTH.feet,
-  'nautical_miles': LENGTH.nautical_miles,
+  'nautical_miles': LENGTH.nauticalMiles,
   'yards': LENGTH.yards,
   'miles': LENGTH.miles,
   'millimeters': LENGTH.millimeters,
@@ -164,8 +164,8 @@ const Map<String, dynamic> LengthUnitsList = {
   'angstroms': LENGTH.angstroms,
   'picometers': LENGTH.picometers,
   'kilometers': LENGTH.kilometers,
-  'astronomical_units': LENGTH.astronomical_units,
-  'light_years': LENGTH.light_years,
+  'astronomical_units': LENGTH.astronomicalUnits,
+  'light_years': LENGTH.lightYears,
   'parsec': LENGTH.parsec,
 };
 //All Number Base Unit
@@ -182,8 +182,8 @@ const Map<String, dynamic> PowerUnitsList = {
   'kilowatt': POWER.kilowatt,
   'megawatt': POWER.megawatt,
   'gigawatt': POWER.gigawatt,
-  'european_horse_power': POWER.european_horse_power,
-  'imperial_horse_power': POWER.imperial_horse_power,
+  'european_horse_power': POWER.europeanHorsePower,
+  'imperial_horse_power': POWER.imperialHorsePower,
 };
 //All Pressure Unit
 const Map<String, dynamic> PressureUnitsList = {
@@ -196,11 +196,11 @@ const Map<String, dynamic> PressureUnitsList = {
 };
 //All Speed Unit
 const Map<String, dynamic> SpeedUnitsList = {
-  'meters_per_second': SPEED.meters_per_second,
-  'kilometers_per_hour': SPEED.kilometers_per_hour,
-  'miles_per_hour': SPEED.miles_per_hour,
+  'meters_per_second': SPEED.metersPerSecond,
+  'kilometers_per_hour': SPEED.kilometersPerHour,
+  'miles_per_hour': SPEED.milesPerHour,
   'knots': SPEED.knots,
-  'feets_per_second': SPEED.feets_per_second,
+  'feets_per_second': SPEED.feetsPerSecond,
 };
 //All Temperature Unit
 const Map<String, dynamic> TemperatureUnitsList = {
@@ -253,7 +253,7 @@ const Map<String, dynamic> TimeUnitsList = {
   'hours': TIME.hours,
   'days': TIME.days,
   'weeks': TIME.weeks,
-  'years_365': TIME.years_365,
+  'years_365': TIME.years365,
   'lustrum': TIME.lustrum,
   'decades': TIME.decades,
   'centuries': TIME.centuries,
@@ -261,24 +261,24 @@ const Map<String, dynamic> TimeUnitsList = {
 };
 //All Volume Unit
 const Map<String, dynamic> VolumeUnitsList = {
-  'seconds': VOLUME.cubic_meters,
+  'seconds': VOLUME.cubicMeters,
   'liters': VOLUME.liters,
-  'imperial_gallons': VOLUME.imperial_gallons,
-  'us_gallons': VOLUME.us_gallons,
-  'imperial_pints': VOLUME.imperial_pints,
-  'us_pints': VOLUME.us_pints,
+  'imperial_gallons': VOLUME.imperialGallons,
+  'us_gallons': VOLUME.usGallons,
+  'imperial_pints': VOLUME.imperialPints,
+  'us_pints': VOLUME.usPints,
   'milliliters': VOLUME.milliliters,
-  'tablespoons_us': VOLUME.tablespoons_us,
-  'australian_tablespoons': VOLUME.australian_tablespoons,
+  'tablespoons_us': VOLUME.tablespoonsUs,
+  'australian_tablespoons': VOLUME.australianTablespoons,
   'cups': VOLUME.cups,
-  'cubic_centimeters': VOLUME.cubic_centimeters,
-  'cubic_feet': VOLUME.cubic_feet,
-  'cubic_inches': VOLUME.cubic_inches,
-  'cubic_millimeters': VOLUME.cubic_millimeters,
-  'imperial_fluid_ounces': VOLUME.imperial_fluid_ounces,
-  'us_fluid_ounces': VOLUME.us_fluid_ounces,
-  'imperial_gill': VOLUME.imperial_gill,
-  'us_gill': VOLUME.us_gill,
+  'cubic_centimeters': VOLUME.cubicCentimeters,
+  'cubic_feet': VOLUME.cubicFeet,
+  'cubic_inches': VOLUME.cubicInches,
+  'cubic_millimeters': VOLUME.cubicMillimeters,
+  'imperial_fluid_ounces': VOLUME.imperialFluidOunces,
+  'us_fluid_ounces': VOLUME.usFluidOunces,
+  'imperial_gill': VOLUME.imperialGill,
+  'us_gill': VOLUME.usGill,
 };
 //All Weight Unit
 const Map<String, dynamic> WeightUnitsList = {
@@ -294,34 +294,34 @@ const Map<String, dynamic> WeightUnitsList = {
   'carats': MASS.carats,
   'centigrams': MASS.centigrams,
   'pennyweights': MASS.pennyweights,
-  'troy_ounces': MASS.troy_ounces,
+  'troy_ounces': MASS.troyOunces,
   'stones': MASS.stones,
 };
 //All FuelConsumption Unit
 const Map<String, dynamic> FuelUnitsList = {
-  'kilometers_per_liter': FUEL_CONSUMPTION.kilometers_per_liter,
-  'liters_per_100_km': FUEL_CONSUMPTION.liters_per_100_km,
-  'miles_per_US_gallon': FUEL_CONSUMPTION.miles_per_US_gallon,
-  'miles_per_imperial_gallon': FUEL_CONSUMPTION.miles_per_imperial_gallon,
+  'kilometers_per_liter': FUEL_CONSUMPTION.kilometersPerLiter,
+  'liters_per_100_km': FUEL_CONSUMPTION.litersPer100km,
+  'miles_per_US_gallon': FUEL_CONSUMPTION.milesPerUsGallon,
+  'miles_per_imperial_gallon': FUEL_CONSUMPTION.milesPerImperialGallon,
 };
 //All Torque Unit
 const Map<String, dynamic> TorqueUnitsList = {
-  'newton_meter': TORQUE.newton_meter,
-  'dyne_meter': TORQUE.dyne_meter,
-  'pound_force_feet': TORQUE.pound_force_feet,
-  'kilogram_force_meter': TORQUE.kilogram_force_meter,
-  'poundal_meter': TORQUE.poundal_meter,
+  'newton_meter': TORQUE.newtonMeter,
+  'dyne_meter': TORQUE.dyneMeter,
+  'pound_force_feet': TORQUE.poundForceFeet,
+  'kilogram_force_meter': TORQUE.kilogramForceMeter,
+  'poundal_meter': TORQUE.poundalMeter,
 };
 //All ShoeSize Unit
 const Map<String, dynamic> ShoeSizeUnitsList = {
   'centimeters': SHOE_SIZE.centimeters,
   'inches': SHOE_SIZE.inches,
-  'eu_china': SHOE_SIZE.eu_china,
-  'uk_india_child': SHOE_SIZE.uk_india_child,
-  'uk_india_man': SHOE_SIZE.uk_india_man,
-  'uk_india_woman': SHOE_SIZE.uk_india_woman,
-  'usa_canada_child': SHOE_SIZE.usa_canada_child,
-  'usa_canada_man': SHOE_SIZE.usa_canada_man,
-  'usa_canada_woman': SHOE_SIZE.usa_canada_woman,
+  'eu_china': SHOE_SIZE.euChina,
+  'uk_india_child': SHOE_SIZE.ukIndiaChild,
+  'uk_india_man': SHOE_SIZE.ukIndiaMan,
+  'uk_india_woman': SHOE_SIZE.ukIndiaWoman,
+  'usa_canada_child': SHOE_SIZE.usaCanadaChild,
+  'usa_canada_man': SHOE_SIZE.usaCanadaMan,
+  'usa_canada_woman': SHOE_SIZE.usaCanadaWoman,
   'japan': SHOE_SIZE.japan,
 };
