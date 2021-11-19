@@ -326,7 +326,7 @@ class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
                   )
               ),
             ),
-            //BuildBannerAd(),
+            BuildBannerAd(),
           ],
         ),
       ),

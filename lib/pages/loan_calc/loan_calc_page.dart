@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:multi_task_calculator/components/build_banner_ad.dart';
 import 'package:multi_task_calculator/components/build_result_card.dart';
 import 'package:multi_task_calculator/components/build_text_field.dart';
 import 'package:multi_task_calculator/pages/loan_calc/components/loan_type_picker.dart';
@@ -211,7 +212,7 @@ class _LoanCalcPageState extends State<LoanCalcPage> {
                 ),
               ),
             ),
-            //BuildBannerAd(),
+            BuildBannerAd(),
           ],
         ),
       ),

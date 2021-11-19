@@ -113,7 +113,7 @@ class _UnitPriceCalcPageState extends State<UnitPriceCalcPage> {
                 ),
               ),
             ),
-            //BuildBannerAd(),
+            BuildBannerAd(),
           ],
         ),
       ),

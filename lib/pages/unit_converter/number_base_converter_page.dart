@@ -235,7 +235,7 @@ class _NumberBaseConverterPageState extends State<NumberBaseConverterPage> {
                   )
               ),
             ),
-            //BuildBannerAd(),
+            BuildBannerAd(),
           ],
         ),
       ),

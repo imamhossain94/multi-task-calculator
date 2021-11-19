@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:multi_task_calculator/components/build_banner_ad.dart';
 import 'package:multi_task_calculator/components/build_result_card.dart';
 import 'package:multi_task_calculator/components/build_text_field.dart';
 import 'package:multi_task_calculator/pages/savings_calc/components/build_savings_value_picker.dart';
@@ -211,7 +212,7 @@ class _SavingsCalcPageState extends State<SavingsCalcPage> {
                 ),
               ),
             ),
-            //BuildBannerAd(),
+            BuildBannerAd(),
           ],
         ),
       ),

@@ -49,6 +49,7 @@ class _UnitConverterPageState extends State<UnitConverterPage> {
                   child: BuildUnitConverterMenuPad(),
                 )
             ),
+            BuildBannerAd(),
           ],
         ),
       ),

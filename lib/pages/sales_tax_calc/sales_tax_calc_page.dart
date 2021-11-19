@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:multi_task_calculator/components/build_banner_ad.dart';
 import 'package:multi_task_calculator/components/build_result_card.dart';
 import 'package:multi_task_calculator/components/build_text_field.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
@@ -145,7 +146,7 @@ class _SalesTaxCalcPageState extends State<SalesTaxCalcPage> {
                 ),
               ),
             ),
-            //BuildBannerAd(),
+            BuildBannerAd(),
           ],
         ),
       ),
