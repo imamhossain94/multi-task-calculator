@@ -86,14 +86,15 @@ class _UpdateCheckPageState extends State<UpdateCheckPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Expanded(
-                  flex: responsiveHeight(1).toInt(),
+                  flex: 1,
                   child: Container(
+                      padding: EdgeInsets.all(30),
                       color: ThemesMode.isDarkMode?Colors.black26:Colors.grey[200],
                       child: BuildAppLogo()
                   )
                 ),
                 Expanded(
-                  flex: responsiveHeight(1).toInt(),
+                  flex: 1,
                   child:isLoading? loading():
                   isUpdated?noUpdate():forceUpdate?emergencyUpdate():regularUpdate(),
                 ),
