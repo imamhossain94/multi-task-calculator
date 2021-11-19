@@ -44,14 +44,11 @@ class _UnitConverterPageState extends State<UnitConverterPage> {
         body: Column(
           children: [
             Expanded(
-                child: ListView(
+                child: SingleChildScrollView(
                   physics: BouncingScrollPhysics(),
-                  children: [
-                    BuildUnitConverterMenuPad()
-                  ],
+                  child: BuildUnitConverterMenuPad(),
                 )
             ),
-            //BuildBannerAd(),
           ],
         ),
       ),

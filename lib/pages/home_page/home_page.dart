@@ -164,11 +164,9 @@ class _HomePageState extends State<HomePage> {
           body: Column(
             children: [
               Expanded(
-                  child: ListView(
+                  child: SingleChildScrollView(
                     physics: BouncingScrollPhysics(),
-                    children: [
-                      BuildHomeMenuPad()
-                    ],
+                    child: BuildHomeMenuPad(),
                   )
               ),
               // rewardSeconds != null?
@@ -181,7 +179,7 @@ class _HomePageState extends State<HomePage> {
               //           '${(rewardTime-rewardSeconds)~/60}m ${(rewardTime-rewardSeconds)%60}s'
               //       ),
               //     ):
-              // BuildBannerAd(),
+              BuildBannerAd(),
             ],
           ),
         ),

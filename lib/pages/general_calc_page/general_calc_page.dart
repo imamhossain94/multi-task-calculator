@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:multi_task_calculator/components/build_banner_ad.dart';
 import 'package:multi_task_calculator/pages/general_calc_page/components/build_calc_pad.dart';
 import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:multi_task_calculator/utils/extensions.dart';
@@ -141,7 +142,7 @@ class _GeneralCalcPageState extends State<GeneralCalcPage> {
               },
             ),
             SizedBox(height: 5,),
-            //BuildBannerAd(),
+            BuildBannerAd(),
           ],
         ),
       ),
