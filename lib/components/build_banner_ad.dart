@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:multi_task_calculator/services/shared_pref_services.dart';
+import 'package:multi_task_calculator/utils/constant.dart';
 import 'package:multi_task_calculator/utils/screen_config.dart';
 
 
@@ -33,7 +34,7 @@ class _BuildBannerAdState extends State<BuildBannerAd> {
 
   void initBannerAds() {
     _bannerAd = BannerAd(
-      adUnitId: BannerAd.testAdUnitId,
+      adUnitId: id_banner,
       request: AdRequest(),
       size: AdSize.banner,
       listener: BannerAdListener(
