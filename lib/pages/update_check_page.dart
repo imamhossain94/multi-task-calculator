@@ -1,286 +1,242 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:multi_task_calculator/components/build_app_logo.dart';
-import 'package:multi_task_calculator/services/shared_pref_services.dart';
-import 'package:multi_task_calculator/utils/constant.dart';
-import 'package:multi_task_calculator/utils/screen_config.dart';
-import 'package:multi_task_calculator/utils/themes_mode.dart';
-import 'package:package_info/package_info.dart';
-import 'package:pub_semver/pub_semver.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
+﻿import 'package:flutter/material.dart';
 
+import '../components/app_surface.dart';
+import '../services/app_version_service.dart';
+import '../services/shared_pref_services.dart';
+import '../utils/app_color.dart';
+import '../utils/constant.dart';
+import '../utils/extensions.dart';
+/// Manual "check for update" screen.
+///
+/// The previous version read the latest version from a Firestore collection.
+/// Firebase has been removed, so this now fetches a small JSON manifest over
+/// HTTPS â€” which also fixes the crash that happened whenever the collection
+/// had no document (both `latestAppVersion` and `currentAppVersion` were left
+/// null and then compared).
 class UpdateCheckPage extends StatefulWidget {
+  const UpdateCheckPage({super.key});
+
   @override
-  _UpdateCheckPageState createState() => _UpdateCheckPageState();
+  State<UpdateCheckPage> createState() => _UpdateCheckPageState();
 }
 
 class _UpdateCheckPageState extends State<UpdateCheckPage> {
-
-  final fireStoreInstance = FirebaseFirestore.instance;
-  Version latestAppVersion, currentAppVersion;
-  bool forceUpdate, isUpdated, isLoading = true;
+  UpdateInfo? _info;
+  bool _isChecking = false;
 
   @override
   void initState() {
     super.initState();
-    checkForUpdate();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _check());
   }
 
-
-  void checkForUpdate() async{
-
-    await fireStoreInstance.collection("version").get().then((querySnapshot) {
-      querySnapshot.docs.forEach((result) {
-        var data = result.data();
-        latestAppVersion = Version.parse(data['appVersion']);
-        forceUpdate = data['forceUpdate'];
-      });
-    });
-
-    await PackageInfo.fromPlatform().then((PackageInfo packageInfo) async{
-      String version = packageInfo.version;
-      currentAppVersion = Version.parse(version);
-      var prefs = await SharedPreferences.getInstance();
-      prefs.setString(appVersion, version);
-    });
-
-    if(latestAppVersion > currentAppVersion){
-      isUpdated = false;
-    }else{
-      isUpdated = true;
-    }
-
+  Future<void> _check() async {
+    if (!mounted) return;
     setState(() {
-      isLoading = false;
+      _isChecking = true;
+      _info = null;
+    });
+
+    // Remember the running version for the About screen and the drawer.
+    final String installed = await AppVersionService.installedVersion();
+    if (installed.isNotEmpty) {
+      await SharedPrefService.setAppVersion(installed);
+    }
+    await SharedPrefService.setLastUpdateCheck(
+      DateTime.now().millisecondsSinceEpoch,
+    );
+
+    final UpdateInfo info = await AppVersionService().check();
+    if (!mounted) return;
+    setState(() {
+      _isChecking = false;
+      _info = info;
     });
   }
-
-
 
   @override
   Widget build(BuildContext context) {
-    ScreenConfig().init(context);
-    ThemesMode().init(context);
-
-    return SafeArea(
-      child: Scaffold(
-          //backgroundColor: Colors.white,
-          appBar: AppBar(
-            centerTitle: true,
-            elevation: 0,
-            backgroundColor: Colors.transparent,
-            title: Text(
-              'Software Update',
-              style: TextStyle(
-                  fontSize: responsiveText(22),
-                  fontFamily: fontAudioWide,
-              ),
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Software Update'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () => Navigator.of(context).maybePop(),
+        ),
+        actions: <Widget>[
+          IconButton(
+            onPressed: _isChecking ? null : _check,
+            tooltip: 'Check again',
+            icon: const Icon(Icons.refresh_rounded),
           ),
-          body: Container(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
+        ],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(14, 10, 14, 24),
+        physics: const BouncingScrollPhysics(),
+        children: <Widget>[
+          AppGradientCard(
+            palette: AppPalettes.neutral,
+            child: Row(
+              children: <Widget>[
+                Image.asset(appIconLight, height: 56, width: 56),
+                const SizedBox(width: 14),
                 Expanded(
-                  flex: 1,
-                  child: Container(
-                      padding: EdgeInsets.all(30),
-                      color: ThemesMode.isDarkMode?Colors.black26:Colors.grey[200],
-                      child: BuildAppLogo()
-                  )
-                ),
-                Expanded(
-                  flex: 1,
-                  child:isLoading? loading():
-                  isUpdated?noUpdate():forceUpdate?emergencyUpdate():regularUpdate(),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                      '$appName: ${getAppVersion()}',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontSize: responsiveText(16),
-                        fontWeight: FontWeight.bold
-                      )
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text(
+                        appName,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'Audiowide',
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Installed: ${_info?.currentVersion.isNotEmpty ?? false ? _info!.currentVersion : 'â€”'}',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.9),
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
-                )
-
+                ),
               ],
             ),
-          )),
+          ),
+          const SizedBox(height: 16),
+          if (_isChecking)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 40),
+              child: Column(
+                children: <Widget>[
+                  CircularProgressIndicator(),
+                  SizedBox(height: 18),
+                  Text('Checking for an updateâ€¦'),
+                ],
+              ),
+            )
+          else if (_info != null)
+            _StatusCard(info: _info!, onRetry: _check),
+        ],
+      ),
     );
   }
+}
 
-  Widget loading(){
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(
-              ThemesMode.isDarkMode?Colors.white12:Colors.black45
+class _StatusCard extends StatelessWidget {
+  const _StatusCard({required this.info, required this.onRetry});
+
+  final UpdateInfo info;
+  final Future<void> Function() onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    late final IconData icon;
+    late final String title;
+    late final String body;
+    late final Color color;
+    final bool showUpdate = info.status == UpdateStatus.updateAvailable;
+    final bool force = info.status == UpdateStatus.forceUpdate;
+
+    switch (info.status) {
+      case UpdateStatus.upToDate:
+        icon = Icons.check_circle_rounded;
+        title = 'You are up to date';
+        body = 'You are running the latest version '
+            '(${info.currentVersion}). Nothing to do.';
+        color = AppColors.success;
+      case UpdateStatus.updateAvailable:
+        icon = Icons.system_update_rounded;
+        title = 'Update available';
+        body = 'Version ${info.latestVersion} is on the Play Store.';
+        color = AppColors.info;
+      case UpdateStatus.forceUpdate:
+        icon = Icons.warning_amber_rounded;
+        title = 'Update required';
+        body = 'Please update to version ${info.latestVersion} to keep using '
+            'the app.';
+        color = AppColors.danger;
+      case UpdateStatus.failed:
+        icon = Icons.cloud_off_rounded;
+        title = 'Could not check';
+        body = info.error ?? 'Something went wrong. Please try again.';
+        color = AppColors.warning;
+    }
+
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: color, size: 28),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
-        SizedBox(
-          height: responsiveHeight(30),
-        ),
-        Text(
-            'Please wait\nwhile we are checking\nfor an update.',
+          const SizedBox(height: 12),
+          Text(
+            body,
             textAlign: TextAlign.center,
             style: TextStyle(
-                fontSize: responsiveText(16),
-                fontWeight: FontWeight.bold,
-                color: ThemesMode.isDarkMode?Colors.white12:Colors.black45
-            )
-        ),
-      ],
-    );
-  }
-
-  Widget noUpdate(){
-    return Container(
-      alignment: Alignment.center,
-      child: Text(
-          'NO UPDATE',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: responsiveText(34),
-            fontFamily: fontAudioWide,
-            color: ThemesMode.isDarkMode?Colors.white12:Colors.black12
-          )
-      ),
-    );
-  }
-
-  Widget emergencyUpdate(){
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text('Emergency Update Available',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontSize: responsiveText(18),
-                  fontWeight: FontWeight.bold
-              )
-          ),
-          Divider(),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(15, 20, 15, 25),
-            child: Text(
-                'Please update this app to continue with the new version: $latestAppVersion',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontSize: responsiveText(16),
-                    fontWeight: FontWeight.bold,
-                    color: ThemesMode.isDarkMode?Colors.white12:Colors.black45
-                )
+              fontSize: 14.5,
+              height: 1.4,
+              color: Theme.of(context).textTheme.bodySmall?.color,
             ),
           ),
-
-          buildHeaderClickable(
-              title: 'Update Now',
-              color: textBlue.withOpacity(0.7),
-              onPressed: () async{
-                if (await canLaunch(appLink)) {
-                await launch(appLink);
-                } else {
-                throw 'Could not launch $appLink';
-                }
-              }
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget regularUpdate(){
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text('Update Available',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontSize: responsiveText(18),
-                  fontWeight: FontWeight.bold
-              )
-          ),
-          Divider(),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(15, 20, 15, 25),
-            child: Text(
-                'A newer version ($latestAppVersion) of this app is available',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontSize: responsiveText(16),
-                    fontWeight: FontWeight.bold,
-                    color: ThemesMode.isDarkMode?Colors.white12:Colors.black45
-                )
-            ),
-          ),
-
-          buildHeaderClickable(
-            title: 'Update Now',
-            color: textBlue.withOpacity(0.7),
-            onPressed: () async{
-              if (await canLaunch(appLink)) {
-                await launch(appLink);
-              } else {
-                throw 'Could not launch $appLink';
-              }
-            }
-          ),
-          buildHeaderClickable(
-              title: 'Not Now',
-              color: textRed.withOpacity(0.7),
-              onPressed: (){
-                Navigator.pop(context);
-              }
-          ),
-
-        ],
-      ),
-    );
-  }
-
-  Widget buildHeaderClickable({String title, VoidCallback onPressed, Color color}) {
-    return Material(
-      color: Colors.transparent,
-      child: new InkWell(
-          onTap: () {
-            onPressed();
-            //print("tapped");
-          },
-          child: Container(
-            height: responsiveHeight(40),
-            alignment: Alignment.center,
-            margin: EdgeInsets.all(5),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                color: Colors.grey.withOpacity(0.12),
-            ),
-            child: Text(
-              title,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontSize: responsiveText(16),
-                  color: color
-                  //fontWeight: FontWeight.bold
+          if (info.notes != null && info.notes!.isNotEmpty) ...<Widget>[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                info.notes!,
+                style: const TextStyle(fontSize: 13.5, height: 1.4),
               ),
             ),
-          )
+          ],
+          const SizedBox(height: 18),
+          if (showUpdate || force)
+            AppButton(
+              label: 'Update now',
+              icon: Icons.download_rounded,
+              palette: AppPalettes.general,
+              onPressed: () => openExternal(context, appLink),
+            )
+          else
+            AppButton(
+              label: 'Check again',
+              icon: Icons.refresh_rounded,
+              palette: AppPalettes.neutral,
+              onPressed: onRetry,
+            ),
+        ],
       ),
     );
   }
-
 }

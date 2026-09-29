@@ -1,56 +1,190 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:multi_task_calculator/components/build_banner_ad.dart';
-import 'package:multi_task_calculator/pages/unit_converter/components/build_unit_converter_menu_pad.dart';
-import 'package:multi_task_calculator/utils/constant.dart';
-import 'package:multi_task_calculator/utils/screen_config.dart';
-import 'package:multi_task_calculator/utils/themes_mode.dart';
+﻿import 'package:flutter/material.dart';
+import '../../services/google_ad_service.dart';
 
-class UnitConverterPage extends StatefulWidget {
+import '../../components/app_surface.dart';
+import '../../components/calculator_scaffold.dart';
+import '../../utils/app_color.dart';
+import '../../utils/constant.dart';
+import 'models/unit_category.dart';
+
+/// Category picker for the unit converter.
+class UnitConverterPage extends StatelessWidget {
+  const UnitConverterPage({super.key});
+
+  static const ToolPalette _palette = AppPalettes.unitConverter;
+
   @override
-  _UnitConverterPageState createState() => _UnitConverterPageState();
+  Widget build(BuildContext context) {
+    return CalculatorScaffold(
+      palette: _palette,
+      title: 'Unit Converter',
+      icon: Icons.swap_horiz_rounded,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.fromLTRB(4, 4, 4, 10),
+          child: Text(
+            'Pick a category to convert between its units.',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ),
+        _CategoryGrid(categories: unitCategories, palette: _palette),
+        const SizedBox(height: 14),
+        AppButton(
+          label: 'Number Base Converter',
+          icon: Icons.tag_rounded,
+          palette: AppPalettes.numberBase,
+          onPressed: () =>
+              Navigator.of(context).pushNamed(numberBaseConverterPage),
+        ),
+      ],
+    );
+  }
 }
 
-class _UnitConverterPageState extends State<UnitConverterPage> {
+class _CategoryGrid extends StatelessWidget {
+  const _CategoryGrid({required this.categories, required this.palette});
+
+  final List<UnitCategory> categories;
+  final ToolPalette palette;
 
   @override
-  void initState() {
-    super.initState();
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        // Three columns on a phone, more on a tablet.
+        final int columns = constraints.maxWidth > 600 ? 5 : 3;
+        return GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: columns,
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 10,
+          childAspectRatio: 1.05,
+          children: categories.map((UnitCategory category) {
+            return _CategoryTile(
+              category: category,
+              palette: palette,
+              onTap: () => _open(context, category),
+            );
+          }).toList(growable: false),
+        );
+      },
+    );
   }
 
-  @override
-  void dispose() {
-    super.dispose();
+  Future<void> _open(BuildContext context, UnitCategory category) async {
+    await showInterstitialAd();
+    if (!context.mounted) return;
+    await Navigator.of(context).pushNamed(
+      unitConverterChildPage,
+      arguments: <String, String>{'category': category.label},
+    );
+  }
+}
+
+class _CategoryTile extends StatelessWidget {
+  const _CategoryTile({
+    required this.category,
+    required this.palette,
+    required this.onTap,
+  });
+
+  final UnitCategory category;
+  final ToolPalette palette;
+  final VoidCallback onTap;
+
+  /// Icon per category, so the grid is scannable at a glance.
+  static IconData iconFor(String iconKey) {
+    switch (iconKey) {
+      case 'angle':
+        return Icons.rotate_right_rounded;
+      case 'area':
+        return Icons.crop_square_rounded;
+      case 'energy':
+        return Icons.bolt_rounded;
+      case 'force':
+        return Icons.fitness_center_rounded;
+      case 'length':
+        return Icons.straighten_rounded;
+      case 'power':
+        return Icons.power_rounded;
+      case 'pressure':
+        return Icons.compress_rounded;
+      case 'speed':
+        return Icons.speed_rounded;
+      case 'shoe':
+        return Icons.ice_skating_rounded;
+      case 'temperature':
+        return Icons.thermostat_rounded;
+      case 'storage':
+        return Icons.storage_rounded;
+      case 'weight':
+        return Icons.monitor_weight_rounded;
+      case 'time':
+        return Icons.schedule_rounded;
+      case 'volume':
+        return Icons.local_drink_rounded;
+      case 'fuel':
+        return Icons.local_gas_station_rounded;
+      case 'torque':
+        return Icons.settings_rounded;
+      default:
+        return Icons.straighten_rounded;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    ThemesMode().init(context);
-    ScreenConfig().init(context);
-
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          title: Text(
-            'Unit Converter',
-            style: TextStyle(
-                //color: Colors.black,
-                fontFamily: fontAudioWide,
-                fontSize: responsiveText(18)),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(18),
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-        ),
-        body: Column(
-          children: [
-            Expanded(
-                child: SingleChildScrollView(
-                  physics: BouncingScrollPhysics(),
-                  child: BuildUnitConverterMenuPad(),
-                )
-            ),
-            BuildBannerAd(),
-          ],
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  gradient: palette.linear,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(iconFor(category.iconKey),
+                    color: Colors.white, size: 21),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                category.label,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w800,
+                  height: 1.2,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                '${category.units.length} units',
+                style: const TextStyle(fontSize: 10.5),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -1,159 +1,153 @@
-import 'package:flutter/material.dart';
-import 'package:multi_task_calculator/components/build_banner_ad.dart';
-import 'package:multi_task_calculator/components/build_result_card.dart';
-import 'package:multi_task_calculator/components/build_text_field.dart';
-import 'package:multi_task_calculator/services/google_ad_service.dart';
-import 'package:multi_task_calculator/utils/constant.dart';
-import 'package:multi_task_calculator/utils/extensions.dart';
-import 'package:multi_task_calculator/utils/screen_config.dart';
-import 'package:multi_task_calculator/utils/themes_mode.dart';
+﻿import 'package:flutter/material.dart';
+import '../../services/google_ad_service.dart';
 
-
+import '../../components/build_result_card.dart';
+import '../../components/build_text_field.dart';
+import '../../components/calculator_scaffold.dart';
+import '../../utils/app_color.dart';
+import '../../utils/calculator_math.dart';
+import '../../utils/extensions.dart';
+import '../../utils/num_x.dart';
+/// Adds a sales tax to a price.
+///
+/// The previous version divided nothing unguarded but never reset its results,
+/// so clearing the price left the last number on screen.
 class SalesTaxCalcPage extends StatefulWidget {
+  const SalesTaxCalcPage({super.key});
+
   @override
-  _SalesTaxCalcPageState createState() => _SalesTaxCalcPageState();
+  State<SalesTaxCalcPage> createState() => _SalesTaxCalcPageState();
 }
 
 class _SalesTaxCalcPageState extends State<SalesTaxCalcPage> {
+  final TextEditingController _priceController = TextEditingController();
+  final TextEditingController _rateController = TextEditingController();
 
+  double _tax = 0;
+  double _totalPrice = 0;
+  bool _hasInput = false;
 
-  TextEditingController taxRateController = TextEditingController();
-  TextEditingController originalPriceController = TextEditingController();
-
-  String taxRate, originalPrice;
-  double tax, totalPrice;
-
+  static const ToolPalette _palette = AppPalettes.salesTax;
 
   @override
   void initState() {
-    tax = 0.0;
-    totalPrice = 0.0;
-    calculateDiscount();
     super.initState();
+    _priceController.addListener(_recalculate);
+    _rateController.addListener(_recalculate);
   }
 
   @override
   void dispose() {
-    taxRateController.dispose();
-    originalPriceController.dispose();
+    _priceController.dispose();
+    _rateController.dispose();
     super.dispose();
   }
 
-  void calculateDiscount() {
-    taxRateController.addListener(() {
-      updateResult();
-    });
-    originalPriceController.addListener(() {
-      updateResult();
-    });
-  }
+  void _recalculate() {
+    final double price = double.tryParse(_priceController.text) ?? 0;
+    final double rate = double.tryParse(_rateController.text) ?? 0;
 
-  void updateResult() {
-    taxRate = taxRateController.value.text;
-    originalPrice = originalPriceController.value.text;
-    //Make null safety
+    if (price <= 0) {
+      if (_hasInput || _tax != 0 || _totalPrice != 0) {
+        setState(() {
+          _hasInput = false;
+          _tax = 0;
+          _totalPrice = 0;
+        });
+      }
+      return;
+    }
+
+    final ({double tax, double total}) result =
+        salesTax(price: price, ratePercent: rate);
     setState(() {
-
-      double _taxRate = double.tryParse(taxRate)??0.0;
-      double _originalPrice = double.tryParse(originalPrice)??0.0;
-
-      tax =  _originalPrice * (_taxRate/100);
-      totalPrice = _originalPrice + tax;
-
+      _hasInput = true;
+      _tax = result.tax;
+      _totalPrice = result.total;
     });
   }
 
+  Future<void> _reset() async {
+    await showInterstitialAd();
+    if (!mounted) return;
+    resetPage(context, const SalesTaxCalcPage());
+  }
 
   @override
   Widget build(BuildContext context) {
-    ScreenConfig().init(context);
-    ThemesMode().init(context);
-
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Sales Tax Calculator',
-            style: TextStyle(
-              fontFamily: fontAudioWide,
-              fontSize: responsiveWidth(18)
+    return CalculatorScaffold(
+      palette: _palette,
+      title: 'Sales Tax Calculator',
+      icon: Icons.receipt_long_rounded,
+      actions: <Widget>[CalculatorResetButton(onPressed: _reset)],
+      children: <Widget>[
+        Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              BuildTextField(
+                title: 'Original Price',
+                hint: '0.00',
+                isEnabled: true,
+                textController: _priceController,
+                palette: _palette,
+                onPressedAction: null,
+                widget: const Text(r'$'),
+              ),
+              BuildTextField(
+                title: 'Tax Rate',
+                hint: '0.00',
+                isEnabled: true,
+                textController: _rateController,
+                palette: _palette,
+                onPressedAction: null,
+                widget: const Text('%'),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 6),
+        Row(
+          children: <Widget>[
+            BuildResultCard(
+              title: 'Tax Amount',
+              numeric: _tax,
+              prefix: r'$',
+              palette: _palette,
+              icon: Icons.account_balance_rounded,
+            ),
+            BuildResultCard(
+              title: 'Total Price',
+              numeric: _totalPrice,
+              prefix: r'$',
+              palette: _palette,
+              icon: Icons.shopping_bag_rounded,
+            ),
+          ],
+        ),
+        if (_hasInput)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+            child: Text(
+              '${NumX.money(_totalPrice - _tax)} + '
+              '${NumX.money(_tax)} tax = ${NumX.money(_totalPrice)}.',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall,
             ),
           ),
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          actions: [
-            IconButton(
-              onPressed: () async {
-                await showInterstitialAd();
-                resetPage(context, SalesTaxCalcPage());
-              },
-              icon: Icon(Icons.refresh),
-              tooltip: 'Refresh',
-            )
-          ],
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                physics: BouncingScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      margin: EdgeInsets.all(10),
-                      padding: EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                          color: ThemesMode.isDarkMode?Colors.black:textWhite,
-                          borderRadius: BorderRadius.circular(5),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.grey.withOpacity(0.9),
-                                blurRadius: 0.5,
-                                spreadRadius: 0.5,
-                                offset: Offset.zero
-                            )
-                          ]
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          BuildTextField(
-                            title: 'Tax Rate',
-                            hint: '0.0',
-                            isEnabled: true,
-                            textController: taxRateController,
-                            onPressedAction: null,
-                            widget: Text('%', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-                          BuildTextField(
-                            title: 'Original Price',
-                            hint: '0.0',
-                            isEnabled: true,
-                            textController: originalPriceController,
-                            onPressedAction: null,
-                            widget: Text('\$', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-
-                        ],
-                      ),
-                    ),
-                    //Result
-                    Row(
-                      children: [
-                        BuildResultCard(title: 'Tax', value: tax.toStringAsFixed(2),),
-                        BuildResultCard(title: 'Total Price', value: totalPrice.toStringAsFixed(2),),
-                      ],
-                    ),
-
-                  ],
-                ),
-              ),
-            ),
-            BuildBannerAd(),
-          ],
-        ),
-      ),
+      ],
     );
   }
-
-
-
 }

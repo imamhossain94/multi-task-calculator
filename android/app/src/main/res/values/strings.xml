@@ -1,6 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="appName" translatable="false">MultiCalc</string>
-    <string name="applicationId">ca-app-pub-4061500537427923~1513034907</string>
-<!--    <string name="applicationId">ca-app-pub-3940256099942544~3347511713</string>-->
+    <string name="appName" translatable="false">Multi-Task Calculator</string>
 
+    <!--
+      AdMob application id.
+      This is a *public* identifier (it is shipped inside every published APK),
+      not a secret. Override it in android/app/build.gradle.kts or via a
+      product flavour if you fork this app.
+    -->
+    <string name="adMobAppId" translatable="false">ca-app-pub-4061500537427923~1513034907</string>
 </resources>

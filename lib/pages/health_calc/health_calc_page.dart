@@ -1,239 +1,332 @@
-import 'package:flutter/material.dart';
-import 'package:multi_task_calculator/components/build_banner_ad.dart';
-import 'package:multi_task_calculator/components/build_result_card.dart';
-import 'package:multi_task_calculator/components/build_text_field.dart';
-import 'package:multi_task_calculator/pages/health_calc/components/build_gender_picker.dart';
-import 'package:multi_task_calculator/services/google_ad_service.dart';
-import 'package:multi_task_calculator/utils/constant.dart';
-import 'package:multi_task_calculator/utils/extensions.dart';
-import 'package:multi_task_calculator/utils/screen_config.dart';
-import 'package:multi_task_calculator/utils/themes_mode.dart';
+﻿import 'package:flutter/material.dart';
+import '../../services/google_ad_service.dart';
 
-
+import '../../components/app_surface.dart';
+import '../../components/build_result_card.dart';
+import '../../components/build_text_field.dart';
+import '../../components/calculator_scaffold.dart';
+import '../../services/history_service.dart';
+import '../../utils/app_color.dart';
+import '../../utils/calculator_math.dart';
+import '../../utils/constant.dart';
+import '../../utils/extensions.dart';
+import '../../utils/num_x.dart';
 class HealthCalcPage extends StatefulWidget {
+  const HealthCalcPage({super.key});
+
   @override
-  _HealthCalcPageState createState() => _HealthCalcPageState();
+  State<HealthCalcPage> createState() => _HealthCalcPageState();
 }
 
 class _HealthCalcPageState extends State<HealthCalcPage> {
+  final TextEditingController _heightController = TextEditingController();
+  final TextEditingController _weightController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
 
-  TextEditingController heightController = TextEditingController();
-  TextEditingController weightController = TextEditingController();
-  TextEditingController ageController = TextEditingController();
+  bool _isMale = true;
 
-  String height, weight, age, gender, status;
-  double bmi, bmr;
+  double _bmi = 0;
+  double _bmr = 0;
+  String _status = '';
+  bool _hasBmi = false;
+  bool _hasBmr = false;
 
+  static const ToolPalette _palette = AppPalettes.health;
 
   @override
   void initState() {
-    bmi = 0.0;
-    bmr = 0.0;
-    gender = 'Male';
-    calculateDiscount();
     super.initState();
+    _heightController.addListener(_recalculate);
+    _weightController.addListener(_recalculate);
+    _ageController.addListener(_recalculate);
   }
 
   @override
   void dispose() {
-    heightController.dispose();
-    weightController.dispose();
-    ageController.dispose();
+    _heightController.dispose();
+    _weightController.dispose();
+    _ageController.dispose();
     super.dispose();
   }
 
-  void calculateDiscount() {
+  void _recalculate() {
+    final double height = double.tryParse(_heightController.text) ?? 0;
+    final double weight = double.tryParse(_weightController.text) ?? 0;
+    final int age = int.tryParse(_ageController.text) ?? 0;
 
-    heightController.addListener(() {
-      updateResult();
-    });
-    weightController.addListener(() {
-      updateResult();
-    });
-    ageController.addListener(() {
-      updateResult();
-    });
+    // BMI only needs height and weight; BMR additionally needs an age.
+    // Previously both were gated on `age`, so BMI silently stayed at 0 until
+    // an age was typed in.
+    final bool hasBmi = height > 0 && weight > 0;
+    final double bmiValue =
+        hasBmi ? bmi(heightCm: height, weightKg: weight) : 0;
+    final String status = hasBmi ? bmiCategory(bmiValue) : '';
 
-  }
+    final bool hasBmr = hasBmi && age > 0;
+    final double bmrValue = hasBmr
+        ? bmr(
+            weightKg: weight,
+            heightCm: height,
+            age: age,
+            isMale: _isMale,
+          )
+        : 0;
 
-  void updateResult() {
-
-    height = heightController.value.text;
-    weight = weightController.value.text;
-    age = ageController.value.text;
-    //Make null safety
-    if(height.isNotEmpty || weight.isNotEmpty){
-      setState(() {
-        double _height = double.tryParse(height)??0.0;
-        double _weight = double.tryParse(weight)??0.0;
-
-        bmi = _weight /((_height/100) * _height/100);
-
-
-        if(age.isNotEmpty){
-          double _age = double.tryParse(age)??0;
-          if(gender == 'Male'){
-            bmr = 10 * _weight +  6.25 * _height - 5 * _age + 5;
-            //bmr = 88.362 + (13.397 * _weight) + (4.799 * _height) - (5.677 * _age);
-          }else if(gender == 'Female'){
-            bmr = 10 * _weight +  6.25 * _height - 5 * _age -161;
-            //bmr = 447.593 + (9.247 * _weight) + (3.098 * _height) - (4.330 * _age);
-          }
-
-          if(bmi < 18.5){
-            status = 'Underweight';
-          }else if(bmi >= 18.5 && bmi <=24.9){
-            status = 'Healthy weight';
-          }else if(bmi >= 25.0 && bmi <=29.9){
-            status = 'Overweight';
-          }else if(bmi >= 30.0 && bmi <=39.9){
-            status = 'Obese';
-          }
-        }else{
-          status = null;
-        }
-
-
-
-      });
+    if (hasBmi == _hasBmi &&
+        hasBmr == _hasBmr &&
+        bmiValue == _bmi &&
+        bmrValue == _bmr &&
+        status == _status) {
+      return;
     }
+
+    setState(() {
+      _hasBmi = hasBmi;
+      _hasBmr = hasBmr;
+      _bmi = bmiValue;
+      _bmr = bmrValue;
+      _status = status;
+    });
+
+    if (hasBmi) _maybeSave(height, weight, age, bmiValue, bmrValue);
   }
 
-
-  @override
-  Widget build(BuildContext context) {
-    ScreenConfig().init(context);
-    ThemesMode().init(context);
-
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Health Calculator',
-            style: TextStyle(
-                fontFamily: fontAudioWide,
-                fontSize: responsiveWidth(18)
-            ),
-          ),
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          actions: [
-            IconButton(
-              onPressed: () async {
-                await showInterstitialAd();
-                resetPage(context, HealthCalcPage());
-              },
-              icon: Icon(Icons.refresh),
-              tooltip: 'Reset',
-            )
-          ],
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                physics: BouncingScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      margin: EdgeInsets.all(10),
-                      padding: EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                          color: ThemesMode.isDarkMode?Colors.black:textWhite,
-                          borderRadius: BorderRadius.circular(5),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.grey.withOpacity(0.9),
-                                blurRadius: 0.5,
-                                spreadRadius: 0.5,
-                                offset: Offset.zero
-                            )
-                          ]
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-
-                          BuildGenderPicker(
-                            valueChanged: (String value) {
-                              print(value);
-                              setState(() {
-                                gender = value;
-                                updateResult();
-                              });
-
-                            },
-                            title: 'Gender',
-                          ),
-
-                          BuildTextField(
-                            title: 'Height',
-                            hint: '0.0',
-                            isEnabled: true,
-                            textController: heightController,
-                            onPressedAction: null,
-                            widget: Text('cm', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-                          BuildTextField(
-                            title: 'Weight',
-                            hint: '0.0',
-                            isEnabled: true,
-                            textController: weightController,
-                            onPressedAction: null,
-                            widget: Text('kg', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-                          BuildTextField(
-                            title: 'Age',
-                            hint: '0.0',
-                            isEnabled: true,
-                            textController: ageController,
-                            onPressedAction: null,
-                            widget: Text('yrs', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-                        ],
-                      ),
-                    ),
-                    //Result
-                    Row(
-                      children: [
-                        BuildResultCard(title: 'BMI', value: '${bmi.toStringAsFixed(2)}',),
-                        BuildResultCard(title: 'BMR', value: '${bmr.toStringAsFixed(2)}',),
-                      ],
-                    ),
-
-                   status != null?
-                    Container(
-                      margin: EdgeInsets.all(10),
-                      padding: EdgeInsets.fromLTRB(5, 15, 5, 15),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                          color: ThemesMode.isDarkMode?Colors.black:backgroundLight,
-                          borderRadius: BorderRadius.circular(5),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.grey.withOpacity(0.9),
-                                blurRadius: 0.5,
-                                spreadRadius: 0.5,
-                                offset: Offset.zero
-                            )
-                          ]
-                      ),
-                      child: Text(
-                        'Status: $status',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: responsiveText(26), fontWeight: FontWeight.bold),
-                      ),
-                    ):SizedBox(),
-                  ],
-                ),
-              ),
-            ),
-            BuildBannerAd(),
-          ],
-        ),
+  String? _lastSaved;
+  void _maybeSave(
+      double height, double weight, int age, double bmi, double bmr) {
+    final String signature = '$height|$weight|$age|$_isMale';
+    if (_lastSaved == signature) return;
+    _lastSaved = signature;
+    HistoryService.add(
+      CalculationRecord(
+        id: HistoryService.newId(),
+        tool: 'Health',
+        toolRoute: healthCalcPage,
+        summary: '${NumX.format(height)} cm, ${NumX.format(weight)} kg'
+            '${age > 0 ? ', $age yrs' : ''} '
+            '-> BMI ${NumX.format(bmi)}'
+            '${bmr > 0 ? ', BMR ${NumX.format(bmr)}' : ''}',
+        createdAt: DateTime.now(),
       ),
     );
   }
 
+  void _onGenderChanged(bool male) {
+    setState(() => _isMale = male);
+    _recalculate();
+  }
+
+  Future<void> _reset() async {
+    await showInterstitialAd();
+    if (!mounted) return;
+    resetPage(context, const HealthCalcPage());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CalculatorScaffold(
+      palette: _palette,
+      title: 'Health Calculator',
+      icon: Icons.favorite_rounded,
+      actions: <Widget>[CalculatorResetButton(onPressed: _reset)],
+      children: <Widget>[
+        AppCard(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(2, 0, 2, 8),
+                child: Text(
+                  'Gender',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.2,
+                    color: Theme.of(context).textTheme.titleMedium?.color,
+                  ),
+                ),
+              ),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: _GenderButton(
+                      label: 'Male',
+                      icon: Icons.male_rounded,
+                      color: const Color(0xFF3B82F6),
+                      selected: _isMale,
+                      onTap: () => _onGenderChanged(true),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _GenderButton(
+                      label: 'Female',
+                      icon: Icons.female_rounded,
+                      color: const Color(0xFFEC4899),
+                      selected: !_isMale,
+                      onTap: () => _onGenderChanged(false),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              BuildTextField(
+                title: 'Height',
+                hint: '0.00',
+                isEnabled: true,
+                textController: _heightController,
+                palette: _palette,
+                onPressedAction: null,
+                widget: const Text('cm'),
+              ),
+              BuildTextField(
+                title: 'Weight',
+                hint: '0.00',
+                isEnabled: true,
+                textController: _weightController,
+                palette: _palette,
+                onPressedAction: null,
+                widget: const Text('kg'),
+              ),
+              BuildTextField(
+                title: 'Age',
+                hint: '0',
+                isEnabled: true,
+                textController: _ageController,
+                palette: _palette,
+                onPressedAction: null,
+                widget: const Text('yrs'),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 6),
+        Row(
+          children: <Widget>[
+            BuildResultCard(
+              title: 'BMI',
+              numeric: _bmi,
+              palette: _palette,
+              icon: Icons.monitor_weight_rounded,
+            ),
+            BuildResultCard(
+              title: 'BMR',
+              numeric: _bmr,
+              suffix: _hasBmr ? ' kcal' : '',
+              palette: _palette,
+              icon: Icons.local_fire_department_rounded,
+            ),
+          ],
+        ),
+        if (_hasBmi)
+          AppGradientCard(
+            palette: _palette,
+            child: Row(
+              children: <Widget>[
+                const Icon(Icons.info_rounded, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text(
+                        _status,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 17,
+                        ),
+                      ),
+                      Text(
+                        'BMI = weight (kg) / heightÂ² (m). '
+                        'Add your age to see BMR.',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.9),
+                          fontSize: 12.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        if (!_hasBmi)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4, 6, 4, 8),
+            child: Text(
+              'Enter your height and weight to see your BMI.',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ),
+      ],
+    );
+  }
 }
 
+class _GenderButton extends StatelessWidget {
+  const _GenderButton({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.selected,
+    required this.onTap,
+  });
 
+  final String label;
+  final IconData icon;
+  final Color color;
+  final bool selected;
+  final VoidCallback onTap;
 
-
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 160),
+          height: 46,
+          decoration: BoxDecoration(
+            gradient: selected ? LinearGradient(colors: <Color>[color, color]) : null,
+            color: selected ? null : Theme.of(context).colorScheme.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: selected
+                ? <BoxShadow>[
+                    BoxShadow(
+                      color: color.withValues(alpha: 0.35),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Icon(icon,
+                  size: 20,
+                  color: selected ? Colors.white : Theme.of(context).hintColor),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 14,
+                  color: selected
+                      ? Colors.white
+                      : Theme.of(context).textTheme.bodyMedium?.color,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

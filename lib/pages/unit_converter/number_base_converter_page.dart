@@ -1,334 +1,524 @@
-import 'package:flutter/material.dart';
-import 'package:multi_task_calculator/components/build_banner_ad.dart';
-import 'package:multi_task_calculator/pages/unit_converter/components/build_unit_text_field.dart';
-import 'package:multi_task_calculator/pages/unit_converter/models/unit_converter_helper.dart';
-import 'package:multi_task_calculator/services/google_ad_service.dart';
-import 'package:multi_task_calculator/utils/constant.dart';
-import 'package:multi_task_calculator/utils/extensions.dart';
-import 'package:multi_task_calculator/utils/screen_config.dart';
-import 'package:multi_task_calculator/utils/themes_mode.dart';
-import 'package:units_converter/units_converter.dart';
+﻿import 'package:flutter/material.dart';
+import '../../services/google_ad_service.dart';
+
+import '../../components/app_surface.dart';
+import '../../components/calculator_scaffold.dart';
+import '../../services/history_service.dart';
+import '../../utils/app_color.dart';
+import '../../utils/constant.dart';
+import '../../utils/extensions.dart';
+/// The four number bases the app supports.
+enum NumberBase {
+  decimal('Decimal', 'DEC', 10, Icons.pin_rounded),
+  hexadecimal('Hexadecimal', 'HEX', 16, Icons.tag_rounded),
+  octal('Octal', 'OCT', 8, Icons.compress_rounded),
+  binary('Binary', 'BIN', 2, Icons.memory_rounded);
+
+  const NumberBase(this.label, this.shortLabel, this.radix, this.icon);
+
+  final String label;
+  final String shortLabel;
+  final int radix;
+  final IconData icon;
+
+  /// Parses [input] in this base. Returns `null` when [input] is not a valid
+  /// number for this radix â€” e.g. `8` is not valid binary, `G` is not valid
+  /// hex.
+  BigInt? parse(String input) {
+    final String cleaned = input.trim().toUpperCase().replaceAll(' ', '');
+    if (cleaned.isEmpty) return null;
+    // Only allow the digits valid for this radix, plus a leading sign.
+    final int signOffset = (cleaned.startsWith('-') || cleaned.startsWith('+')) ? 1 : 0;
+    for (int i = signOffset; i < cleaned.length; i++) {
+      final int digit = cleaned.codeUnitAt(i) - 0x30;
+      final int alphaDigit = cleaned.codeUnitAt(i) - 0x41 + 10;
+      final int value = digit <= 9 ? digit : alphaDigit;
+      if (value < 0 || value >= radix) return null;
+    }
+    return BigInt.tryParse(
+      cleaned[0] == '-' || cleaned[0] == '+'
+          ? cleaned.substring(1)
+          : cleaned,
+      radix: radix,
+    );
+  }
+
+  /// Renders [value] in this base.
+  String format(BigInt value) {
+    final BigInt magnitude = value.abs();
+    final String digits = magnitude.toRadixString(radix).toUpperCase();
+    if (value.isNegative) return '-$digits';
+    // Group binary/hex digits for readability.
+    if (radix == 2) {
+      return digits.replaceAllMapped(
+        RegExp(r'(.{4})(?=.)'),
+        (Match m) => '${m.group(1)} ',
+      );
+    }
+    return digits;
+  }
+}
 
 class NumberBaseConverterPage extends StatefulWidget {
+  const NumberBaseConverterPage({super.key});
+
   @override
-  _NumberBaseConverterPageState createState() => _NumberBaseConverterPageState();
+  State<NumberBaseConverterPage> createState() =>
+      _NumberBaseConverterPageState();
 }
 
 class _NumberBaseConverterPageState extends State<NumberBaseConverterPage> {
+  final TextEditingController _inputController =
+      TextEditingController(text: '0');
 
-  TextEditingController fromUnitController = TextEditingController();
-  TextEditingController toUnitController = TextEditingController();
+  NumberBase _fromBase = NumberBase.decimal;
+  NumberBase _toBase = NumberBase.binary;
 
-  Map<String, dynamic> allUnits;
-  dynamic fromUnit, toUnit;
-  String fromUnitDisplay, removeString;
-  bool isLoading = true;
+  BigInt? _value;
+  String? _error;
 
-  List<UnitConversion> unitConversionList = [];
-  String fromUnitValue;
+  static const ToolPalette _palette = AppPalettes.numberBase;
 
   @override
   void initState() {
-    fromUnitValue = '0';
-    fromUnitController.text = '0';
-    toUnitController.text = '0';
-    getAllUnit();
-    fromUnitController.addListener((){
-      setState(() {
-        fromUnitValue = fromUnitController.value.text;
-        getAllUnit();
-      });
-    });
     super.initState();
+    _inputController.addListener(_convert);
+    _convert();
   }
 
   @override
   void dispose() {
-    fromUnitController.dispose();
-    toUnitController.dispose();
+    _inputController
+      ..removeListener(_convert)
+      ..dispose();
     super.dispose();
   }
 
-
-  void getAllUnit() async{
-    setState(() {
-      isLoading = true;
-      unitConversionList.clear();
-    });
-    setState(() {
-
-      removeString = 'NUMERAL_SYSTEMS.';
-      var numeralSystems = NumeralSystems();
-
-      allUnits = NumberBaseUnitsList;
-      fromUnit = fromUnit == null? allUnits.entries.elementAt(0).value:fromUnit;
-      toUnit = toUnit == null? allUnits.entries.elementAt(1).value.toString().replaceAll(removeString, ''):toUnit.toString().replaceAll(removeString, '');
-      fromUnitDisplay = fromUnit.toString().replaceAll(removeString, '');
-      numeralSystems.convert(fromUnit, fromUnitValue);
-
-      unitConversionList.add(UnitConversion(unitName: numeralSystems.decimal.name.toString().replaceAll(removeString, ''), unitCode: numeralSystems.decimal.symbol, unitValue: numeralSystems.decimal.stringValue));
-      unitConversionList.add(UnitConversion(unitName: numeralSystems.hexadecimal.name.toString().replaceAll(removeString, ''), unitCode: numeralSystems.hexadecimal.symbol, unitValue: numeralSystems.hexadecimal.stringValue));
-      unitConversionList.add(UnitConversion(unitName: numeralSystems.octal.name.toString().replaceAll(removeString, ''), unitCode: numeralSystems.octal.symbol, unitValue: numeralSystems.octal.stringValue));
-      unitConversionList.add(UnitConversion(unitName: numeralSystems.binary.name.toString().replaceAll(removeString, ''), unitCode: numeralSystems.binary.symbol, unitValue: numeralSystems.binary.stringValue));
-
-      unitConversionList.forEach((obj) {
-        if(obj.unitName == toUnit.toString()){
-          toUnitController.text = obj.unitValue.toString()??'fuck';
-        }
+  Future<void> _convert() async {
+    final String raw = _inputController.text;
+    if (raw.trim().isEmpty) {
+      setState(() {
+        _value = null;
+        _error = null;
       });
+      return;
+    }
 
-      isLoading = false;
+    final BigInt? parsed = _fromBase.parse(raw);
+    if (parsed == null) {
+      setState(() {
+        _value = null;
+        _error = raw.contains('.')
+            ? 'Decimals are not supported. Use a whole number.'
+            : 'Not a valid ${_fromBase.label.toLowerCase()} number';
+      });
+      return;
+    }
+
+    setState(() {
+      _value = parsed;
+      _error = null;
     });
+    await _maybeSave(raw, parsed);
   }
 
-
-  @override
-  Widget build(BuildContext context) {
-    ScreenConfig().init(context);
-    ThemesMode().init(context);
-
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Number Base',
-            style: TextStyle(
-              fontFamily: fontAudioWide,
-              fontSize: responsiveWidth(18)
-            ),
-          ),
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          actions: [
-            IconButton(
-              onPressed: () async {
-                await showInterstitialAd();
-                resetPage(context, NumberBaseConverterPage());
-              },
-              icon: Icon(Icons.refresh),
-              tooltip: 'Reset',
-            )
-          ],
-        ),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              margin: EdgeInsets.all(10),
-              padding: EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: ThemesMode.isDarkMode?Colors.black:textWhite,
-                borderRadius: BorderRadius.circular(5),
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.grey.withOpacity(0.9),
-                      blurRadius: 0.5,
-                      spreadRadius: 0.5,
-                      offset: Offset.zero
-                  )
-                ]
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  BuildUnitTextField(
-                    isEnabled: true,
-                    hint: fromUnitController.text,
-                    title: 'From Unit',
-                    unitName: fromUnitDisplay,
-                    textController: fromUnitController,
-                    onPressedAction: () {
-                      showUnitPicker(context, (v){
-                        FocusScope.of(context).unfocus();
-                          setState(() {
-                            fromUnit = v;
-                            getAllUnit();
-                          });
-                      });
-                    },
-                  ),
-                  BuildUnitTextField(
-                    isEnabled: false,
-                    hint: '0',
-                    title: 'To Unit',
-                    unitName: toUnit.toString(),
-                    textController: toUnitController,
-                    onPressedAction: () {
-                      showUnitPicker(context, (v){
-                        FocusScope.of(context).unfocus();
-                        setState(() {
-                          toUnit = v;
-                          getAllUnit();
-                        });
-                      });
-                    },
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Container(
-                  margin: EdgeInsets.all(10),
-                  padding: EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                      color: ThemesMode.isDarkMode?Colors.black:backgroundLight,
-                      borderRadius: BorderRadius.circular(5),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.grey.withOpacity(0.9),
-                            blurRadius: 0.5,
-                            spreadRadius: 0.5,
-                            offset: Offset.zero
-                        )
-                      ]
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        child:isLoading?
-                        Container(
-                          height: 50,
-                          width: 50,
-                          alignment: Alignment.center,
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                                ThemesMode.isDarkMode?Colors.white12:Colors.black45
-                            ),
-                          ),
-                        ):
-                        ListView.builder(
-                          physics: BouncingScrollPhysics(),
-                          itemCount: unitConversionList.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Container(
-                              margin: EdgeInsets.all(8),
-                              padding: EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.withOpacity(0.3),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Text(unitConversionList[index].unitCode??'', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-
-                                      //${currencyRates[index].symbol}
-
-                                      Expanded(
-                                        child: Text(unitConversionList[index].unitValue.toString(),
-                                            textAlign: TextAlign.right,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                                      ),
-                                    ],
-                                  ),
-                                  Text(unitConversionList[index].unitName.toString(),),
-                                ],
-                              ),
-                            );
-                          },
-                        ),)
-                    ],
-                  )
-              ),
-            ),
-            BuildBannerAd(),
-          ],
-        ),
+  String? _lastSaved;
+  Future<void> _maybeSave(String raw, BigInt value) async {
+    final String signature = '${_fromBase.name}|$raw';
+    if (_lastSaved == signature) return;
+    _lastSaved = signature;
+    await HistoryService.add(
+      CalculationRecord(
+        id: HistoryService.newId(),
+        tool: 'Number Base',
+        toolRoute: numberBaseConverterPage,
+        summary: '$raw (${_fromBase.shortLabel}) = '
+            '${NumberBase.hexadecimal.format(value)} (HEX) = '
+            '${NumberBase.octal.format(value)} (OCT) = '
+            '${NumberBase.binary.format(value)} (BIN)',
+        createdAt: DateTime.now(),
       ),
     );
   }
 
-  Future<bool>  showUnitPicker(BuildContext context, ValueChanged<dynamic> valueChanged) {
-    return showModalBottomSheet(
+  Future<void> _pickBase({required bool isFrom}) async {
+    final NumberBase? picked = await showAppBottomSheet<NumberBase>(
       context: context,
-      elevation: 0.0,
-      isScrollControlled: true,
-      isDismissible: true,
-      backgroundColor: Colors.transparent,
-      barrierColor: Colors.transparent,//ThemesMode.isDarkMode?Colors.black54:Colors.transparent
-      builder: (context) {
-        return DraggableScrollableSheet(
-          // initialChildSize: 0.63,
-          // minChildSize: 0.30,
-          maxChildSize: 0.97,
-          builder: (_, controller) {
-            return Container(
-              padding: EdgeInsets.only(top: 5,),
-              decoration: BoxDecoration(
-                  color: ThemesMode.isDarkMode?backgroundDark:backgroundLight,
-                  borderRadius: BorderRadius.only(
-                    topLeft: const Radius.circular(10.0),
-                    topRight: const Radius.circular(10.0),
+      title: isFrom ? 'From base' : 'To base',
+      maxChildSize: 0.6,
+      builder: (BuildContext sheetContext, ScrollController _) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: NumberBase.values.map((NumberBase base) {
+          final bool selected = isFrom ? base == _fromBase : base == _toBase;
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(14),
+                onTap: () => Navigator.of(sheetContext).pop(base),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 14),
+                  decoration: BoxDecoration(
+                    gradient: selected ? _palette.linear : null,
+                    color: selected
+                        ? null
+                        : Theme.of(context).colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(14),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black12.withOpacity(0.9),
-                        blurRadius: responsiveWidth(3),
-                        spreadRadius: responsiveWidth(3),
-                        offset: Offset.zero)
-                  ]
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 15),
-                    child: Row(
-                      children: [
-                        Text('Select Unit', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                        Spacer(),
-                        IconButton(icon: Icon(Icons.close), onPressed: (){
-                          Navigator.pop(context, false);
-                        })
+                  child: Row(
+                    children: <Widget>[
+                      Icon(base.icon,
+                          size: 20,
+                          color: selected
+                              ? Colors.white
+                              : Theme.of(context).hintColor),
+                      const SizedBox(width: 14),
+                      Text(
+                        base.label,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15,
+                          color: selected
+                              ? Colors.white
+                              : Theme.of(context).textTheme.titleMedium?.color,
+                        ),
+                      ),
+                      const Spacer(),
+                      Text(
+                        'base ${base.radix}',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: selected
+                              ? Colors.white70
+                              : Theme.of(context).hintColor,
+                        ),
+                      ),
+                      if (selected) ...<Widget>[
+                        const SizedBox(width: 8),
+                        const Icon(Icons.check_rounded,
+                            color: Colors.white, size: 18),
                       ],
-                    )
+                    ],
                   ),
-                  Expanded(
-                    child:
-                    ListView.builder(
-                      shrinkWrap: true,
-                      controller: controller,
-                      physics: BouncingScrollPhysics(),
-                      itemCount: allUnits.entries.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Material(
-                          child: InkWell(
-                            onTap: (){
-                              valueChanged(allUnits.entries.elementAt(index).value);
-                              Navigator.pop(context, true);
-                            },
-                            child:
-                            Container(
-                              margin: EdgeInsets.all(8),
-                              padding: EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.withOpacity(0.3),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(allUnits.entries.elementAt(index).value.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                                  Text(allUnits.entries.elementAt(index).key.toString(), style: TextStyle()),
-                                ],
-                              ),
-                            )
-                          ),
-                        );
-                      },
-                    )
-                  ),
-                ],
+                ),
               ),
-            );
-          },
-        );
-      },
+            ),
+          );
+        }).toList(growable: false),
+      ),
+    );
+
+    if (picked == null || !mounted) return;
+    setState(() {
+      if (isFrom) {
+        _fromBase = picked;
+      } else {
+        _toBase = picked;
+      }
+    });
+    _convert();
+  }
+
+  void _swapBases() {
+    setState(() {
+      final NumberBase tmp = _fromBase;
+      _fromBase = _toBase;
+      _toBase = tmp;
+    });
+  }
+
+  Future<void> _reset() async {
+    await showInterstitialAd();
+    if (!mounted) return;
+    resetPage(context, const NumberBaseConverterPage());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final BigInt? value = _value;
+
+    return CalculatorScaffold(
+      palette: _palette,
+      title: 'Number Base',
+      icon: Icons.tag_rounded,
+      actions: <Widget>[CalculatorResetButton(onPressed: _reset)],
+      children: <Widget>[
+        AppCard(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              _BaseField(
+                title: 'From',
+                base: _fromBase,
+                controller: _inputController,
+                palette: _palette,
+                onTapBase: () => _pickBase(isFrom: true),
+              ),
+              Center(
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: _swapBases,
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        gradient: _palette.linear,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.swap_vert_rounded,
+                          color: Colors.white, size: 22),
+                    ),
+                  ),
+                ),
+              ),
+              _BaseField(
+                title: 'To',
+                base: _toBase,
+                // Read-only: pass the formatted string rather than a controller
+                // so we don't allocate (and leak) one on every build.
+                text: value == null ? '' : _toBase.format(value),
+                palette: _palette,
+                onTapBase: () => _pickBase(isFrom: false),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        if (_error != null)
+          AppCard(
+            child: Row(
+              children: <Widget>[
+                const Icon(Icons.error_outline_rounded,
+                    color: AppColors.danger, size: 22),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    _error!,
+                    style: const TextStyle(
+                        color: AppColors.danger, fontWeight: FontWeight.w700),
+                  ),
+                ),
+              ],
+            ),
+          )
+        else if (value != null)
+          ...NumberBase.values
+              .where((NumberBase b) => b != _toBase)
+              .map((NumberBase base) => Padding(
+                    padding: const EdgeInsets.only(bottom: 7),
+                    child: _ResultRow(
+                      base: base,
+                      text: base.format(value),
+                      palette: _palette,
+                    ),
+                  )),
+        const SizedBox(height: 4),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+          child: Text(
+            'Type a number in the "from" base. Invalid digits are rejected, '
+            'so 8 in binary or G in hexadecimal will not be accepted.',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _BaseField extends StatelessWidget {
+  const _BaseField({
+    required this.title,
+    required this.base,
+    required this.palette,
+    required this.onTapBase,
+    this.controller,
+    this.text,
+  });
+
+  final String title;
+  final NumberBase base;
+  final ToolPalette palette;
+  final VoidCallback onTapBase;
+
+  /// Set for the editable "from" field.
+  final TextEditingController? controller;
+
+  /// Set for the read-only "to" field.
+  final String? text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w800,
+              color: Theme.of(context).textTheme.titleMedium?.color,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Row(
+            children: <Widget>[
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(14),
+                  onTap: onTapBase,
+                  child: Container(
+                    height: 48,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      gradient: palette.linear,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Icon(base.icon, size: 17, color: Colors.white),
+                        const SizedBox(width: 6),
+                        Text(
+                          base.shortLabel,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const Icon(Icons.expand_more_rounded,
+                            color: Colors.white, size: 18),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Container(
+                  height: 48,
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  alignment: Alignment.centerLeft,
+                  // A plain Text for the read-only side: no cursor, no
+                  // selection handles, no leaked controller.
+                  child: controller != null
+                      ? TextField(
+                          controller: controller,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 16,
+                            fontFamily: 'monospace',
+                          ),
+                          decoration: const InputDecoration(
+                            filled: false,
+                            border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            disabledBorder: InputBorder.none,
+                            contentPadding: EdgeInsets.zero,
+                            hintText: '0',
+                          ),
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.done,
+                          autocorrect: false,
+                          enableSuggestions: false,
+                        )
+                      : Text(
+                          text ?? '',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 16,
+                            fontFamily: 'monospace',
+                          ),
+                        ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ResultRow extends StatelessWidget {
+  const _ResultRow({
+    required this.base,
+    required this.text,
+    required this.palette,
+  });
+
+  final NumberBase base;
+  final String text;
+  final ToolPalette palette;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: <Widget>[
+          Container(
+            width: 46,
+            height: 34,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              gradient: palette.linear,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              base.shortLabel,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w900,
+                fontSize: 11.5,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            base.label,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: Theme.of(context).hintColor,
+            ),
+          ),
+          const Spacer(),
+          Flexible(
+            child: Text(
+              text,
+              textAlign: TextAlign.right,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontWeight: FontWeight.w900,
+                fontSize: 15,
+                fontFamily: 'monospace',
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

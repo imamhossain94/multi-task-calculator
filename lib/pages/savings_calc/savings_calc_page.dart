@@ -1,326 +1,390 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:multi_task_calculator/components/build_banner_ad.dart';
-import 'package:multi_task_calculator/components/build_result_card.dart';
-import 'package:multi_task_calculator/components/build_text_field.dart';
-import 'package:multi_task_calculator/pages/savings_calc/components/build_savings_value_picker.dart';
-import 'package:multi_task_calculator/services/google_ad_service.dart';
-import 'package:multi_task_calculator/utils/constant.dart';
-import 'package:multi_task_calculator/utils/extensions.dart';
-import 'package:multi_task_calculator/utils/screen_config.dart';
-import 'package:multi_task_calculator/utils/themes_mode.dart';
+﻿import 'package:flutter/material.dart';
+import '../../services/google_ad_service.dart';
 
-
+import '../../components/app_surface.dart';
+import '../../components/build_result_card.dart';
+import '../../components/build_text_field.dart';
+import '../../components/calculator_scaffold.dart';
+import '../../services/history_service.dart';
+import '../../utils/app_color.dart';
+import '../../utils/calculator_math.dart';
+import '../../utils/constant.dart';
+import '../../utils/extensions.dart';
+import '../../utils/num_x.dart';
 class SavingsCalcPage extends StatefulWidget {
+  const SavingsCalcPage({super.key});
+
   @override
-  _SavingsCalcPageState createState() => _SavingsCalcPageState();
+  State<SavingsCalcPage> createState() => _SavingsCalcPageState();
 }
 
 class _SavingsCalcPageState extends State<SavingsCalcPage> {
+  final TextEditingController _principalController = TextEditingController();
+  final TextEditingController _contributionController =
+      TextEditingController();
+  final TextEditingController _rateController = TextEditingController();
+  final TextEditingController _yearsController = TextEditingController();
 
-  TextEditingController principalController = TextEditingController();
-  TextEditingController contributionController = TextEditingController();
-  TextEditingController interestRateController = TextEditingController();
-  TextEditingController timePeriodController = TextEditingController();
+  int _intervalDays = 30; // Monthly
+  String _intervalName = 'Monthly';
 
-  String principal, contribution, interestRate, timePeriod;
-  MapEntry<String, int> frequencies;
-  double savingsResult;
+  double _balance = 0;
+  double _contributed = 0;
+  double _interest = 0;
+  bool _hasInput = false;
+
+  static const ToolPalette _palette = AppPalettes.savings;
+
+  /// Contribution frequency, in days between deposits.
+  static const Map<String, int> _frequencies = <String, int>{
+    'Weekly': 7,
+    'Bi-Weekly': 14,
+    'Monthly': 30,
+    'Quarterly': 91,
+    'Annually': 364,
+  };
 
   @override
   void initState() {
-    savingsResult = 0.0;
-    frequencies = MapEntry('Weekly', 7);
-    calculateLoan();
     super.initState();
+    _principalController.addListener(_recalculate);
+    _contributionController.addListener(_recalculate);
+    _rateController.addListener(_recalculate);
+    _yearsController.addListener(_recalculate);
   }
 
   @override
   void dispose() {
-    principalController.dispose();
-    contributionController.dispose();
-    interestRateController.dispose();
-    timePeriodController.dispose();
+    _principalController.dispose();
+    _contributionController.dispose();
+    _rateController.dispose();
+    _yearsController.dispose();
     super.dispose();
   }
 
-  void calculateLoan() {
-    principalController.addListener(() {
-      updateResult();
-    });
-    contributionController.addListener(() {
-      updateResult();
-    });
-    interestRateController.addListener(() {
-      updateResult();
-    });
-    timePeriodController.addListener(() {
-      updateResult();
-    });
-  }
+  void _recalculate() {
+    final double principal = double.tryParse(_principalController.text) ?? 0;
+    final double contribution =
+        double.tryParse(_contributionController.text) ?? 0;
+    final double rate = double.tryParse(_rateController.text) ?? 0;
+    final int years = int.tryParse(_yearsController.text) ?? 0;
 
-  void updateResult() {
-    principal = principalController.value.text;
-    contribution = contributionController.value.text;
-    interestRate = interestRateController.value.text;
-    timePeriod = timePeriodController.value.text;
-    //Make null safety
+    if (rate < 0 || years <= 0) {
+      if (_hasInput) _clear();
+      return;
+    }
+
+    final double balance = savingsProjection(
+      principal: principal,
+      contribution: contribution,
+      annualRatePercent: rate,
+      years: years,
+      contributionIntervalDays: _intervalDays,
+    );
+    final double contributed = savingsTotalContributed(
+      principal: principal,
+      contribution: contribution,
+      years: years,
+      contributionIntervalDays: _intervalDays,
+    );
+
     setState(() {
-      //Converting JS to Dart
-      //https://codepen.io/cerovac/pen/xvgWrd
-      double _principal = double.tryParse(principal)??0.0;
-      double _contribution = double.tryParse(contribution) ?? 0.0;
-      double _interestRate = double.tryParse(interestRate)??0.0;
-      int _timePeriod = int.tryParse(timePeriod)??0;
-      double r = _interestRate/100/365;
-      double C = _contribution;
-      double P = _principal;
-      int y = _timePeriod;
-      int d = 365 * y;
-      int n = frequencies.value;
-      var nn = (365/n).floor();
-      double total = P+C;
-      double ri = 0;
-      DateTime yr = DateTime.now(), z, zz;
-      int count = 0;
-      bool initialDeposit = true;
+      _hasInput = true;
+      _balance = balance;
+      _contributed = contributed;
+      _interest = balance - contributed;
+      if (_interest < 0) _interest = 0;
+    });
 
-      while (count++ < d) {
-        int ny = yr.year, nm = yr.month, nd = yr.day;
-        z = DateTime(ny, nm, count);
-        zz = DateTime(ny, nm, count+1);
-        if (count % n == 0) {
-          if (!initialDeposit) {
-            total += C;
-          } else {
-            initialDeposit = false;
-          }
-        }
-        if (zz.day < z.day) {
-          total = total + ri;
-          ri = 0;
-        }
-        ri += (total * r);
-      }
-      savingsResult = total;
+    _maybeSave(principal, contribution, rate, years, balance, contributed);
+  }
+
+  void _clear() {
+    setState(() {
+      _hasInput = false;
+      _balance = 0;
+      _contributed = 0;
+      _interest = 0;
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    ScreenConfig().init(context);
-    ThemesMode().init(context);
-
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Savings Calculator',
-            style: TextStyle(
-              fontFamily: fontAudioWide,
-              fontSize: responsiveWidth(18)
-            ),
-          ),
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          actions: [
-            IconButton(
-              onPressed: () async {
-                await showInterstitialAd();
-                resetPage(context, SavingsCalcPage());
-              },
-              icon: Icon(Icons.refresh_rounded),
-              tooltip: 'Reset',
-            )
-          ],
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                physics: BouncingScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      margin: EdgeInsets.all(10),
-                      padding: EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                          color: ThemesMode.isDarkMode?Colors.black:textWhite,
-                          borderRadius: BorderRadius.circular(5),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.grey.withOpacity(0.9),
-                                blurRadius: 0.5,
-                                spreadRadius: 0.5,
-                                offset: Offset.zero
-                            )
-                          ]
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          BuildSavingsValuePicker(
-                            title: 'Frequency',
-                            frequencyName: frequencies.key,
-                            onPressedAction: () {
-                              pickFrequency(
-                                context: context,
-                                  valueChanged:(value){
-                                    setState(() {
-                                      frequencies = value;
-                                    });
-                                  }
-                              );
-                            },
-                          ),
-                          BuildTextField(
-                            title: 'Principle',
-                            hint: '0.0',
-                            isEnabled: true,
-                            textController: principalController,
-                            onPressedAction: null,
-                            widget: Text('\$', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-                          BuildTextField(
-                            title: 'Contribution',
-                            hint: '0.0',
-                            isEnabled: true,
-                            textController: contributionController,
-                            onPressedAction: null,
-                            widget: Text('\$', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-                          BuildTextField(
-                            title: 'Interest Rate',
-                            hint: '0.0',
-                            isEnabled: true,
-                            textController: interestRateController,
-                            onPressedAction: null,
-                            widget: Text('%', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-                          BuildTextField(
-                            title: 'Time Period',
-                            hint: '0',
-                            isEnabled: true,
-                            textController: timePeriodController,
-                            onPressedAction: null,
-                            widget: Text('yrs', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-                        ],
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        BuildResultCard(title: 'Savings Result', value: savingsResult.toStringAsFixed(2),),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            BuildBannerAd(),
-          ],
-        ),
+  String? _lastSaved;
+  void _maybeSave(
+    double principal,
+    double contribution,
+    double rate,
+    int years,
+    double balance,
+    double contributed,
+  ) {
+    final String signature =
+        '$principal|$contribution|$rate|$years|$_intervalDays';
+    if (_lastSaved == signature) return;
+    _lastSaved = signature;
+    HistoryService.add(
+      CalculationRecord(
+        id: HistoryService.newId(),
+        tool: 'Savings',
+        toolRoute: savingCalcPage,
+        summary: '${NumX.money(principal)} + ${NumX.money(contribution)}/$_intervalName '
+            '@ ${NumX.percentText(rate, decimals: 2)} for $years yrs '
+            '= ${NumX.money(balance)}',
+        createdAt: DateTime.now(),
       ),
     );
   }
 
-
-  //Home Page Back Press
-  Future<bool> pickFrequency(
-      {BuildContext context, ValueChanged<MapEntry<String, int>> valueChanged}) async {
-
-    List<Map<String, int>> frequencyList = [
-      {'Weekly':7},
-      {'Bi-Weekly':14},
-      {'Monthly':30},
-      {'Quarterly':91},
-      {'Annually':364},
-    ];
-
-    return showModalBottomSheet(
+  Future<void> _pickFrequency() async {
+    await showAppBottomSheet<void>(
       context: context,
-      elevation: 0.0,
-      isScrollControlled: true,
-      isDismissible: true,
-      backgroundColor: Colors.transparent,
-      barrierColor: ThemesMode.isDarkMode?Colors.black54:Colors.transparent,
-      builder: (context) {
-        return DraggableScrollableSheet(
-          maxChildSize: 0.97,
-          builder: (_, controller) {
-            return Container(
-              padding: EdgeInsets.only(top: 5,),
-              decoration: BoxDecoration(
-                  color: ThemesMode.isDarkMode?backgroundDark:backgroundLight,
-                  borderRadius: BorderRadius.only(
-                    topLeft: const Radius.circular(10.0),
-                    topRight: const Radius.circular(10.0),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black12.withOpacity(0.9),
-                        blurRadius: responsiveWidth(3),
-                        spreadRadius: responsiveWidth(3),
-                        offset: Offset.zero)
-                  ]
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                      padding: const EdgeInsets.only(left: 15),
-                      child: Row(
-                        children: [
-                          Text('Select Frequency', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                          Spacer(),
-                          IconButton(icon: Icon(Icons.close), onPressed: (){
-                            Navigator.pop(context, false);
-                          })
+      title: 'Contribution Frequency',
+      maxChildSize: 0.7,
+      builder: (BuildContext sheetContext, ScrollController controller) {
+        return ListView.builder(
+          controller: controller,
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 20),
+          itemCount: _frequencies.length,
+          itemBuilder: (BuildContext _, int index) {
+            final String name = _frequencies.keys.elementAt(index);
+            final int days = _frequencies.values.elementAt(index);
+            final bool selected = name == _intervalName;
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(14),
+                  onTap: () {
+                    setState(() {
+                      _intervalName = name;
+                      _intervalDays = days;
+                    });
+                    Navigator.of(sheetContext).pop();
+                    _recalculate();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
+                    decoration: BoxDecoration(
+                      gradient: selected ? _palette.linear : null,
+                      color: selected
+                          ? null
+                          : Theme.of(context).colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                      children: <Widget>[
+                        Text(
+                          name,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 15,
+                            color: selected
+                                ? Colors.white
+                                : Theme.of(context).textTheme.titleMedium?.color,
+                          ),
+                        ),
+                        const Spacer(),
+                        Text(
+                          'every $days days',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: selected
+                                ? Colors.white70
+                                : Theme.of(context).hintColor,
+                          ),
+                        ),
+                        if (selected) ...<Widget>[
+                          const SizedBox(width: 8),
+                          const Icon(Icons.check_rounded,
+                              color: Colors.white, size: 18),
                         ],
-                      )
+                      ],
+                    ),
                   ),
-                  Expanded(
-                      child:
-                      ListView.builder(
-                        controller: controller,
-                        physics: BouncingScrollPhysics(),
-                        itemCount: frequencyList.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Material(
-                            child: InkWell(
-                                onTap: (){
-                                  valueChanged(frequencyList[index].entries.elementAt(0));
-                                  Navigator.pop(context, true);
-                                },
-                                child:
-                                Container(
-                                  margin: EdgeInsets.all(8),
-                                  padding: EdgeInsets.fromLTRB(8, 15, 8, 15),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.withOpacity(0.3),
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(frequencyList[index].entries.elementAt(0).key, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                                      Spacer(),
-                                      Text(frequencyList[index].entries.elementAt(0).value.toString() + ' Days', style: TextStyle()),
-                                    ],
-                                  ),
-                                )
-                            ),
-                          );
-                        },
-                      )
-                  ),
-                ],
+                ),
               ),
             );
           },
         );
       },
     );
-
-
   }
 
+  Future<void> _reset() async {
+    await showInterstitialAd();
+    if (!mounted) return;
+    resetPage(context, const SavingsCalcPage());
+  }
 
+  @override
+  Widget build(BuildContext context) {
+    return CalculatorScaffold(
+      palette: _palette,
+      title: 'Savings Calculator',
+      icon: Icons.savings_rounded,
+      actions: <Widget>[CalculatorResetButton(onPressed: _reset)],
+      children: <Widget>[
+        AppCard(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              _FrequencyRow(
+                name: _intervalName,
+                onTap: _pickFrequency,
+                palette: _palette,
+              ),
+              BuildTextField(
+                title: 'Initial Deposit',
+                hint: '0.00',
+                isEnabled: true,
+                textController: _principalController,
+                palette: _palette,
+                onPressedAction: null,
+                widget: const Text(r'$'),
+              ),
+              BuildTextField(
+                title: 'Regular Contribution',
+                hint: '0.00',
+                isEnabled: true,
+                textController: _contributionController,
+                palette: _palette,
+                onPressedAction: null,
+                widget: Text('/$_intervalName'),
+              ),
+              BuildTextField(
+                title: 'Annual Interest Rate',
+                hint: '0.00',
+                isEnabled: true,
+                textController: _rateController,
+                palette: _palette,
+                onPressedAction: null,
+                widget: const Text('%'),
+              ),
+              BuildTextField(
+                title: 'Time Period',
+                hint: '0',
+                isEnabled: true,
+                textController: _yearsController,
+                palette: _palette,
+                onPressedAction: null,
+                widget: const Text('yrs'),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 6),
+        BuildResultCard(
+          title: 'Projected Balance',
+          numeric: _balance,
+          prefix: r'$',
+          palette: _palette,
+          group: false,
+          icon: Icons.account_balance_wallet_rounded,
+        ),
+        const SizedBox(height: 6),
+        Row(
+          children: <Widget>[
+            BuildResultCard(
+              title: 'You Contribute',
+              numeric: _contributed,
+              prefix: r'$',
+              palette: _palette,
+              icon: Icons.payments_rounded,
+            ),
+            BuildResultCard(
+              title: 'Interest Earned',
+              numeric: _interest,
+              prefix: r'$',
+              palette: _palette,
+              icon: Icons.trending_up_rounded,
+            ),
+          ],
+        ),
+        if (_hasInput)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+            child: Text(
+              'Compounded daily at ${NumX.percentText(double.tryParse(_rateController.text) ?? 0, decimals: 2)} '
+              'over ${int.tryParse(_yearsController.text) ?? 0} years, '
+              'with ${savingsContributionCount(years: int.tryParse(_yearsController.text) ?? 0, contributionIntervalDays: _intervalDays)} contributions.',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ),
+      ],
+    );
+  }
+}
 
+class _FrequencyRow extends StatelessWidget {
+  const _FrequencyRow({
+    required this.name,
+    required this.onTap,
+    required this.palette,
+  });
+
+  final String name;
+  final VoidCallback onTap;
+  final ToolPalette palette;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            'Frequency',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w800,
+              color: Theme.of(context).textTheme.titleMedium?.color,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(14),
+              onTap: onTap,
+              child: Container(
+                height: 48,
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(
+                        name,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        gradient: palette.linear,
+                        borderRadius: BorderRadius.circular(9),
+                      ),
+                      child: const Icon(Icons.expand_more_rounded,
+                          size: 18, color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

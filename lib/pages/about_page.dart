@@ -1,147 +1,192 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:multi_task_calculator/components/build_app_logo.dart';
-import 'package:multi_task_calculator/services/shared_pref_services.dart';
-import 'package:multi_task_calculator/utils/constant.dart';
-import 'package:multi_task_calculator/utils/screen_config.dart';
-import 'package:multi_task_calculator/utils/themes_mode.dart';
-import 'package:url_launcher/url_launcher.dart';
+﻿import 'package:flutter/material.dart';
 
-class AboutPage extends StatefulWidget {
-  @override
-  _AboutPageState createState() => _AboutPageState();
-}
-
-class _AboutPageState extends State<AboutPage> {
+import '../components/app_surface.dart';
+import '../services/shared_pref_services.dart';
+import '../utils/app_color.dart';
+import '../utils/constant.dart';
+import '../utils/extensions.dart';
+class AboutPage extends StatelessWidget {
+  const AboutPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    ScreenConfig().init(context);
-    ThemesMode().init(context);
-
-    return SafeArea(
-      child: Scaffold(
-          //backgroundColor: Colors.white,
-          appBar: AppBar(
-            centerTitle: true,
-            elevation: 0.0,
-            backgroundColor: Colors.transparent,
-            title: Text(
-              'About',
-              style: TextStyle(
-                  fontSize: responsiveText(22),
-                  fontFamily: fontAudioWide,
-              ),
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('About'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () => Navigator.of(context).maybePop(),
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(14, 6, 14, 24),
+        physics: const BouncingScrollPhysics(),
+        children: <Widget>[
+          _LogoCard(),
+          const SizedBox(height: 12),
+          _InfoCard(
+            title: 'Development',
+            rows: <(String, String)>[
+              ('Developer', developerName),
+              ('UI design', designerName),
+              ('Platforms', 'Android Â· iOS'),
+              ('Icons', 'Font Awesome Â· custom'),
+            ],
           ),
-          body: Container(
+          const SizedBox(height: 12),
+          AppCard(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                    flex: responsiveHeight(5).toInt(),
-                    child: Container(
-                        color: ThemesMode.isDarkMode?Colors.black26:Colors.grey[200],
-                        child: BuildAppLogo()
-                    )
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'What is $appName?',
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
-                SizedBox(height: 10,),
-                Expanded(
-                  flex: responsiveHeight(5).toInt(),
-                  child: SingleChildScrollView(
-                    physics: BouncingScrollPhysics(),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        buildHeader('Development'),
-                        buildDescription('Android Engineering', developerName),
-                        buildDescription('UI Design', designerName),
-                        buildDescription('Icon Used', 'flaticon, fontawesome'),
-                        buildHeaderClickable('Other App', () async{
-                          if (await canLaunch(storeLink)) {
-                            await launch(storeLink);
-                          } else {
-                            throw 'Could not launch $storeLink';
-                          }
-                        }),
-                        SizedBox(height: responsiveHeight(8),),
-
-                        buildHeaderClickable('$appName: ${getAppVersion()}', () async{
-
-                        }),
+                const SizedBox(height: 10),
+                ...appFeature.map(
+                  (String feature) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        const Icon(Icons.check_circle_rounded,
+                            size: 17, color: AppColors.success),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            feature,
+                            style: const TextStyle(fontSize: 14, height: 1.4),
+                          ),
+                        ),
                       ],
                     ),
                   ),
                 ),
               ],
             ),
-          )),
-    );
-  }
-
-
-
-  Container buildHeader(String title) {
-    return Container(
-      height: responsiveHeight(50),
-      color: Colors.grey.withOpacity(0.12),
-      child: Center(
-        child: Text(
-          title,
-          style: TextStyle(
-              fontSize: responsiveText(18), fontWeight: FontWeight.bold),
-        ),
+          ),
+          const SizedBox(height: 12),
+          _InfoCard(
+            title: 'Everything offline',
+            rows: const <(String, String)>[
+              ('Account required', 'No'),
+              ('Data collected', 'Nothing'),
+              ('Works offline', 'Yes, all of it'),
+            ],
+          ),
+          const SizedBox(height: 12),
+          AppCard(
+            child: Column(
+              children: <Widget>[
+                AppButton(
+                  label: 'Our other apps',
+                  icon: Icons.apps_rounded,
+                  palette: AppPalettes.unitConverter,
+                  onPressed: () => openExternal(context, storeLink),
+                ),
+                const SizedBox(height: 10),
+                AppButton(
+                  label: 'Rate $appName',
+                  icon: Icons.star_rounded,
+                  palette: AppPalettes.discount,
+                  onPressed: () => onRatingPressed(context),
+                ),
+                const SizedBox(height: 10),
+                AppButton(
+                  label: 'Privacy policy',
+                  icon: Icons.privacy_tip_rounded,
+                  palette: AppPalettes.salesTax,
+                  onPressed: () => openExternal(context, privacyPolicyLink),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
+}
 
-  Widget buildHeaderClickable(String title, VoidCallback onPressed) {
-    return Material(
-      child: new InkWell(
-        onTap: () {
-          onPressed();
-          //print("tapped");
-        },
-        child: Container(
-          height: responsiveHeight(50),
-          color: Colors.grey.withOpacity(0.12),
-          alignment: Alignment.center,
-          child: Text(
-            title,
+class _LogoCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return AppGradientCard(
+      palette: AppPalettes.general,
+      padding: const EdgeInsets.symmetric(vertical: 26, horizontal: 20),
+      child: Column(
+        children: <Widget>[
+          Image.asset(appIconLight, height: 84, width: 84),
+          const SizedBox(height: 14),
+          Text(
+            appName,
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: responsiveText(18), fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              fontFamily: 'Audiowide',
+              fontSize: 21,
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
           ),
-        )
+          const SizedBox(height: 6),
+          Text(
+            'Version ${SharedPrefService.appVersion}',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.9),
+              fontSize: 13.5,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
     );
   }
+}
 
-  Widget buildDescription(String title, String description) {
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      alignment: Alignment.center,
-      child: RichText(
-        textAlign: TextAlign.center,
-        text: new TextSpan(
-          text: '$title: ',
-          style: TextStyle(
-              fontSize: responsiveText(14),
-              fontWeight: FontWeight.bold,
-              color: ThemesMode.isDarkMode?textWhite:textBlack
+class _InfoCard extends StatelessWidget {
+  const _InfoCard({required this.title, required this.rows});
+
+  final String title;
+  final List<(String, String)> rows;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(title, style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 10),
+          ...rows.map(
+            ((String, String) row) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                      row.$1,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      row.$2,
+                      textAlign: TextAlign.right,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Theme.of(context).textTheme.bodySmall?.color,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-          children: <TextSpan>[
-            new TextSpan(
-                text: description,
-                style: TextStyle(
-                    fontSize: responsiveText(14),
-                    fontWeight: FontWeight.normal,
-                    color: ThemesMode.isDarkMode?textWhite:textBlack
-                )),
-          ],
-        ),
+        ],
       ),
     );
   }

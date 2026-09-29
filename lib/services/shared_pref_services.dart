@@ -1,52 +1,86 @@
-import 'package:multi_task_calculator/utils/constant.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+﻿import 'package:shared_preferences/shared_preferences.dart';
 
+import '../utils/constant.dart';
+/// Thin, typed wrapper around [SharedPreferences].
+///
+/// The previous implementation kept the instance in a mutable static and read
+/// it from free functions, which meant any call before [init] threw. Values are
+/// now resolved lazily and every getter has a safe default.
 class SharedPrefService {
-  static SharedPreferences prefs;
-  Future init() async {
-    prefs = await SharedPreferences.getInstance();
+  SharedPrefService._();
+
+  static SharedPreferences? _prefs;
+  static bool _initialised = false;
+
+  static Future<void> init() async {
+    _prefs ??= await SharedPreferences.getInstance();
+    _initialised = true;
   }
-}
 
-//themes
-int getSavedTheme() {
-  return themes.indexOf(SharedPrefService.prefs.getString(appTheme) ?? systemDefault);
-}
+  static SharedPreferences? get _p => _initialised ? _prefs : null;
 
-String getAppVersion() {
-  return SharedPrefService.prefs.getString(appVersion) ?? '0';
-}
+  // ------------------------------------------------------------------ theme
+  static String get theme => _p?.getString(appTheme) ?? systemDefault;
 
-//Currency
-void setAppPurchasedStatus(bool value) {
-  SharedPrefService.prefs.setBool('app_purchase_status', value);
-}
+  static Future<bool> setTheme(String value) async {
+    await init();
+    return _prefs!.setString(appTheme, value);
+  }
 
-bool getAppPurchasedStatus() {
-  bool result = SharedPrefService.prefs.getBool('app_purchase_status',)??false;
-  return result;
-}
+  // ----------------------------------------------------------------- version
+  static String get appVersion => _p?.getString(appVersionKey) ?? '';
 
+  static Future<bool> setAppVersion(String value) async {
+    await init();
+    return _prefs!.setString(appVersionKey, value);
+  }
 
-void setAdFreeTime(String value) {
-  SharedPrefService.prefs.setString('ad_free_time', value);
-}
+  // -------------------------------------------------------------------- ads
+  static bool get isAdFree =>
+      _p?.getBool(appPurchasedStatusKey) ?? false;
 
-String getAdFreeTime() {
-  String result = SharedPrefService.prefs.getString('ad_free_time')??'zero';
-  return result;
-}
+  static Future<bool> setAdFree(bool value) async {
+    await init();
+    return _prefs!.setBool(appPurchasedStatusKey, value);
+  }
 
-bool setCardClick() {
-  int counter = getCardClick();
-  if(counter>=5) counter = 0;
-  else counter ++;
-  SharedPrefService.prefs.setInt('itemClick', counter);
-  print("counter: "+ counter.toString());
-  return getAppPurchasedStatus()?false:counter==0?true:false;
-}
+  /// Records that an interstitial was shown. Returns `true` when this tap is
+  /// the one that should actually show an ad (i.e. every Nth tap).
+  static Future<bool> shouldShowInterstitial() async {
+    await init();
+    final int counter = (_prefs!.getInt(itemClickKey) ?? 0) + 1;
+    await _prefs!.setInt(itemClickKey, counter);
+    if (isAdFree) return false;
+    return counter % interstitialTapInterval == 0;
+  }
 
-int getCardClick() {
-  int result = SharedPrefService.prefs.getInt('itemClick',)??0;
-  return result;
+  // ------------------------------------------------------- reward ad timer
+  static String get adFreeUntil => _p?.getString(adFreeTimeKey) ?? 'zero';
+
+  static Future<bool> setAdFreeUntil(String value) async {
+    await init();
+    return _prefs!.setString(adFreeTimeKey, value);
+  }
+
+  // ---------------------------------------------------------------- history
+  static String get historyJson => _p?.getString(historyKey) ?? '[]';
+
+  static Future<bool> setHistoryJson(String value) async {
+    await init();
+    return _prefs!.setString(historyKey, value);
+  }
+
+  static Future<bool> clearHistory() async {
+    await init();
+    return _prefs!.remove(historyKey);
+  }
+
+  // -------------------------------------------------------- update checking
+  static int get lastUpdateCheck =>
+      _p?.getInt(lastUpdateCheckKey) ?? 0;
+
+  static Future<bool> setLastUpdateCheck(int millis) async {
+    await init();
+    return _prefs!.setInt(lastUpdateCheckKey, millis);
+  }
 }

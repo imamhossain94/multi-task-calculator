@@ -1,41 +1,94 @@
-# Miscellaneous
-*.class
-*.log
-*.pyc
-*.swp
-.DS_Store
-.atom/
-.buildlog/
-.history
-.svn/
+# ---------------------------------------------------------------------------
+# Secrets — NEVER commit these
+# ---------------------------------------------------------------------------
+# Signing material
+**/*.jks
+**/*.keystore
+**/*.p12
+**/*.pfx
+**/*.pem
+**/*.key
+key.properties
+android/key.properties
+ios/Runner/GoogleService-Info.plist
+android/app/google-services.json
+**/serviceAccount*.json
+**/*firebase*options*.dart
+**/.env
+**/.env.*
 
-# IntelliJ related
+# ---------------------------------------------------------------------------
+# Local machine configuration
+# ---------------------------------------------------------------------------
+local.properties
+**/local.properties
+.gradle/
+**/.gradle/
+.idea/
+**/.idea/
 *.iml
+.vscode/
+**/.vscode/
 *.ipr
 *.iws
-.idea/
+.DS_Store
+Thumbs.db
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
-
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
+# ---------------------------------------------------------------------------
+# Flutter / Dart
+# ---------------------------------------------------------------------------
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
 .packages
 .pub-cache/
 .pub/
-/build/
-
-# Web related
+build/
+**/build/
+coverage/
+**/doc/api/
+**/ios/Flutter/.last_build_id
+**/ios/Flutter/ephemeral/
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/Pods/
+**/ios/.symlinks/
+**/macos/Flutter/ephemeral/
 lib/generated_plugin_registrant.dart
+android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
+.metadata
 
-# Symbolication related
+# ---------------------------------------------------------------------------
+# iOS / Xcode
+# ---------------------------------------------------------------------------
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/ephemeral/
+**/ios/Runner.xcworkspace/xcuserdata/
+**/ios/Runner.xcodeproj/xcuserdata/
+**/ios/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+**/DerivedData/
+*.xcuserstate
+*.xcscmblueprint
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# ---------------------------------------------------------------------------
+# Build artefacts / release output
+# ---------------------------------------------------------------------------
+android/app/release/
+android/app/debug/
+android/app/profile/
+*.aab
+*.apk
+*.ap_
+*.dex
 app.*.symbols
-
-# Obfuscation related
 app.*.map.json
+
+# Kotlin / NDK / AGP scratch output
+.kotlin/
+**/.cxx/
+android/.gradle/
+android/app/src/main/jniLibs/

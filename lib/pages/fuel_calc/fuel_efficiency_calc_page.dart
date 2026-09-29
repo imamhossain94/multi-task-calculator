@@ -1,169 +1,200 @@
-import 'package:flutter/material.dart';
-import 'package:multi_task_calculator/components/build_banner_ad.dart';
-import 'package:multi_task_calculator/components/build_result_card.dart';
-import 'package:multi_task_calculator/components/build_text_field.dart';
-import 'package:multi_task_calculator/services/google_ad_service.dart';
-import 'package:multi_task_calculator/utils/constant.dart';
-import 'package:multi_task_calculator/utils/extensions.dart';
-import 'package:multi_task_calculator/utils/screen_config.dart';
-import 'package:multi_task_calculator/utils/themes_mode.dart';
+﻿import 'package:flutter/material.dart';
+import '../../services/google_ad_service.dart';
 
-
+import '../../components/build_result_card.dart';
+import '../../components/build_text_field.dart';
+import '../../components/calculator_scaffold.dart';
+import '../../services/history_service.dart';
+import '../../utils/app_color.dart';
+import '../../utils/calculator_math.dart';
+import '../../utils/constant.dart';
+import '../../utils/extensions.dart';
+import '../../utils/num_x.dart';
 class FuelEfficiencyCalcPage extends StatefulWidget {
+  const FuelEfficiencyCalcPage({super.key});
+
   @override
-  _FuelEfficiencyCalcPageState createState() => _FuelEfficiencyCalcPageState();
+  State<FuelEfficiencyCalcPage> createState() =>
+      _FuelEfficiencyCalcPageState();
 }
 
 class _FuelEfficiencyCalcPageState extends State<FuelEfficiencyCalcPage> {
+  final TextEditingController _beforeController = TextEditingController();
+  final TextEditingController _litresController = TextEditingController();
+  final TextEditingController _afterController = TextEditingController();
 
+  double _efficiency = 0;
+  double _distance = 0;
+  bool _hasInput = false;
 
-  TextEditingController mileageBeforeController = TextEditingController();
-  TextEditingController refuelledGasolineController = TextEditingController();
-  TextEditingController mileageAfterController = TextEditingController();
-
-  String mileageBefore, refuelledGasoline, mileageAfter;
-  double calculatedFuelEfficiency;
-
+  static const ToolPalette _palette = AppPalettes.fuelEfficiency;
 
   @override
   void initState() {
-    calculatedFuelEfficiency = 0.0;
-    calculateDiscount();
     super.initState();
+    _beforeController.addListener(_recalculate);
+    _litresController.addListener(_recalculate);
+    _afterController.addListener(_recalculate);
   }
 
   @override
   void dispose() {
-    mileageBeforeController.dispose();
-    refuelledGasolineController.dispose();
-    mileageAfterController.dispose();
+    _beforeController.dispose();
+    _litresController.dispose();
+    _afterController.dispose();
     super.dispose();
   }
 
-  void calculateDiscount() {
-    mileageBeforeController.addListener(() {
-      updateResult();
-    });
-    refuelledGasolineController.addListener(() {
-      updateResult();
-    });
-    mileageAfterController.addListener(() {
-      updateResult();
-    });
-  }
+  void _recalculate() {
+    final double before = double.tryParse(_beforeController.text) ?? 0;
+    final double litres = double.tryParse(_litresController.text) ?? 0;
+    final double after = double.tryParse(_afterController.text) ?? 0;
 
-  void updateResult() {
-    mileageBefore = mileageBeforeController.value.text;
-    refuelledGasoline = refuelledGasolineController.value.text;
-    mileageAfter = mileageAfterController.value.text;
-    //Make null safety
+    // Needs a non-zero fill and a positive distance travelled. Anything else
+    // used to divide by zero and render `Infinity`.
+    if (litres <= 0 || after <= before) {
+      if (_hasInput || _efficiency != 0) {
+        setState(() {
+          _hasInput = false;
+          _efficiency = 0;
+          _distance = 0;
+        });
+      }
+      return;
+    }
+
+    final double distance = after - before;
+    final double efficiency =
+        fuelEfficiency(startOdometer: before, endOdometer: after, litres: litres);
+
     setState(() {
-
-      double _mileageBefore = double.tryParse(mileageBefore)??0.0;
-      double _refuelledGasoline = double.tryParse(refuelledGasoline)??0.0;
-      double _mileageAfter = double.tryParse(mileageAfter)??0.0;
-
-      double _totalMileage = _mileageAfter - _mileageBefore;
-      calculatedFuelEfficiency = _totalMileage / _refuelledGasoline;
-
+      _hasInput = true;
+      _distance = distance;
+      _efficiency = efficiency;
     });
+
+    _maybeSave(before, after, litres);
   }
 
-
-  @override
-  Widget build(BuildContext context) {
-    ScreenConfig().init(context);
-    ThemesMode().init(context);
-
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Fuel Efficiency Calculator',
-            style: TextStyle(
-              fontFamily: fontAudioWide,
-              fontSize: responsiveWidth(18)
-            ),
-          ),
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          actions: [
-            IconButton(
-              onPressed: () async {
-                await showInterstitialAd();
-                resetPage(context, FuelEfficiencyCalcPage());
-              },
-              icon: Icon(Icons.refresh),
-              tooltip: 'Refresh',
-            )
-          ],
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                physics: BouncingScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      margin: EdgeInsets.all(10),
-                      padding: EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                          color: ThemesMode.isDarkMode?Colors.black:textWhite,
-                          borderRadius: BorderRadius.circular(5),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.grey.withOpacity(0.9),
-                                blurRadius: 0.5,
-                                spreadRadius: 0.5,
-                                offset: Offset.zero
-                            )
-                          ]
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          BuildTextField(
-                            title: 'Mileage Before Refueling',
-                            hint: '0.0',
-                            isEnabled: true,
-                            textController: mileageBeforeController,
-                            onPressedAction: null,
-                            widget: Text('km', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-                          BuildTextField(
-                            title: 'The Amount of Refuelled Gasoline',
-                            hint: '0.0',
-                            isEnabled: true,
-                            textController: refuelledGasolineController,
-                            onPressedAction: null,
-                            widget: Text('ℓ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-                          BuildTextField(
-                            title: 'Mileage After Driving',
-                            hint: '0.0',
-                            isEnabled: true,
-                            textController: mileageAfterController,
-                            onPressedAction: null,
-                            widget: Text('km', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-                        ],
-                      ),
-                    ),
-                    //Result
-                    Row(
-                      children: [
-                        BuildResultCard(title: 'Calculated Fuel Efficiency', value: '${calculatedFuelEfficiency.toStringAsFixed(4)} km/ℓ',),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ),
-            BuildBannerAd(),
-          ],
-        ),
+  String? _lastSaved;
+  void _maybeSave(double before, double after, double litres) {
+    final String signature = '$before|$after|$litres';
+    if (_lastSaved == signature) return;
+    _lastSaved = signature;
+    HistoryService.add(
+      CalculationRecord(
+        id: HistoryService.newId(),
+        tool: 'Fuel Efficiency',
+        toolRoute: fuelEfficiencyCalcPage,
+        summary: '${NumX.format(_distance)} km on ${NumX.format(litres, decimals: 2)} l '
+            '= ${NumX.format(_efficiency, decimals: 2)} km/l',
+        createdAt: DateTime.now(),
       ),
     );
   }
 
+  Future<void> _reset() async {
+    await showInterstitialAd();
+    if (!mounted) return;
+    resetPage(context, const FuelEfficiencyCalcPage());
+  }
 
-
+  @override
+  Widget build(BuildContext context) {
+    return CalculatorScaffold(
+      palette: _palette,
+      title: 'Fuel Efficiency',
+      icon: Icons.eco_rounded,
+      actions: <Widget>[CalculatorResetButton(onPressed: _reset)],
+      children: <Widget>[
+        Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              BuildTextField(
+                title: 'Odometer Before Refuelling',
+                hint: '0.00',
+                isEnabled: true,
+                textController: _beforeController,
+                palette: _palette,
+                onPressedAction: null,
+                widget: const Text('km'),
+              ),
+              BuildTextField(
+                title: 'Fuel Added',
+                hint: '0.00',
+                isEnabled: true,
+                textController: _litresController,
+                palette: _palette,
+                onPressedAction: null,
+                widget: const Text('l'),
+              ),
+              BuildTextField(
+                title: 'Odometer After Driving',
+                hint: '0.00',
+                isEnabled: true,
+                textController: _afterController,
+                palette: _palette,
+                onPressedAction: null,
+                widget: const Text('km'),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 6),
+        Row(
+          children: <Widget>[
+            BuildResultCard(
+              title: 'Distance Travelled',
+              numeric: _distance,
+              decimals: 1,
+              suffix: ' km',
+              palette: _palette,
+              icon: Icons.route_rounded,
+            ),
+            BuildResultCard(
+              title: 'Efficiency',
+              numeric: _efficiency,
+              decimals: 2,
+              suffix: ' km/l',
+              palette: _palette,
+              icon: Icons.eco_rounded,
+            ),
+          ],
+        ),
+        if (!_hasInput)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+            child: Text(
+              'Fill the tank, drive, then enter the fuel added and both '
+              'odometer readings.',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          )
+        else
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+            child: Text(
+              'That is ${NumX.format(NumX.divide(100, _efficiency, 0), decimals: 1)} l '
+              'per 100 km.',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ),
+      ],
+    );
+  }
 }

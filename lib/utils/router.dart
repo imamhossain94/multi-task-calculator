@@ -1,100 +1,134 @@
-import 'package:flutter/material.dart';
-import 'package:multi_task_calculator/pages/currency_calc_page/currency_calc_page.dart';
-import 'package:multi_task_calculator/pages/date_calc/date_calc_page.dart';
-import 'package:multi_task_calculator/pages/discount_calc/discount_calc_page.dart';
-import 'package:multi_task_calculator/pages/fuel_calc/fuel_cost_calc_page.dart';
-import 'package:multi_task_calculator/pages/fuel_calc/fuel_efficiency_calc_page.dart';
-import 'package:multi_task_calculator/pages/general_calc_page/general_calc_page.dart';
-import 'package:multi_task_calculator/pages/health_calc/health_calc_page.dart';
-import 'package:multi_task_calculator/pages/home_page/home_page.dart';
-import 'package:multi_task_calculator/pages/loan_calc/loan_calc_page.dart';
-import 'package:multi_task_calculator/pages/premium_page.dart';
-import 'package:multi_task_calculator/pages/sales_tax_calc/sales_tax_calc_page.dart';
-import 'package:multi_task_calculator/pages/savings_calc/savings_calc_page.dart';
-import 'package:multi_task_calculator/pages/about_page.dart';
-import 'package:multi_task_calculator/pages/feedback_page.dart';
-import 'package:multi_task_calculator/pages/help_page.dart';
-import 'package:multi_task_calculator/pages/tip_calc/tip_calc_page.dart';
-import 'package:multi_task_calculator/pages/unit_converter/number_base_converter_page.dart';
-import 'package:multi_task_calculator/pages/unit_converter/unit_converter_child_page.dart';
-import 'package:multi_task_calculator/pages/unit_converter/unit_converter_page.dart';
-import 'package:multi_task_calculator/pages/unit_price_calc/unit_price_calc_page.dart';
-import 'package:multi_task_calculator/pages/update_check_page.dart';
-import 'package:multi_task_calculator/utils/constant.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
+import '../pages/about_page.dart';
+import '../pages/currency_calc_page/currency_calc_page.dart';
+import '../pages/date_calc/date_calc_page.dart';
+import '../pages/discount_calc/discount_calc_page.dart';
+import '../pages/feedback_page.dart';
+import '../pages/fuel_calc/fuel_cost_calc_page.dart';
+import '../pages/fuel_calc/fuel_efficiency_calc_page.dart';
+import '../pages/general_calc_page/general_calc_page.dart';
+import '../pages/health_calc/health_calc_page.dart';
+import '../pages/help_page.dart';
+import '../pages/history_page.dart';
+import '../pages/home_page/home_page.dart';
+import '../pages/loan_calc/loan_calc_page.dart';
+import '../pages/premium_page.dart';
+import '../pages/sales_tax_calc/sales_tax_calc_page.dart';
+import '../pages/savings_calc/savings_calc_page.dart';
+import '../pages/tip_calc/tip_calc_page.dart';
+import '../pages/unit_converter/number_base_converter_page.dart';
+import '../pages/unit_converter/unit_converter_child_page.dart';
+import '../pages/unit_converter/unit_converter_page.dart';
+import '../pages/unit_price_calc/unit_price_calc_page.dart';
+import '../pages/update_check_page.dart';
+import 'constant.dart';
 
-Route<dynamic> generateRoute(RouteSettings settings) {
-  switch (settings.name) {
+/// Single place that maps a route name onto its page.
+///
+/// Returning a real [PageRoute] for unknown names (instead of `null`) means a
+/// bad deep link lands on a readable error screen rather than crashing.
+Route<dynamic>? generateRoute(RouteSettings settings) {
+  final String? name = settings.name;
+  if (name == null) return null;
+
+  switch (name) {
+    // ---------------------------------------------------------- app screens
     case homePage:
-      return PageTransition(child: HomePage(), type: PageTransitionType.fade, settings: settings,);
-      break;
+      return _fade(HomePage(), settings);
     case aboutPage:
-      return PageTransition(child: AboutPage(), type: PageTransitionType.fade, settings: settings,);
-      break;
+      return _fade(AboutPage(), settings);
     case feedbackPage:
-      return PageTransition(child: FeedbackPage(), type: PageTransitionType.fade, settings: settings,);
-      break;
+      return _fade(FeedbackPage(), settings);
     case helpPage:
-      return PageTransition(child: HelpPage(), type: PageTransitionType.fade, settings: settings,);
-      break;
+      return _fade(HelpPage(), settings);
     case updateCheckPage:
-      return PageTransition(child: UpdateCheckPage(), type: PageTransitionType.fade, settings: settings,);
-      break;
-    //Calculators
-    case generalCalcPage:
-      return PageTransition(child: GeneralCalcPage(), type: PageTransitionType.fade, settings: settings,);
-      break;
-    case currencyCalcPage:
-      return PageTransition(child: CurrencyCalcPage(), type: PageTransitionType.fade, settings: settings,);
-      break;
-    case unitConverterPage:
-      return PageTransition(child: UnitConverterPage(), type: PageTransitionType.rightToLeft, settings: settings,);
-      break;
-    case unitConverterChildPage:
-      return PageTransition(child: UnitConverterChildPage(arguments: settings.arguments), type: PageTransitionType.fade, settings: settings,);
-      break;
-    case numberBaseConverterPage:
-      return PageTransition(child: NumberBaseConverterPage(), type: PageTransitionType.fade, settings: settings,);
-      break;
-    case discountCalcPage:
-      return PageTransition(child: DiscountCalcPage(), type: PageTransitionType.fade, settings: settings,);
-      break;
-    case tipCalcPage:
-      return PageTransition(child: TipCalcPage(), type: PageTransitionType.fade, settings: settings,);
-      break;
-    case dateCalcPage:
-      return PageTransition(child: DateCalcPage(), type: PageTransitionType.fade, settings: settings,);
-      break;
-    case fuelCalcPage:
-      return PageTransition(child: FuelCostCalcPage(), type: PageTransitionType.fade, settings: settings,);
-      break;
-    case fuelEfficiencyCalcPage:
-      return PageTransition(child: FuelEfficiencyCalcPage(), type: PageTransitionType.fade, settings: settings,);
-      break;
-    case healthCalcPage:
-      return PageTransition(child: HealthCalcPage(), type: PageTransitionType.fade, settings: settings,);
-      break;
-    case loanCalcPage:
-      return PageTransition(child: LoanCalcPage(), type: PageTransitionType.fade, settings: settings,);
-      break;
-    case salesTaxCalcPage:
-      return PageTransition(child: SalesTaxCalcPage(), type: PageTransitionType.fade, settings: settings,);
-      break;
-    case savingCalcPage:
-      return PageTransition(child: SavingsCalcPage(), type: PageTransitionType.fade, settings: settings,);
-      break;
-    case unitPriceCalcPage:
-      return PageTransition(child: UnitPriceCalcPage(), type: PageTransitionType.fade, settings: settings,);
-      break;
+      return _fade(const UpdateCheckPage(), settings);
+    case historyPage:
+      return _fade(const HistoryPage(), settings);
     case premiumPage:
-      return PageTransition(child: PremiumPage(), type: PageTransitionType.fade, settings: settings,);
-      break;
+      return _fade(const PremiumPage(), settings);
+
+    // ---------------------------------------------------------- calculators
+    case generalCalcPage:
+      return _fade(GeneralCalcPage(), settings);
+    case currencyCalcPage:
+      return _fade(CurrencyCalcPage(), settings);
+    case discountCalcPage:
+      return _fade(DiscountCalcPage(), settings);
+    case tipCalcPage:
+      return _fade(TipCalcPage(), settings);
+    case dateCalcPage:
+      return _fade(DateCalcPage(), settings);
+    case fuelCalcPage:
+      return _fade(FuelCostCalcPage(), settings);
+    case fuelEfficiencyCalcPage:
+      return _fade(FuelEfficiencyCalcPage(), settings);
+    case healthCalcPage:
+      return _fade(HealthCalcPage(), settings);
+    case loanCalcPage:
+      return _fade(LoanCalcPage(), settings);
+    case salesTaxCalcPage:
+      return _fade(SalesTaxCalcPage(), settings);
+    case savingCalcPage:
+      return _fade(SavingsCalcPage(), settings);
+    case unitPriceCalcPage:
+      return _fade(UnitPriceCalcPage(), settings);
+
+    // ------------------------------------------------------ unit converters
+    case unitConverterPage:
+      return _slide(UnitConverterPage(), settings);
+    case unitConverterChildPage:
+      return _fade(UnitConverterChildPage(arguments: settings.arguments), settings);
+    case numberBaseConverterPage:
+      return _fade(NumberBaseConverterPage(), settings);
 
     default:
-      return null;
+      return _fade(_UnknownRoutePage(name: name), settings);
   }
 }
 
+PageRoute<dynamic> _fade(Widget child, RouteSettings settings) => PageTransition(
+      child: child,
+      type: PageTransitionType.fade,
+      settings: settings,
+    );
 
+PageRoute<dynamic> _slide(Widget child, RouteSettings settings) => PageTransition(
+      child: child,
+      type: PageTransitionType.rightToLeft,
+      settings: settings,
+    );
 
+class _UnknownRoutePage extends StatelessWidget {
+  const _UnknownRoutePage({required this.name});
+
+  final String name;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Not found')),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const Icon(Icons.explore_off_rounded, size: 48),
+              const SizedBox(height: 12),
+              Text('No page is registered for "$name".'),
+              const SizedBox(height: 16),
+              FilledButton(
+                onPressed: () =>
+                    Navigator.of(context).pushNamedAndRemoveUntil(homePage, (_) => false),
+                child: const Text('Back to home'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

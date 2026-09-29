@@ -1,269 +1,309 @@
-import 'package:flutter/material.dart';
-import 'package:multi_task_calculator/components/build_banner_ad.dart';
-import 'package:multi_task_calculator/components/build_result_card.dart';
-import 'package:multi_task_calculator/components/build_text_field.dart';
-import 'package:multi_task_calculator/services/google_ad_service.dart';
-import 'package:multi_task_calculator/utils/constant.dart';
-import 'package:multi_task_calculator/utils/extensions.dart';
-import 'package:multi_task_calculator/utils/screen_config.dart';
-import 'package:multi_task_calculator/utils/themes_mode.dart';
+﻿import 'package:flutter/material.dart';
+import '../../services/google_ad_service.dart';
 
-
+import '../../components/app_surface.dart';
+import '../../components/build_result_card.dart';
+import '../../components/build_text_field.dart';
+import '../../components/calculator_scaffold.dart';
+import '../../services/history_service.dart';
+import '../../utils/app_color.dart';
+import '../../utils/calculator_math.dart';
+import '../../utils/constant.dart';
+import '../../utils/extensions.dart';
+import '../../utils/num_x.dart';
 class TipCalcPage extends StatefulWidget {
+  const TipCalcPage({super.key});
+
   @override
-  _TipCalcPageState createState() => _TipCalcPageState();
+  State<TipCalcPage> createState() => _TipCalcPageState();
 }
 
 class _TipCalcPageState extends State<TipCalcPage> {
+  final TextEditingController _billController = TextEditingController();
+  final TextEditingController _peopleController = TextEditingController();
+  final TextEditingController _tipController = TextEditingController();
+  final TextEditingController _taxController = TextEditingController();
 
-  TextEditingController billAmountController = TextEditingController();
-  TextEditingController numberOfPeopleController = TextEditingController();
-  TextEditingController tipAmountController = TextEditingController();
-  TextEditingController taxAmountController = TextEditingController();
+  /// Whether the tip input is an absolute amount (`true`) or a percentage.
+  bool _tipIsAmount = true;
 
-  String billAmount, numberOfPeople, tipAmount, taxAmount;
-  double finalAmount, amountPerPerson, tipPercentage, taxPercentage;
-  bool tipAmountDollar = true, taxAmountDollar = true;
+  /// Whether the tax input is an absolute amount (`true`) or a percentage.
+  bool _taxIsAmount = true;
 
+  double _tip = 0;
+  double _tax = 0;
+  double _finalAmount = 0;
+  double _perPerson = 0;
+  bool _hasInput = false;
+
+  static const ToolPalette _palette = AppPalettes.tip;
 
   @override
   void initState() {
-    finalAmount = 0.0;
-    amountPerPerson = 0.0;
-    calculateTip();
     super.initState();
+    for (final TextEditingController c in <TextEditingController>[
+      _billController,
+      _peopleController,
+      _tipController,
+      _taxController,
+    ]) {
+      c.addListener(_recalculate);
+    }
   }
 
   @override
   void dispose() {
-    billAmountController.dispose();
-    numberOfPeopleController.dispose();
-    tipAmountController.dispose();
-    taxAmountController.dispose();
+    _billController.dispose();
+    _peopleController.dispose();
+    _tipController.dispose();
+    _taxController.dispose();
     super.dispose();
   }
 
-  void calculateTip() {
-    billAmountController.addListener(() {
-      updateResult();
-    });
-    numberOfPeopleController.addListener(() {
-      updateResult();
-    });
-    tipAmountController.addListener(() {
-      updateResult();
-    });
-    taxAmountController.addListener(() {
-      updateResult();
-    });
-  }
+  Future<void> _recalculate() async {
+    final double bill = double.tryParse(_billController.text) ?? 0;
+    final int people = int.tryParse(_peopleController.text) ?? 0;
+    final double tipInput = double.tryParse(_tipController.text) ?? 0;
+    final double taxInput = double.tryParse(_taxController.text) ?? 0;
 
-  void updateResult() {
-    billAmount = billAmountController.value.text;
-    numberOfPeople = numberOfPeopleController.value.text;
-    tipAmount = tipAmountController.value.text;
-    taxAmount = taxAmountController.value.text;
-    //Make null safety
+    if (bill <= 0) {
+      if (_hasInput) _clear();
+      return;
+    }
+
+    final ({double tip, double tax, double finalAmount, double perPerson}) result =
+        tip(
+      bill: bill,
+      tipInput: tipInput,
+      taxInput: taxInput,
+      people: people,
+      tipIsPercent: !_tipIsAmount,
+      taxIsPercent: !_taxIsAmount,
+    );
+
     setState(() {
+      _hasInput = true;
+      _tip = result.tip;
+      _tax = result.tax;
+      _finalAmount = result.finalAmount;
+      _perPerson = result.perPerson;
+    });
 
-      double _billAmount = double.tryParse(billAmount)??0.0;
-      int _numberOfPeople = int.tryParse(numberOfPeople) ?? 0;
-      double _tipAmount = double.tryParse(tipAmount)??0.0;
-      double _taxAmount = double.tryParse(taxAmount)??0.0;
+    await _maybeSave(bill, people, result.finalAmount, result.perPerson);
+  }
 
-      if(_tipAmount == 0.0 && _taxAmount == 0.0){
-          finalAmount = _billAmount;
-          amountPerPerson = _billAmount / _numberOfPeople;
-      }else if( _taxAmount == 0.0){
-
-        if(tipAmountDollar){
-          finalAmount = _billAmount + _tipAmount;
-          amountPerPerson = finalAmount / _numberOfPeople;
-        }else{
-          finalAmount = _billAmount + (_billAmount * _tipAmount/100);
-          amountPerPerson = finalAmount / _numberOfPeople;
-        }
-
-      }
-      //else if(_billAmount != 0.0 && _taxAmount != 0.0 && _taxAmount != 0.0){
-      //   if(taxAmountDollar){
-      //
-      //
-      //     double _tempBillAmount = _billAmount - _taxAmount;
-      //     double _tipPercent = (_taxAmount * 100) / _tempBillAmount;
-      //     double _tipAmnt = _tempBillAmount * (_tipPercent/100);
-      //     //_tipAmount = _tempBillAmount * (((_tipAmount * 100) / _tempBillAmount)/100);
-      //
-      //     finalAmount = _billAmount + _tipAmnt;
-      //     amountPerPerson = finalAmount / _numberOfPeople;
-      //     print(_tempBillAmount);
-      //     print(_tipPercent);
-      //     print(_tipAmnt);
-      //
-      //
-      //   }
-      //   // else{
-      //   //   print('heat: ${_billAmount * _tipAmount/100}');
-      //   //   finalAmount = _billAmount + (_billAmount * _tipAmount/100);
-      //   //   amountPerPerson = finalAmount / _numberOfPeople;
-      //   // }
-      //
-      // }
-
+  void _clear() {
+    setState(() {
+      _hasInput = false;
+      _tip = 0;
+      _tax = 0;
+      _finalAmount = 0;
+      _perPerson = 0;
     });
   }
 
-  void tipAmountToTipPercent(){
-
-  }
-
-
-  @override
-  Widget build(BuildContext context) {
-    ScreenConfig().init(context);
-    ThemesMode().init(context);
-
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Tip Calculator',
-            style: TextStyle(
-              fontFamily: fontAudioWide,
-              fontSize: responsiveWidth(18)
-            ),
-          ),
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          actions: [
-            IconButton(
-              onPressed: () async {
-                await showInterstitialAd();
-                resetPage(context, TipCalcPage());
-              },
-              icon: Icon(Icons.refresh_rounded),
-              tooltip: 'Reset',
-            )
-          ],
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                physics: BouncingScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      margin: EdgeInsets.all(10),
-                      padding: EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                          color: ThemesMode.isDarkMode?Colors.black:textWhite,
-                          borderRadius: BorderRadius.circular(5),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.grey.withOpacity(0.9),
-                                blurRadius: 0.5,
-                                spreadRadius: 0.5,
-                                offset: Offset.zero
-                            )
-                          ]
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          BuildTextField(
-                            title: 'Bill Amount',
-                            hint: '0.0',
-                            isEnabled: true,
-                            textController: billAmountController,
-                            onPressedAction: null,
-                            widget: Text('\$', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-
-                          BuildTextField(
-                            title: 'Number of People',
-                            hint: '0.0',
-                            isEnabled: true,
-                            textController: numberOfPeopleController,
-                            onPressedAction: null,
-                            widget: Icon(Icons.people_rounded, size: responsiveText(18),),),
-
-                          BuildTextField(
-                            title: 'Tip Amount',
-                            hint: '0.0',
-                            isEnabled: true,
-                            textController: tipAmountController,
-                            onPressedAction: (){
-                              billAmount = billAmountController.value.text;
-                              tipAmount = tipAmountController.value.text;
-                              double _billAmount = double.tryParse(billAmount)??0.0;
-                              double _tipAmount = double.tryParse(tipAmount)??0.0;
-                              setState(() {
-                                if(tipAmountDollar){
-                                  tipAmountDollar = false;
-                                  tipAmountController.text = ((_tipAmount*100)/_billAmount).toString();
-                                }else{
-                                  tipAmountDollar = true;
-                                  tipAmountController.text = ((_billAmount * _tipAmount/100)).toString();
-                                }
-                              });
-                            },
-                            widget: Text(tipAmountDollar?'\$':'%', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-
-                          // BuildTextField(
-                          //   title: 'Tax Amount',
-                          //   hint: '0.0',
-                          //   isEnabled: true,
-                          //   textController: taxAmountController,
-                          //   onPressedAction: (){
-                          //     billAmount = billAmountController.value.text;
-                          //     numberOfPeople = numberOfPeopleController.value.text;
-                          //     tipAmount = tipAmountController.value.text;
-                          //     taxAmount = taxAmountController.value.text;
-                          //
-                          //     double _billAmount = double.tryParse(billAmount)??0.0;
-                          //     int _numberOfPeople = int.tryParse(numberOfPeople) ?? 0;
-                          //     double _tipAmount = double.tryParse(tipAmount)??0.0;
-                          //     double _taxAmount = double.tryParse(taxAmount)??0.0;
-                          //
-                          //     // setState(() {
-                          //     //   if(taxAmountDollar){
-                          //     //     taxAmountDollar = false;
-                          //     //     _tempBillAmount = _billAmount-_taxAmount;
-                          //     //     //%
-                          //     //     _taxAmount = ((_taxAmount*100)/_tempBillAmount);
-                          //     //     taxAmountController.text = (_taxAmount).toString();
-                          //     //     tipAmountController.text = (_tempBillAmount * _taxAmount/100).toString();
-                          //     //   }else{
-                          //     //     taxAmountDollar = true;
-                          //     //     // _taxAmount = (_tempBillAmount * (_taxAmount/100));
-                          //     //     // taxAmountController.text = (_taxAmount).toString();
-                          //     //
-                          //     //   }
-                          //     // });
-                          //   },
-                          //   widget: Text(taxAmountDollar?'\$':'%', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-                        ],
-                      ),
-                    ),
-                    //Result
-                    Row(
-                      children: [
-                        BuildResultCard(title: 'Final Amount', value: finalAmount.toStringAsFixed(2),),
-                        BuildResultCard(title: 'Amount per Person', value: amountPerPerson.toStringAsFixed(2),),
-                      ],
-                    ),
-
-                  ],
-                ),
-              ),
-            ),
-            BuildBannerAd(),
-          ],
-        ),
+  String? _lastSaved;
+  Future<void> _maybeSave(
+      double bill, int people, double total, double each) async {
+    final String signature = '$bill|$people|$total|$each|$_tipIsAmount|'
+        '$_taxIsAmount|${_tipController.text}|${_taxController.text}';
+    if (_lastSaved == signature) return;
+    _lastSaved = signature;
+    await HistoryService.add(
+      CalculationRecord(
+        id: HistoryService.newId(),
+        tool: 'Tip',
+        toolRoute: tipCalcPage,
+        summary: '${NumX.money(bill)} bill, tip ${NumX.money(_tip)}, '
+            'tax ${NumX.money(_tax)} = ${NumX.money(total)} '
+            '(${NumX.money(each)} each for ${people < 1 ? 1 : people})',
+        createdAt: DateTime.now(),
       ),
     );
   }
 
+  /// Flips the tip input between an absolute amount and a percentage of the
+  /// bill, converting the current value so the result never jumps.
+  void _toggleTipMode() {
+    final double bill = double.tryParse(_billController.text) ?? 0;
+    final double current = double.tryParse(_tipController.text) ?? 0;
 
+    final double converted = _tipIsAmount
+        ? NumX.percent(current, bill) // $ -> %
+        : bill * (current / 100); // % -> $
 
+    setState(() {
+      _tipIsAmount = !_tipIsAmount;
+      _tipController.text = _formatForInput(converted);
+    });
+  }
+
+  /// Flips the tax input between an absolute amount and a percentage.
+  void _toggleTaxMode() {
+    final double bill = double.tryParse(_billController.text) ?? 0;
+    final double current = double.tryParse(_taxController.text) ?? 0;
+
+    final double converted = _taxIsAmount
+        ? NumX.percent(current, bill) // $ -> %
+        : bill * (current / 100); // % -> $
+
+    setState(() {
+      _taxIsAmount = !_taxIsAmount;
+      _taxController.text = _formatForInput(converted);
+    });
+  }
+
+  static String _formatForInput(double value) =>
+      value == 0 ? '' : value.toStringAsFixed(2);
+
+  /// Switches the tip into percentage mode and sets it to [percent].
+  void _applyTipPreset(int percent) {
+    if (!mounted) return;
+    setState(() {
+      _tipIsAmount = false;
+      _tipController.text = percent.toString();
+    });
+  }
+
+  Future<void> _reset() async {
+    await showInterstitialAd();
+    if (!mounted) return;
+    resetPage(context, const TipCalcPage());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CalculatorScaffold(
+      palette: _palette,
+      title: 'Tip Calculator',
+      icon: Icons.receipt_rounded,
+      actions: <Widget>[CalculatorResetButton(onPressed: _reset)],
+      children: <Widget>[
+        AppCard(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              BuildTextField(
+                title: 'Bill Amount',
+                hint: '0.00',
+                isEnabled: true,
+                textController: _billController,
+                palette: _palette,
+                onPressedAction: null,
+                widget: const Text(r'$'),
+              ),
+              BuildTextField(
+                title: 'Tax Amount',
+                hint: '0.00',
+                isEnabled: true,
+                textController: _taxController,
+                palette: _palette,
+                onPressedAction: _toggleTaxMode,
+                widget: Text(_taxIsAmount ? r'$' : '%'),
+              ),
+              BuildTextField(
+                title: 'Tip Amount',
+                hint: '0.00',
+                isEnabled: true,
+                textController: _tipController,
+                palette: _palette,
+                onPressedAction: _toggleTipMode,
+                widget: Text(_tipIsAmount ? r'$' : '%'),
+              ),
+              BuildTextField(
+                title: 'Split Between',
+                hint: '1',
+                isEnabled: true,
+                textController: _peopleController,
+                palette: _palette,
+                onPressedAction: null,
+                widget: const Icon(Icons.group_rounded, size: 19),
+              ),
+              _QuickTipRow(onSelected: _applyTipPreset),
+            ],
+          ),
+        ),
+        const SizedBox(height: 6),
+        Row(
+          children: <Widget>[
+            BuildResultCard(
+              title: 'Final Amount',
+              numeric: _finalAmount,
+              prefix: r'$',
+              palette: _palette,
+              icon: Icons.receipt_long_rounded,
+            ),
+            BuildResultCard(
+              title: 'Each Person Pays',
+              numeric: _perPerson,
+              prefix: r'$',
+              palette: _palette,
+              icon: Icons.group_rounded,
+            ),
+          ],
+        ),
+        if (_hasInput)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+            child: Text(
+              'Bill ${NumX.money(_finalAmount - _tip - _tax)}'
+              '${_tax > 0 ? ' + tax ${NumX.money(_tax)}' : ''}'
+              '${_tip > 0 ? ' + tip ${NumX.money(_tip)}' : ''}'
+              ' = ${NumX.money(_finalAmount)}.',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// One-tap 10 / 15 / 20 / 25 % shortcuts.
+class _QuickTipRow extends StatelessWidget {
+  const _QuickTipRow({required this.onSelected});
+
+  final ValueChanged<int> onSelected;
+
+  static const List<int> presets = <int>[10, 15, 20, 25];
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 6, 12, 2),
+      child: Row(
+        children: presets.map((int preset) {
+          return Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 3),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(10),
+                  onTap: () => onSelected(preset),
+                  child: Container(
+                    height: 34,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: AppPalettes.tip.accent.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      '$preset%',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 13,
+                        color: AppColors.success,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(growable: false),
+      ),
+    );
+  }
 }

@@ -1,174 +1,192 @@
-import 'package:flutter/material.dart';
-import 'package:multi_task_calculator/components/build_banner_ad.dart';
-import 'package:multi_task_calculator/components/build_result_card.dart';
-import 'package:multi_task_calculator/components/build_text_field.dart';
-import 'package:multi_task_calculator/services/google_ad_service.dart';
-import 'package:multi_task_calculator/utils/constant.dart';
-import 'package:multi_task_calculator/utils/extensions.dart';
-import 'package:multi_task_calculator/utils/screen_config.dart';
-import 'package:multi_task_calculator/utils/themes_mode.dart';
+﻿import 'package:flutter/material.dart';
+import '../../services/google_ad_service.dart';
 
-
+import '../../components/build_result_card.dart';
+import '../../components/build_text_field.dart';
+import '../../components/calculator_scaffold.dart';
+import '../../services/history_service.dart';
+import '../../utils/app_color.dart';
+import '../../utils/calculator_math.dart';
+import '../../utils/constant.dart';
+import '../../utils/extensions.dart';
+import '../../utils/num_x.dart';
 class FuelCostCalcPage extends StatefulWidget {
+  const FuelCostCalcPage({super.key});
+
   @override
-  _FuelCostCalcPageState createState() => _FuelCostCalcPageState();
+  State<FuelCostCalcPage> createState() => _FuelCostCalcPageState();
 }
 
 class _FuelCostCalcPageState extends State<FuelCostCalcPage> {
+  final TextEditingController _distanceController = TextEditingController();
+  final TextEditingController _efficiencyController = TextEditingController();
+  final TextEditingController _priceController = TextEditingController();
 
+  double _litres = 0;
+  double _cost = 0;
+  bool _hasInput = false;
 
-  TextEditingController distanceController = TextEditingController();
-  TextEditingController fuelEfficiencyController = TextEditingController();
-  TextEditingController fuelPriceController = TextEditingController();
-
-  String distance, fuelEfficiency, fuelPrice;
-
-  double estimatedCost, estimatedAmountOfFuel;
-
+  static const ToolPalette _palette = AppPalettes.fuelCost;
 
   @override
   void initState() {
-    estimatedCost = 0.0;
-    estimatedAmountOfFuel = 0.0;
-    calculateDiscount();
     super.initState();
+    _distanceController.addListener(_recalculate);
+    _efficiencyController.addListener(_recalculate);
+    _priceController.addListener(_recalculate);
   }
 
   @override
   void dispose() {
-    distanceController.dispose();
-    fuelEfficiencyController.dispose();
-    fuelPriceController.dispose();
+    _distanceController.dispose();
+    _efficiencyController.dispose();
+    _priceController.dispose();
     super.dispose();
   }
 
-  void calculateDiscount() {
-    distanceController.addListener(() {
-      updateResult();
-    });
-    fuelEfficiencyController.addListener(() {
-      updateResult();
-    });
-    fuelPriceController.addListener(() {
-      updateResult();
-    });
+  void _recalculate() {
+    final double distance = double.tryParse(_distanceController.text) ?? 0;
+    final double efficiency =
+        double.tryParse(_efficiencyController.text) ?? 0;
+    final double price = double.tryParse(_priceController.text) ?? 0;
 
-  }
+    // Efficiency must be > 0 or the result is `Infinity`. Require both a real
+    // distance and a real efficiency before showing anything.
+    if (distance <= 0 || efficiency <= 0) {
+      if (_hasInput || _litres != 0 || _cost != 0) {
+        setState(() {
+          _hasInput = false;
+          _litres = 0;
+          _cost = 0;
+        });
+      }
+      return;
+    }
 
-  void updateResult() {
-    distance = distanceController.value.text;
-    fuelEfficiency = fuelEfficiencyController.value.text;
-    fuelPrice = fuelPriceController.value.text;
-    //Make null safety
+    final ({double litres, double cost}) result = fuelCost(
+      distanceKm: distance,
+      efficiencyKmPerLitre: efficiency,
+      pricePerLitre: price,
+    );
+
     setState(() {
-
-      double _distance = double.tryParse(distance)??0.0;
-      double _fuelEfficiency = double.tryParse(fuelEfficiency)??0.0;
-      double _fuelPrice = double.tryParse(fuelPrice)??0.0;
-
-      estimatedAmountOfFuel = _distance/_fuelEfficiency;
-      estimatedCost = estimatedAmountOfFuel * _fuelPrice;
-
+      _hasInput = true;
+      _litres = result.litres;
+      _cost = result.cost;
     });
+
+    _maybeSave(distance, efficiency, price);
   }
 
-
-  @override
-  Widget build(BuildContext context) {
-    ScreenConfig().init(context);
-    ThemesMode().init(context);
-
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Fuel Cost Calculator',
-            style: TextStyle(
-              fontFamily: fontAudioWide,
-              fontSize: responsiveWidth(18)
-            ),
-          ),
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          actions: [
-            IconButton(
-              onPressed: () async {
-                await showInterstitialAd();
-                resetPage(context, FuelCostCalcPage());
-              },
-              icon: Icon(Icons.refresh),
-              tooltip: 'Refresh',
-            )
-          ],
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                physics: BouncingScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      margin: EdgeInsets.all(10),
-                      padding: EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                          color: ThemesMode.isDarkMode?Colors.black:textWhite,
-                          borderRadius: BorderRadius.circular(5),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.grey.withOpacity(0.9),
-                                blurRadius: 0.5,
-                                spreadRadius: 0.5,
-                                offset: Offset.zero
-                            )
-                          ]
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          BuildTextField(
-                            title: 'Distance to Travel Price',
-                            hint: '0.0',
-                            isEnabled: true,
-                            textController: distanceController,
-                            onPressedAction: null,
-                            widget: Text('km', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-                          BuildTextField(
-                            title: 'Fuel Efficiency',
-                            hint: '0.0',
-                            isEnabled: true,
-                            textController: fuelEfficiencyController,
-                            onPressedAction: null,
-                            widget: Text('km/ℓ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-                          BuildTextField(
-                            title: 'Fuel Price',
-                            hint: '0.0',
-                            isEnabled: true,
-                            textController: fuelPriceController,
-                            onPressedAction: null,
-                            widget: Text('\$/ℓ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-                        ],
-                      ),
-                    ),
-                    //Result
-                    Row(
-                      children: [
-                        BuildResultCard(title: 'Estimated Cost\n---', value: '\$${estimatedCost.toStringAsFixed(2)}',),
-                        BuildResultCard(title: 'Estimated Amount of Fuel', value: '${estimatedAmountOfFuel.toStringAsFixed(3)}ℓ',),
-                      ],
-                    ),
-
-                  ],
-                ),
-              ),
-            ),
-            BuildBannerAd(),
-          ],
-        ),
+  String? _lastSaved;
+  void _maybeSave(double distance, double efficiency, double price) {
+    final String signature =
+        '$distance|$efficiency|$price|${_litres.toStringAsFixed(4)}';
+    if (_lastSaved == signature) return;
+    _lastSaved = signature;
+    HistoryService.add(
+      CalculationRecord(
+        id: HistoryService.newId(),
+        tool: 'Fuel Cost',
+        toolRoute: fuelCalcPage,
+        summary:
+            '${NumX.format(distance)} km @ ${NumX.format(efficiency, decimals: 1)} km/l '
+            '= ${NumX.money(_cost)} (${NumX.format(_litres, decimals: 3)} l)',
+        createdAt: DateTime.now(),
       ),
     );
   }
 
+  Future<void> _reset() async {
+    await showInterstitialAd();
+    if (!mounted) return;
+    resetPage(context, const FuelCostCalcPage());
+  }
 
-
+  @override
+  Widget build(BuildContext context) {
+    return CalculatorScaffold(
+      palette: _palette,
+      title: 'Fuel Cost Calculator',
+      icon: Icons.local_gas_station_rounded,
+      actions: <Widget>[CalculatorResetButton(onPressed: _reset)],
+      children: <Widget>[
+        Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              BuildTextField(
+                title: 'Distance to Travel',
+                hint: '0.00',
+                isEnabled: true,
+                textController: _distanceController,
+                palette: _palette,
+                onPressedAction: null,
+                widget: const Text('km'),
+              ),
+              BuildTextField(
+                title: 'Fuel Efficiency',
+                hint: '0.00',
+                isEnabled: true,
+                textController: _efficiencyController,
+                palette: _palette,
+                onPressedAction: null,
+                widget: const Text('km/l'),
+              ),
+              BuildTextField(
+                title: 'Fuel Price',
+                hint: '0.00',
+                isEnabled: true,
+                textController: _priceController,
+                palette: _palette,
+                onPressedAction: null,
+                widget: const Text(r'$/l'),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 6),
+        Row(
+          children: <Widget>[
+            BuildResultCard(
+              title: 'Estimated Cost',
+              numeric: _cost,
+              prefix: r'$',
+              palette: _palette,
+              icon: Icons.payments_rounded,
+            ),
+            BuildResultCard(
+              title: 'Fuel Needed',
+              numeric: _litres,
+              decimals: 3,
+              suffix: ' l',
+              palette: _palette,
+              icon: Icons.water_drop_rounded,
+            ),
+          ],
+        ),
+        if (!_hasInput)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+            child: Text(
+              'Enter a distance and a fuel efficiency above 0 to see the cost.',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ),
+      ],
+    );
+  }
 }

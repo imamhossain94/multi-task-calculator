@@ -1,425 +1,509 @@
-import 'package:flutter/material.dart';
-import 'package:multi_task_calculator/components/build_banner_ad.dart';
-import 'package:multi_task_calculator/pages/unit_converter/components/build_unit_text_field.dart';
-import 'package:multi_task_calculator/pages/unit_converter/models/unit_converter_helper.dart';
-import 'package:multi_task_calculator/services/google_ad_service.dart';
-import 'package:multi_task_calculator/utils/constant.dart';
-import 'package:multi_task_calculator/utils/extensions.dart';
-import 'package:multi_task_calculator/utils/screen_config.dart';
-import 'package:multi_task_calculator/utils/themes_mode.dart';
-import 'package:units_converter/units_converter.dart';
-//import 'package:unit_convert/unit_convert.dart';
+﻿import 'package:flutter/material.dart';
+import '../../services/google_ad_service.dart';
+
+import '../../components/app_surface.dart';
+import '../../components/calculator_scaffold.dart';
+import '../../utils/app_color.dart';
+import '../../utils/extensions.dart';
+import 'models/unit_category.dart';
 
 class UnitConverterChildPage extends StatefulWidget {
-  // final String selectedUnit;
-  // const UnitConverterChildPage({Key key, this.selectedUnit}) : super(key: key);
+  const UnitConverterChildPage({super.key, this.arguments});
 
-  final arguments;
-  const UnitConverterChildPage({this.arguments});
+  /// `{'category': '<label>'}` â€” see [UnitCategory.label].
+  final Object? arguments;
 
   @override
-  _UnitConverterChildPageState createState() => _UnitConverterChildPageState();
+  State<UnitConverterChildPage> createState() =>
+      _UnitConverterChildPageState();
 }
 
 class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
+  final TextEditingController _fromController = TextEditingController(text: '1');
+  final TextEditingController _toController = TextEditingController();
 
-  TextEditingController fromUnitController = TextEditingController();
-  TextEditingController toUnitController = TextEditingController();
+  UnitCategory? _category;
+  Object? _fromUnit;
+  Object? _toUnit;
 
-  var unitObj;
-  Map<String, dynamic> allUnits;
-  dynamic fromUnit, toUnit;
-  String fromUnitDisplay, removeString, selectedUnit;
-  bool isLoading = true;
+  List<_UnitRow> _rows = const <_UnitRow>[];
+  bool _isLoading = true;
+  String? _error;
 
-  List<UnitConversion> unitConversionList = [];
-  double fromUnitValue;
+  static const ToolPalette _palette = AppPalettes.unitConverter;
 
   @override
   void initState() {
-    selectedUnit = widget.arguments['selectedUnit'];
-    fromUnitValue = 0.0;
-    fromUnitController.text = '0.0';
-    toUnitController.text = '0.0';
-    getAllUnit();
-    fromUnitController.addListener((){
-      setState(() {
-        String  fromCurrencyValue = fromUnitController.value.text;
-        fromUnitValue = double.tryParse(fromCurrencyValue)??0.0;
-        getAllUnit();
-      });
-    });
     super.initState();
+    _fromController.addListener(_convert);
+    _resolveCategory();
   }
 
   @override
   void dispose() {
-    fromUnitController.dispose();
-    toUnitController.dispose();
+    _fromController
+      ..removeListener(_convert)
+      ..dispose();
+    _toController.dispose();
     super.dispose();
   }
 
-
-  void updateResult() {
-    fromUnit = fromUnit == null? allUnits.entries.elementAt(0).value:fromUnit;
-    toUnit = toUnit == null? allUnits.entries.elementAt(1).value.toString().replaceAll(removeString, ''):toUnit.toString().replaceAll(removeString, '');
-    fromUnitDisplay = fromUnit.toString().replaceAll(removeString, '');
-    unitObj.convert(fromUnit, fromUnitValue);
-    var units = unitObj.getAll();
-    for (var unit in units) {
-      //if(unit.name != null &&  unit.symbol != null){
-        unitConversionList.add(UnitConversion(unitName: unit.name.toString().replaceAll(removeString, ''), unitCode: unit.symbol??unit.name.toString().replaceAll(removeString, ''), unitValue: unit.value));
-      //}
+  UnitCategory? _categoryFromArguments() {
+    if (widget.arguments is Map) {
+      final Object? label = (widget.arguments as Map)['category'];
+      if (label is String) return unitCategoryByLabel(label);
     }
-    unitConversionList.forEach((obj) {
-      print(obj.unitName);
-      if(obj.unitName == toUnit.toString()){
-        toUnitController.text = obj.unitValue.toStringAsFixed(2);
-      }
-    });
+    return null;
   }
 
-  void getAllUnit() async{
-    setState(() {
-      isLoading = true;
-      unitConversionList.clear();
-    });
-    setState(() {
-      if(selectedUnit == UnitConversionHelper.angleUnit){
-        removeString = 'ANGLE.';
-        unitObj = Angle(significantFigures: 7, removeTrailingZeros: false);
-        allUnits = AngleUnitsList;
-        updateResult();
-      }else if(selectedUnit == UnitConversionHelper.areaUnit){
-        removeString = 'AREA.';
-        unitObj = Area(significantFigures: 7, removeTrailingZeros: false);
-        allUnits = AreaUnitsList;
-        updateResult();
-      }else if(selectedUnit == UnitConversionHelper.energyUnit){
-        removeString = 'ENERGY.';
-        unitObj = Energy(significantFigures: 7, removeTrailingZeros: false);
-        allUnits = EnergyUnitsList;
-        updateResult();
-      } else if(selectedUnit == UnitConversionHelper.forceUnit){
-        removeString = 'FORCE.';
-        unitObj = Force(significantFigures: 7, removeTrailingZeros: false);
-        allUnits = ForceUnitsList;
-        updateResult();
-      }else if(selectedUnit == UnitConversionHelper.lengthUnit){
-        removeString = 'LENGTH.';
-        unitObj = Length(significantFigures: 7, removeTrailingZeros: false);
-        allUnits = LengthUnitsList;
-        updateResult();
-      }else if(selectedUnit == UnitConversionHelper.powerUnit){
-        removeString = 'POWER.';
-        unitObj = Power(significantFigures: 7, removeTrailingZeros: false);
-        allUnits = PowerUnitsList;
-        updateResult();
-      }else if(selectedUnit == UnitConversionHelper.pressureUnit){
-        removeString = 'PRESSURE.';
-        unitObj = Pressure(significantFigures: 7, removeTrailingZeros: false);
-        allUnits = PressureUnitsList;
-        updateResult();
-      }else if(selectedUnit == UnitConversionHelper.speedUnit){
-        removeString = 'SPEED.';
-        unitObj = Speed(significantFigures: 7, removeTrailingZeros: false);
-        allUnits = SpeedUnitsList;
-        updateResult();
-      }else if(selectedUnit == UnitConversionHelper.storageUnit){
-        removeString = 'DIGITAL_DATA.';
-        unitObj = DigitalData(significantFigures: 7, removeTrailingZeros: false);
-        allUnits = StorageUnitsList;
-        updateResult();
-      }else if(selectedUnit == UnitConversionHelper.temperatureUnit){
-        removeString = 'TEMPERATURE.';
-        unitObj = Temperature(significantFigures: 7, removeTrailingZeros: false);
-        allUnits = TemperatureUnitsList;
-        updateResult();
-      }else if(selectedUnit == UnitConversionHelper.timeUnit){
-        removeString = 'TIME.';
-        unitObj = Time(significantFigures: 7, removeTrailingZeros: false);
-        allUnits = TimeUnitsList;
-        updateResult();
-      }else if(selectedUnit == UnitConversionHelper.volumeUnit){
-        removeString = 'VOLUME.';
-        unitObj = Volume(significantFigures: 7, removeTrailingZeros: false);
-        allUnits = VolumeUnitsList;
-        updateResult();
-      }else if(selectedUnit == UnitConversionHelper.weightUnit){
-        removeString = 'MASS.';
-        unitObj = Mass(significantFigures: 7, removeTrailingZeros: false);
-        allUnits = WeightUnitsList;
-        updateResult();
-      }else if(selectedUnit == UnitConversionHelper.fuelUnit){
-        removeString = 'FUEL_CONSUMPTION.';
-        unitObj = FuelConsumption(significantFigures: 7, removeTrailingZeros: false);
-        allUnits = FuelUnitsList;
-        updateResult();
-      }else if(selectedUnit == UnitConversionHelper.torqueUnit){
-        removeString = 'TORQUE.';
-        unitObj = Torque(significantFigures: 7, removeTrailingZeros: false);
-        allUnits = TorqueUnitsList;
-        updateResult();
-      }else if(selectedUnit == UnitConversionHelper.shoeSizeUnit){
-        removeString = 'SHOE_SIZE.';
-        unitObj = ShoeSize(significantFigures: 7, removeTrailingZeros: false);
-        allUnits = ShoeSizeUnitsList;
-        updateResult();
-      }
+  void _resolveCategory() {
+    final UnitCategory? category = _categoryFromArguments();
+    if (category == null) {
+      setState(() {
+        _isLoading = false;
+        _error = 'That converter does not exist.';
+      });
+      return;
+    }
 
-      isLoading = false;
+    setState(() {
+      _category = category;
+      // Default to the first two units in the category.
+      _fromUnit = category.units.values.first;
+      _toUnit = category.units.values.length > 1
+          ? category.units.values.elementAt(1)
+          : _fromUnit;
+      _isLoading = false;
     });
+    _convert();
   }
 
+  String _pretty(Object? unit) {
+    final UnitCategory? category = _category;
+    if (category == null || unit == null) return '';
+    return category.pretty(unit);
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    ScreenConfig().init(context);
-    ThemesMode().init(context);
+  /// Human label for a unit key, with underscores turned into spaces.
+  String _labelFor(String key) => UnitCategory.labelFor(key);
 
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(selectedUnit,
-            style: TextStyle(
-              fontFamily: fontAudioWide,
-              fontSize: responsiveWidth(18)
-            ),
-          ),
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          actions: [
-            IconButton(
-              onPressed: () async {
-                await showInterstitialAd();
-                // Navigator.popAndPushNamed(context, unitConverterChildPage, arguments: {
-                //   'selectedUnit': selectedUnit,
-                // });
-                resetPage(context, UnitConverterChildPage(arguments: {
-                  'selectedUnit': selectedUnit,
-                }));
-              },
-              icon: Icon(Icons.refresh),
-              tooltip: 'Reset',
-            )
-          ],
-        ),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              margin: EdgeInsets.all(10),
-              padding: EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: ThemesMode.isDarkMode?Colors.black:textWhite,
-                borderRadius: BorderRadius.circular(5),
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.grey.withOpacity(0.9),
-                      blurRadius: 0.5,
-                      spreadRadius: 0.5,
-                      offset: Offset.zero
-                  )
-                ]
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  BuildUnitTextField(
-                    isEnabled: true,
-                    hint: fromUnitController.text,
-                    title: 'From Unit',
-                    unitName: fromUnitDisplay,
-                    textController: fromUnitController,
-                    onPressedAction: () {
-                      showUnitPicker(context, (v){
-                        FocusScope.of(context).unfocus();
-                          setState(() {
-                            fromUnit = v;
-                            getAllUnit();
-                          });
-                      });
-                    },
-                  ),
-                  BuildUnitTextField(
-                    isEnabled: false,
-                    hint: toUnitController.text,
-                    title: 'To Unit',
-                    unitName: toUnit.toString(),
-                    textController: toUnitController,
-                    onPressedAction: () {
-                      showUnitPicker(context, (v){
-                        FocusScope.of(context).unfocus();
-                        setState(() {
-                          toUnit = v;
-                          getAllUnit();
-                        });
-                      });
-                    },
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Container(
-                  margin: EdgeInsets.all(10),
-                  padding: EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                      color: ThemesMode.isDarkMode?Colors.black:backgroundLight,
-                      borderRadius: BorderRadius.circular(5),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.grey.withOpacity(0.9),
-                            blurRadius: 0.5,
-                            spreadRadius: 0.5,
-                            offset: Offset.zero
-                        )
-                      ]
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        child:isLoading?
-                        Container(
-                          height: 50,
-                          width: 50,
-                          alignment: Alignment.center,
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                                ThemesMode.isDarkMode?Colors.white12:Colors.black45
+  void _convert() {
+    final UnitCategory? category = _category;
+    if (category == null || _fromUnit == null) return;
+
+    final double amount = double.tryParse(_fromController.text) ?? 0;
+
+    setState(() => _isLoading = true);
+
+    try {
+      // A fresh converter each time: `units_converter` mutates its state.
+      final dynamic converter = category.build();
+      converter.convert(_fromUnit, amount);
+      final List<dynamic> all = converter.getAll() as List<dynamic>;
+
+      final List<_UnitRow> rows = all
+          .map((dynamic unit) => _UnitRow(
+                name: _pretty(unit.name),
+                value: (unit.value as num).toDouble(),
+              ))
+          .toList(growable: false);
+
+      // Sort alphabetically so the order does not depend on the package.
+      rows.sort((_UnitRow a, _UnitRow b) => a.name.compareTo(b.name));
+
+      final String target = _pretty(_toUnit);
+      final _UnitRow? match =
+          rows.where((_UnitRow r) => r.name == target).firstOrNull;
+
+      setState(() {
+        _rows = rows;
+        _isLoading = false;
+        _toController.text =
+            match == null ? '0.00' : match.value.toStringAsFixed(4);
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _error = 'Could not convert that value.';
+        _rows = const <_UnitRow>[];
+      });
+    }
+  }
+
+  Future<void> _pickUnit({required bool isFrom}) async {
+    final UnitCategory? category = _category;
+    if (category == null) return;
+
+    final List<MapEntry<String, Object?>> entries =
+        category.units.entries.toList();
+
+    final String? picked = await showAppBottomSheet<String>(
+      context: context,
+      title: isFrom ? 'From unit' : 'To unit',
+      maxChildSize: 0.9,
+      builder: (BuildContext sheetContext, ScrollController controller) {
+        return ListView.builder(
+          controller: controller,
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 20),
+          itemCount: entries.length,
+          itemBuilder: (BuildContext _, int index) {
+            final String label = entries[index].key;
+            final bool selected = isFrom
+                ? entries[index].value == _fromUnit
+                : entries[index].value == _toUnit;
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 3),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () => Navigator.of(sheetContext).pop(label),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 12),
+                    decoration: BoxDecoration(
+                      gradient: selected ? _palette.linear : null,
+                      color: selected
+                          ? null
+                          : Theme.of(context).colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Text(
+                            _labelFor(label),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 14.5,
+                              color: selected
+                                  ? Colors.white
+                                  : Theme.of(context).textTheme.titleMedium?.color,
                             ),
                           ),
-                        ):
-                        ListView.builder(
-                          physics: BouncingScrollPhysics(),
-                          itemCount: unitConversionList.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Container(
-                              margin: EdgeInsets.all(8),
-                              padding: EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.withOpacity(0.3),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Text(unitConversionList[index].unitCode??'', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                                      Spacer(),
-                                      //${currencyRates[index].symbol}
-
-                                      Text(unitConversionList[index].unitValue.toStringAsFixed(2),
-                                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                                    ],
-                                  ),
-                                  Text(unitConversionList[index].unitName.toString(),),
-                                ],
-                              ),
-                            );
-                          },
-                        ),),
-                    ],
-                  )
-              ),
-            ),
-            BuildBannerAd(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<bool>  showUnitPicker(BuildContext context, ValueChanged<dynamic> valueChanged) {
-    return showModalBottomSheet(
-      context: context,
-      elevation: 0.0,
-      isScrollControlled: true,
-      isDismissible: true,
-      backgroundColor: Colors.transparent,
-      barrierColor: Colors.transparent,//ThemesMode.isDarkMode?Colors.black54:Colors.transparent
-      builder: (context) {
-        return DraggableScrollableSheet(
-          // initialChildSize: 0.63,
-          // minChildSize: 0.30,
-          maxChildSize: 0.97,
-          builder: (_, controller) {
-            return Container(
-              padding: EdgeInsets.only(top: 5,),
-              decoration: BoxDecoration(
-                  color: ThemesMode.isDarkMode?backgroundDark:backgroundLight,
-                  borderRadius: BorderRadius.only(
-                    topLeft: const Radius.circular(10.0),
-                    topRight: const Radius.circular(10.0),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black12.withOpacity(0.9),
-                        blurRadius: responsiveWidth(3),
-                        spreadRadius: responsiveWidth(3),
-                        offset: Offset.zero)
-                  ]
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 15),
-                    child: Row(
-                      children: [
-                        Text('Select Unit', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                        Spacer(),
-                        IconButton(icon: Icon(Icons.close), onPressed: (){
-                          Navigator.pop(context, false);
-                        })
+                        ),
+                        if (selected)
+                          const Icon(Icons.check_rounded,
+                              color: Colors.white, size: 18),
                       ],
-                    )
+                    ),
                   ),
-                  Expanded(
-                    child:
-                    ListView.builder(
-                      shrinkWrap: true,
-                      controller: controller,
-                      physics: BouncingScrollPhysics(),
-                      itemCount: allUnits.entries.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Material(
-                          child: InkWell(
-                            onTap: (){
-                              valueChanged(allUnits.entries.elementAt(index).value);
-                              Navigator.pop(context, true);
-                            },
-                            child:
-                            Container(
-                              margin: EdgeInsets.all(8),
-                              padding: EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.withOpacity(0.3),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(allUnits.entries.elementAt(index).value.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                                  Text(allUnits.entries.elementAt(index).key.toString(), style: TextStyle()),
-                                ],
-                              ),
-                            )
-                          ),
-                        );
-                      },
-                    )
-                  ),
-                ],
+                ),
               ),
             );
           },
         );
       },
+    );
+
+    if (picked == null || !mounted) return;
+    final Object? unit = category.units[picked];
+    setState(() {
+      if (isFrom) {
+        _fromUnit = unit;
+      } else {
+        _toUnit = unit;
+      }
+    });
+    _convert();
+  }
+
+  void _swap() {
+    if (_fromUnit == null || _toUnit == null) return;
+    final double converted =
+        double.tryParse(_toController.text) ?? 1;
+    setState(() {
+      final Object? tmp = _fromUnit;
+      _fromUnit = _toUnit;
+      _toUnit = tmp;
+      _fromController.text =
+          converted == 0 ? '1' : converted.toStringAsFixed(4);
+    });
+    _convert();
+  }
+
+  Future<void> _reset() async {
+    await showInterstitialAd();
+    if (!mounted) return;
+    resetPage(
+      context,
+      UnitConverterChildPage(
+        arguments: <String, String>{'category': _category?.label ?? ''},
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final UnitCategory? category = _category;
+    return CalculatorScaffold(
+      palette: _palette,
+      title: category?.label ?? 'Unit Converter',
+      icon: Icons.swap_horiz_rounded,
+      actions: category == null
+          ? const <Widget>[]
+          : <Widget>[CalculatorResetButton(onPressed: _reset)],
+      children: <Widget>[
+        if (_error != null)
+          AppCard(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                const Icon(Icons.error_outline_rounded,
+                    color: AppColors.danger, size: 36),
+                const SizedBox(height: 10),
+                Text(
+                  _error!,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ],
+            ),
+          )
+        else ...<Widget>[
+          AppCard(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                _UnitField(
+                  title: 'From',
+                  unitName: _labelFor(_pretty(_fromUnit)),
+                  controller: _fromController,
+                  editable: true,
+                  palette: _palette,
+                  onTapUnit: () => _pickUnit(isFrom: true),
+                ),
+                Center(
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: _swap,
+                      child: Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          gradient: _palette.linear,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.swap_vert_rounded,
+                            color: Colors.white, size: 22),
+                      ),
+                    ),
+                  ),
+                ),
+                _UnitField(
+                  title: 'To',
+                  unitName: _labelFor(_pretty(_toUnit)),
+                  controller: _toController,
+                  editable: false,
+                  palette: _palette,
+                  onTapUnit: () => _pickUnit(isFrom: false),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          _UnitList(
+            rows: _rows,
+            isLoading: _isLoading,
+            palette: _palette,
+            selectedName: _pretty(_toUnit),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _UnitRow {
+  const _UnitRow({required this.name, required this.value});
+
+  final String name;
+  final double value;
+}
+
+class _UnitField extends StatelessWidget {
+  const _UnitField({
+    required this.title,
+    required this.unitName,
+    required this.controller,
+    required this.editable,
+    required this.palette,
+    required this.onTapUnit,
+  });
+
+  final String title;
+  final String unitName;
+  final TextEditingController controller;
+  final bool editable;
+  final ToolPalette palette;
+  final VoidCallback onTapUnit;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w800,
+              color: Theme.of(context).textTheme.titleMedium?.color,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Row(
+            children: <Widget>[
+              Flexible(
+                flex: 5,
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(14),
+                    onTap: onTapUnit,
+                    child: Container(
+                      height: 48,
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: BoxDecoration(
+                        gradient: palette.linear,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Text(
+                              unitName,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          const Icon(Icons.expand_more_rounded,
+                              color: Colors.white, size: 18),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                flex: 4,
+                child: Container(
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: TextField(
+                    controller: controller,
+                    enabled: editable,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 16,
+                    ),
+                    decoration: const InputDecoration(
+                      filled: false,
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      disabledBorder: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 14),
+                      hintText: '0.00',
+                    ),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    textInputAction: TextInputAction.done,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _UnitList extends StatelessWidget {
+  const _UnitList({
+    required this.rows,
+    required this.isLoading,
+    required this.palette,
+    required this.selectedName,
+  });
+
+  final List<_UnitRow> rows;
+  final bool isLoading;
+  final ToolPalette palette;
+  final String selectedName;
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 40),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    if (rows.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 24),
+        child: Center(child: Text('No results')),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: rows.map((_UnitRow row) {
+        final bool selected = row.name == selectedName;
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 7),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: selected
+                  ? palette.accent.withValues(alpha: 0.16)
+                  : Theme.of(context).cardColor,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    row.name,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
+                      color: selected
+                          ? palette.accent
+                          : Theme.of(context).textTheme.bodyMedium?.color,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  row.value.toStringAsFixed(4),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 15.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }).toList(growable: false),
     );
   }
 }

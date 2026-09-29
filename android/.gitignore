@@ -5,7 +5,15 @@ gradle-wrapper.jar
 /gradlew.bat
 /local.properties
 GeneratedPluginRegistrant.java
+.cxx/
 
-# Remember to never publicly share your keystore.
-# See https://flutter.dev/docs/deployment/android#reference-the-keystore-from-the-app
+# Never commit signing material. See
+# https://docs.flutter.dev/deployment/android#signing-the-app
 key.properties
+**/*.keystore
+**/*.jks
+**/*.p12
+**/*.pem
+
+# Firebase / Google services config
+google-services.json

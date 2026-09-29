@@ -1,280 +1,351 @@
-import 'dart:math';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:multi_task_calculator/components/build_banner_ad.dart';
-import 'package:multi_task_calculator/components/build_result_card.dart';
-import 'package:multi_task_calculator/components/build_text_field.dart';
-import 'package:multi_task_calculator/pages/loan_calc/components/loan_type_picker.dart';
-import 'package:multi_task_calculator/services/google_ad_service.dart';
-import 'package:multi_task_calculator/utils/constant.dart';
-import 'package:multi_task_calculator/utils/extensions.dart';
-import 'package:multi_task_calculator/utils/screen_config.dart';
-import 'package:multi_task_calculator/utils/themes_mode.dart';
-import 'package:url_launcher/url_launcher.dart';
+﻿import 'package:flutter/material.dart';
+import '../../services/google_ad_service.dart';
 
+import '../../components/app_surface.dart';
+import '../../components/build_result_card.dart';
+import '../../components/build_text_field.dart';
+import '../../components/calculator_scaffold.dart';
+import '../../services/history_service.dart';
+import '../../utils/app_color.dart';
+import '../../utils/calculator_math.dart';
+import '../../utils/constant.dart';
+import '../../utils/extensions.dart';
+import '../../utils/num_x.dart';
+/// The two directions the loan calculator can work in.
+enum LoanMode {
+  /// Given a loan amount, work out the monthly payment.
+  monthlyCost('Monthly Cost'),
+
+  /// Given a monthly budget, work out how much you can borrow.
+  maximumLoan('Maximum Loan');
+
+  const LoanMode(this.label);
+
+  final String label;
+}
 
 class LoanCalcPage extends StatefulWidget {
+  const LoanCalcPage({super.key});
+
   @override
-  _LoanCalcPageState createState() => _LoanCalcPageState();
+  State<LoanCalcPage> createState() => _LoanCalcPageState();
 }
 
 class _LoanCalcPageState extends State<LoanCalcPage> {
+  final TextEditingController _amountController = TextEditingController();
+  final TextEditingController _rateController = TextEditingController();
+  final TextEditingController _yearsController = TextEditingController();
 
-  TextEditingController mortgageAmountController = TextEditingController();
-  TextEditingController monthlyPaymentController = TextEditingController();
-  TextEditingController interestRateController = TextEditingController();
-  TextEditingController periodController = TextEditingController();
+  /// Only used in [LoanMode.monthlyCost].
+  final TextEditingController _monthlyController = TextEditingController();
 
-  String mortgageAmount, monthlyPayment, interestRate, period, mortgageType;
-  double totalCostResult, monthlyPaymentResult, youCouldBorrow;
+  LoanMode _mode = LoanMode.monthlyCost;
 
+  double _totalCost = 0;
+  double _monthlyPayment = 0;
+  double _totalInterest = 0;
+  double _maxBorrow = 0;
+  bool _hasInput = false;
+
+  static const ToolPalette _palette = AppPalettes.loan;
 
   @override
   void initState() {
-    totalCostResult = 0.0;
-    monthlyPaymentResult = 0.0;
-    youCouldBorrow = 0.0;
-    mortgageType = 'Monthly Cost';
-    calculateLoan();
     super.initState();
+    _amountController.addListener(_recalculate);
+    _monthlyController.addListener(_recalculate);
+    _rateController.addListener(_recalculate);
+    _yearsController.addListener(_recalculate);
   }
 
   @override
   void dispose() {
-    mortgageAmountController.dispose();
-    monthlyPaymentController.dispose();
-    interestRateController.dispose();
-    periodController.dispose();
+    _amountController.dispose();
+    _monthlyController.dispose();
+    _rateController.dispose();
+    _yearsController.dispose();
     super.dispose();
   }
 
-  void calculateLoan() {
-    mortgageAmountController.addListener(() {
-      updateResult();
-    });
-    monthlyPaymentController.addListener(() {
-      updateResult();
-    });
-    interestRateController.addListener(() {
-      updateResult();
-    });
-    periodController.addListener(() {
-      updateResult();
-    });
-  }
+  bool get _isMonthlyCost => _mode == LoanMode.monthlyCost;
 
-  void updateResult() {
-    mortgageAmount = mortgageAmountController.value.text;
-    monthlyPayment = monthlyPaymentController.value.text;
-    interestRate = interestRateController.value.text;
-    period = periodController.value.text;
-    //Make null safety
-    setState(() {
+  void _recalculate() {
+    final double rate = double.tryParse(_rateController.text) ?? 0;
+    final int years = int.tryParse(_yearsController.text) ?? 0;
 
-      double _mortgageAmount = double.tryParse(mortgageAmount)??0.0;
-      double _monthlyPayment = double.tryParse(monthlyPayment) ?? 0.0;
-      double _interestRate = double.tryParse(interestRate)??0.0;
-      int months = int.tryParse(period)??0;
+    if (rate < 0 || years <= 0) {
+      if (_hasInput) _clearResults();
+      return;
+    }
 
-      _interestRate = _interestRate / 100 / 12;
-      months = months * 12;
-
-      double monthlyTop = _interestRate * pow((1 + _interestRate), months);
-      double monthlyBottom = pow(1 + _interestRate, months) - 1;
-
-      if(mortgageType == 'Monthly Cost'){
-
-        double monthlyRate = _mortgageAmount * (monthlyTop / monthlyBottom);
-        double totalPayment = monthlyRate * months;
-        //result
-        totalCostResult = totalPayment;
-        monthlyPaymentResult = monthlyRate;
-
-      }else if(mortgageType == 'Maximum Loan'){
-
-        double borrowAmount = _monthlyPayment / (monthlyTop / monthlyBottom);
-        double totalPayment = _monthlyPayment * months;
-        //result
-        totalCostResult = totalPayment;
-        youCouldBorrow = borrowAmount;
-        
+    if (_isMonthlyCost) {
+      final double amount = double.tryParse(_amountController.text) ?? 0;
+      if (amount <= 0) {
+        if (_hasInput) _clearResults();
+        return;
       }
 
+      final double monthly = loanMonthlyPayment(
+        principal: amount,
+        annualRatePercent: rate,
+        years: years,
+      );
+      final double total = monthly * years * 12;
+      setState(() {
+        _hasInput = true;
+        _monthlyPayment = monthly;
+        _totalCost = total;
+        _totalInterest = loanTotalInterest(
+          principal: amount,
+          annualRatePercent: rate,
+          years: years,
+        );
+        _maxBorrow = 0;
+      });
+      _maybeSave(rate, years, 'amount=$amount');
+    } else {
+      final double monthly = double.tryParse(_monthlyController.text) ?? 0;
+      if (monthly <= 0) {
+        if (_hasInput) _clearResults();
+        return;
+      }
 
+      final double borrow = loanMaxBorrow(
+        monthlyPayment: monthly,
+        annualRatePercent: rate,
+        years: years,
+      );
+      final double total = monthly * years * 12;
+      setState(() {
+        _hasInput = true;
+        _maxBorrow = borrow;
+        _totalCost = total;
+        _totalInterest = loanTotalInterest(
+          principal: borrow,
+          annualRatePercent: rate,
+          years: years,
+        );
+        _monthlyPayment = monthly;
+      });
+      _maybeSave(rate, years, 'monthly=$monthly');
+    }
+  }
 
+  void _clearResults() {
+    setState(() {
+      _hasInput = false;
+      _totalCost = 0;
+      _monthlyPayment = 0;
+      _totalInterest = 0;
+      _maxBorrow = 0;
     });
   }
 
-  void tipAmountToTipPercent(){
-
-  }
-
-
-  @override
-  Widget build(BuildContext context) {
-    ScreenConfig().init(context);
-    ThemesMode().init(context);
-
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Loan Calculator',
-            style: TextStyle(
-              fontFamily: fontAudioWide,
-              fontSize: responsiveWidth(18)
-            ),
-          ),
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          actions: [
-            IconButton(
-              onPressed: () async {
-                await showInterstitialAd();
-                resetPage(context, LoanCalcPage());
-              },
-              icon: Icon(Icons.refresh_rounded),
-              tooltip: 'Reset',
-            )
-          ],
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                physics: BouncingScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      margin: EdgeInsets.all(10),
-                      padding: EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                          color: ThemesMode.isDarkMode?Colors.black:textWhite,
-                          borderRadius: BorderRadius.circular(5),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.grey.withOpacity(0.9),
-                                blurRadius: 0.5,
-                                spreadRadius: 0.5,
-                                offset: Offset.zero
-                            )
-                          ]
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          LoanTypePicker(
-                            title: 'Mortgage Type',
-                            valueChanged: (String value) {
-                              setState(() {
-                                print(value);
-                                mortgageType = value;
-                                updateResult();
-                              });
-                            },
-                          ),
-                          BuildTextField(
-                            title: mortgageType == 'Monthly Cost'?'Mortgage Amount':'Monthly Payment',
-                            hint: '0.0',
-                            isEnabled: true,
-                            textController: mortgageType == 'Monthly Cost'?mortgageAmountController:monthlyPaymentController,
-                            onPressedAction: null,
-                            widget: Text('\$', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-                          BuildTextField(
-                            title: 'Interest Rate',
-                            hint: '0.0',
-                            isEnabled: true,
-                            textController: interestRateController,
-                            onPressedAction: null,
-                            widget: Text('%', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-
-                          BuildTextField(
-                            title: 'Period',
-                            hint: '0',
-                            isEnabled: true,
-                            textController: periodController,
-                            onPressedAction: null,
-                            widget: Text('yrs', style: TextStyle(fontWeight: FontWeight.bold, fontSize: responsiveText(16)),),),
-                        ],
-                      ),
-                    ),
-
-                    Row(
-                      children: [
-                        BuildResultCard(title: 'Total Cost', value: totalCostResult.toStringAsFixed(2),),
-                        mortgageType == 'Monthly Cost'?
-                        BuildResultCard(title: 'Monthly Payments', value: monthlyPaymentResult.toStringAsFixed(2),):
-                        BuildResultCard(title: 'You Could Borrow', value: youCouldBorrow.toStringAsFixed(2),),
-                      ],
-                    ),
-
-                    buildSuggestion(),
-                  ],
-                ),
-              ),
-            ),
-            BuildBannerAd(),
-          ],
-        ),
+  String? _lastSaved;
+  void _maybeSave(double rate, int years, String extra) {
+    final String signature = '${_mode.name}|$rate|$years|$extra|'
+        '${_monthlyPayment.toStringAsFixed(2)}';
+    if (_lastSaved == signature) return;
+    _lastSaved = signature;
+    HistoryService.add(
+      CalculationRecord(
+        id: HistoryService.newId(),
+        tool: 'Loan',
+        toolRoute: loanCalcPage,
+        summary: _isMonthlyCost
+            ? '${NumX.money(_totalCost - _totalInterest)} @ ${NumX.percentText(rate, decimals: 2)} '
+                'for $years yrs = ${NumX.money(_monthlyPayment)}/mo'
+            : '${NumX.money(_monthlyPayment)}/mo for $years yrs '
+                '@ ${NumX.percentText(rate, decimals: 2)} = ${NumX.money(_maxBorrow)}',
+        createdAt: DateTime.now(),
       ),
     );
   }
 
-  Widget buildSuggestion() {
-    return Container(
-      margin: EdgeInsets.all(10),
-      padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-          color: ThemesMode.isDarkMode?Colors.black:backgroundLight,
-          borderRadius: BorderRadius.circular(5),
-          boxShadow: [
-            BoxShadow(
-                color: Colors.grey.withOpacity(0.9),
-                blurRadius: 0.5,
-                spreadRadius: 0.5,
-                offset: Offset.zero
-            )
-          ]
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            'If you want advanced mortgage calculator '
-                'please download our mortgage application from Play Store.',
-            textAlign: TextAlign.justify,
-            style: TextStyle(fontSize: responsiveText(15),),
-          ),
-          SizedBox(height: 15,),
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(5),
-              onTap: () async {
-                if (await canLaunch(loanAppLink)) {
-                  await launch(loanAppLink);
-                } else {
-                  throw 'Could not launch $loanAppLink';
-                }
-              },
-              child: Container(
-                height: 40,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(5),
+  void _onModeChanged(LoanMode mode) {
+    if (mode == _mode) return;
+    setState(() => _mode = mode);
+    _recalculate();
+  }
+
+  Future<void> _reset() async {
+    await showInterstitialAd();
+    if (!mounted) return;
+    resetPage(context, const LoanCalcPage());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CalculatorScaffold(
+      palette: _palette,
+      title: 'Loan Calculator',
+      icon: Icons.account_balance_rounded,
+      actions: <Widget>[CalculatorResetButton(onPressed: _reset)],
+      children: <Widget>[
+        AppCard(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              AppSegmented<LoanMode>(
+                label: 'Mortgage Type',
+                options: LoanMode.values,
+                selected: _mode,
+                palette: _palette,
+                onChanged: _onModeChanged,
+              ),
+              const SizedBox(height: 8),
+              if (_isMonthlyCost)
+                BuildTextField(
+                  title: 'Loan Amount',
+                  hint: '0.00',
+                  isEnabled: true,
+                  textController: _amountController,
+                  palette: _palette,
+                  onPressedAction: null,
+                  widget: const Text(r'$'),
+                )
+              else
+                BuildTextField(
+                  title: 'Monthly Payment',
+                  hint: '0.00',
+                  isEnabled: true,
+                  textController: _monthlyController,
+                  palette: _palette,
+                  onPressedAction: null,
+                  widget: const Text(r'$'),
                 ),
-                child: Text('Download Now', style: TextStyle(
-                  color: ThemesMode.isDarkMode?textYellow:textBlack,
-                ),),
+              BuildTextField(
+                title: 'Interest Rate',
+                hint: '0.00',
+                isEnabled: true,
+                textController: _rateController,
+                palette: _palette,
+                onPressedAction: null,
+                widget: const Text('%'),
+              ),
+              BuildTextField(
+                title: 'Period',
+                hint: '0',
+                isEnabled: true,
+                textController: _yearsController,
+                palette: _palette,
+                onPressedAction: null,
+                widget: const Text('yrs'),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 6),
+        if (_isMonthlyCost) ...<Widget>[
+          Row(
+            children: <Widget>[
+              BuildResultCard(
+                title: 'Monthly Payment',
+                numeric: _monthlyPayment,
+                prefix: r'$',
+                palette: _palette,
+                icon: Icons.calendar_month_rounded,
+              ),
+              BuildResultCard(
+                title: 'Total Cost',
+                numeric: _totalCost,
+                prefix: r'$',
+                palette: _palette,
+                icon: Icons.payments_rounded,
+              ),
+            ],
+          ),
+          if (_hasInput)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+              child: Text(
+                'Of which ${NumX.money(_totalInterest)} is interest.',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
             ),
+        ] else ...<Widget>[
+          Row(
+            children: <Widget>[
+              BuildResultCard(
+                title: 'You Could Borrow',
+                numeric: _maxBorrow,
+                prefix: r'$',
+                palette: _palette,
+                icon: Icons.trending_up_rounded,
+              ),
+              BuildResultCard(
+                title: 'Total Repaid',
+                numeric: _totalCost,
+                prefix: r'$',
+                palette: _palette,
+                icon: Icons.payments_rounded,
+              ),
+            ],
+          ),
+          if (_hasInput)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+              child: Text(
+                'Of which ${NumX.money(_totalInterest)} is interest.',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ),
+        ],
+        _SuggestionCard(),
+      ],
+    );
+  }
+}
+
+class _SuggestionCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return AppGradientCard(
+      palette: AppPalettes.loan,
+      radius: 18,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              const Icon(Icons.auto_awesome_rounded,
+                  color: Colors.white, size: 20),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Text(
+                  'Need a full amortisation schedule?',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Our Mortgage Calculator app generates a downloadable '
+            'amortisation schedule PDF.',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.92),
+              fontSize: 13.5,
+              height: 1.35,
+            ),
+          ),
+          const SizedBox(height: 14),
+          AppButton(
+            label: 'Download Mortgage Calculator',
+            icon: Icons.download_rounded,
+            palette: AppPalettes.general,
+            onPressed: () => openExternal(context, loanAppLink),
           ),
         ],
       ),
     );
   }
-
 }

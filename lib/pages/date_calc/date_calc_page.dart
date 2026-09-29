@@ -1,253 +1,268 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import '../../services/google_ad_service.dart';
 import 'package:flutter_holo_date_picker/flutter_holo_date_picker.dart';
-import 'package:multi_task_calculator/components/build_banner_ad.dart';
-import 'package:multi_task_calculator/components/build_result_card.dart';
-import 'package:multi_task_calculator/components/build_text_field.dart';
-import 'package:multi_task_calculator/services/google_ad_service.dart';
-import 'package:multi_task_calculator/utils/constant.dart';
-import 'package:multi_task_calculator/utils/extensions.dart';
-import 'package:multi_task_calculator/utils/screen_config.dart';
-import 'package:multi_task_calculator/utils/themes_mode.dart';
+import 'package:intl/intl.dart';
 
+import '../../components/app_surface.dart';
+import '../../components/build_result_card.dart';
+import '../../components/calculator_scaffold.dart';
+import '../../services/history_service.dart';
+import '../../utils/app_color.dart';
+import '../../utils/calculator_math.dart';
+import '../../utils/constant.dart';
+import '../../utils/extensions.dart';
+import 'components/build_date_picker_field.dart';
 
 class DateCalcPage extends StatefulWidget {
+  const DateCalcPage({super.key});
+
   @override
-  _DateCalcPageState createState() => _DateCalcPageState();
+  State<DateCalcPage> createState() => _DateCalcPageState();
 }
 
 class _DateCalcPageState extends State<DateCalcPage> {
+  late DateTime _from;
+  late DateTime _to;
 
-  TextEditingController fromDateController = TextEditingController();
-  TextEditingController toDateController = TextEditingController();
-  DateTime fromDate;
-  DateTime toDate;
+  int _years = 0;
+  int _months = 0;
+  int _days = 0;
+  int _totalDays = 0;
 
-  String resultYears, resultMonths, resultDays;
-
+  static final DateFormat _format = DateFormat('dd MMM yyyy');
+  static const ToolPalette _palette = AppPalettes.date;
 
   @override
   void initState() {
-    resultYears = '0';
-    resultMonths = '0';
-    resultDays = '0';
-    fromDate = DateTime.now();
-    toDate = DateTime.now();
-    fromDateController.text = fromDate.toString().substring(0,10);
-    toDateController.text = toDate.toString().substring(0,10);
     super.initState();
+    final DateTime now = DateTime.now();
+    _from = DateTime(now.year, now.month, now.day);
+    _to = _from.add(const Duration(days: 30));
+    _recalculate();
   }
 
-  @override
-  void dispose() {
-    fromDateController.dispose();
-    toDateController.dispose();
-    super.dispose();
+  void _recalculate() {
+    final ({int days, int months, int totalDays, int years}) result =
+        dateBreakdown(from: _from, to: _to);
+    setState(() {
+      _years = result.years;
+      _months = result.months;
+      _days = result.days;
+      _totalDays = result.totalDays;
+    });
   }
 
+  void _swap() {
+    setState(() {
+      final DateTime tmp = _from;
+      _from = _to;
+      _to = tmp;
+    });
+    _recalculate();
+    _maybeSave();
+  }
 
+  void _onFromPicked(DateTime value) {
+    setState(() => _from = value);
+    _recalculate();
+    _maybeSave();
+  }
 
+  void _onToPicked(DateTime value) {
+    setState(() => _to = value);
+    _recalculate();
+    _maybeSave();
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    ScreenConfig().init(context);
-    ThemesMode().init(context);
-
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Date Calculator',
-            style: TextStyle(
-              fontFamily: fontAudioWide,
-              fontSize: responsiveWidth(18)
-            ),
-          ),
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          actions: [
-            IconButton(
-              onPressed: () async {
-                await showInterstitialAd();
-                resetPage(context, DateCalcPage());
-              },
-              icon: Icon(Icons.refresh_rounded),
-              tooltip: 'Reset',
-            )
-          ],
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                physics: BouncingScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      margin: EdgeInsets.all(10),
-                      padding: EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                          color: ThemesMode.isDarkMode?Colors.black:textWhite,
-                          borderRadius: BorderRadius.circular(5),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.grey.withOpacity(0.9),
-                                blurRadius: 0.5,
-                                spreadRadius: 0.5,
-                                offset: Offset.zero
-                            )
-                          ]
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          BuildTextField(
-                            title: 'From Date',
-                            hint: 'dd/mm/yyyy'.toUpperCase(),
-                            isEnabled: false,
-                            textController: fromDateController,
-                            onPressedAction: () async{
-                              pickDateTime(context: context,
-                                  title: 'From Date',
-                                  valueChanged: (v){
-                                    //print(v);
-                                    fromDate = v;
-                                    fromDateController.text = v.toString().substring(0,10);
-                                    int days = toDate.difference(fromDate).inDays;
-                                    print(days);
-                                    setState(() {
-                                      resultYears = (days~/365).floor().toString();
-                                      resultMonths = ((days%365)~/30.417).toString();
-                                      resultDays = (((days%365)%30.417).toInt()).toString();
-                                      // resultYears = (days~/365).floor().toString();
-                                      // resultMonths = ((days%365)~/12).toString();
-                                      // resultDays = (((days%365)%12)).toString();
-                                    });
-                                  }
-                              );
-
-                            },
-                            widget: Icon(Icons.date_range_rounded, size: responsiveText(18),),),
-
-                          BuildTextField(
-                            title: 'To Date',
-                            hint: 'dd/mm/yyyy'.toUpperCase(),
-                            isEnabled: false,
-                            textController: toDateController,
-                            onPressedAction: () async{
-                              pickDateTime(context: context,
-                                title: 'To Date',
-                                valueChanged: (v){
-                                  toDate = v;
-                                  toDateController.text = v.toString().substring(0,10);
-                                  int days = toDate.difference(fromDate).inDays;
-                                  print(days);
-                                  setState(() {
-                                    resultYears = (days~/365).floor().toString();
-                                    resultMonths = ((days%365)~/12).toString();
-                                    resultDays = (((days%365)%12)).toString();
-                                  });
-                                }
-                              );
-
-                              // print(toDate);
-                              // toDateController.text = toDate.toString();
-                              // int days = toDate.difference(fromDate).inHours;
-                              // print(days);
-                              // setState(() {
-                              //   resultYears = (days~/365).toString();
-                              //   resultMonths = (days~/12).toString();
-                              //   resultDays = (days).toString();
-                              // });
-                            },
-                            widget: Icon(Icons.date_range_rounded, size: responsiveText(18),),),
-                        ],
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        BuildResultCard(title: 'Years', value: resultYears,),
-                        BuildResultCard(title: 'Month', value: resultMonths,),
-                        BuildResultCard(title: 'Days', value: resultDays,),
-                      ],
-                    ),
-
-                  ],
-                ),
-              ),
-            ),
-            BuildBannerAd(),
-          ],
-        ),
+  String? _lastSaved;
+  void _maybeSave() {
+    final String signature = '${_from.toIso8601String()}|${_to.toIso8601String()}';
+    if (_lastSaved == signature) return;
+    _lastSaved = signature;
+    HistoryService.add(
+      CalculationRecord(
+        id: HistoryService.newId(),
+        tool: 'Date',
+        toolRoute: dateCalcPage,
+        summary: '${_format.format(_from)} -> ${_format.format(_to)} = '
+            '$_years y $_months m $_days d ($_totalDays days)',
+        createdAt: DateTime.now(),
       ),
     );
   }
 
-  Future<bool> pickDateTime({BuildContext context, String title, ValueChanged<DateTime> valueChanged}) async {
-    DateTime _selectedDate;
-    return showModalBottomSheet(
-      barrierColor: ThemesMode.isDarkMode?Colors.black54:Colors.white54,
+  Future<void> _pickDate({
+    required String title,
+    required DateTime initial,
+    required ValueChanged<DateTime> onPicked,
+  }) {
+    DateTime selected = initial;
+    return showAppBottomSheet<void>(
       context: context,
-      elevation: 0.0,
-      enableDrag: false,
-      builder: (context) {
-        return Container(
-          clipBehavior: Clip.antiAlias,
-          margin: EdgeInsets.all(responsiveWidth(8)),
-          padding: EdgeInsets.fromLTRB(responsiveWidth(15), responsiveWidth(10), responsiveWidth(15), responsiveWidth(15)),
-          decoration: BoxDecoration(
-              color: ThemesMode.isDarkMode?backgroundDark:backgroundLight,
-              //border: Border.all(width: 0.5, color: Colors.black12),
-              borderRadius: BorderRadius.circular(responsiveWidth(10)),
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.grey.withOpacity(0.9),
-                    blurRadius: responsiveWidth(3),
-                    spreadRadius: responsiveWidth(3),
-                    offset: Offset.zero)
-              ]),
+      title: title,
+      maxChildSize: 0.62,
+      builder: (BuildContext sheetContext, ScrollController _) => Column(
+        children: <Widget>[
+          Expanded(
+            child: DatePickerWidget(
+              looping: true,
+              firstDate: DateTime(1900),
+              lastDate: DateTime(2100),
+              initialDate: initial,
+              locale: DateTimePickerLocale.en_us,
+              dateFormat: 'dd-MMMM-yyyy',
+              onChange: (DateTime newDate, _) => selected = newDate,
+              pickerTheme: DateTimePickerTheme(
+                backgroundColor: Theme.of(sheetContext).colorScheme.surface,
+                itemTextStyle: TextStyle(
+                  fontSize: 15,
+                  color: Theme.of(sheetContext).colorScheme.onSurface,
+                ),
+                itemHeight: 70,
+                dividerColor: Colors.transparent,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 6),
+            child: AppButton(
+              label: 'Select',
+              icon: Icons.check_rounded,
+              palette: _palette,
+              onPressed: () {
+                Navigator.of(sheetContext).pop();
+                onPicked(selected);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _reset() async {
+    await showInterstitialAd();
+    if (!mounted) return;
+    resetPage(context, const DateCalcPage());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CalculatorScaffold(
+      palette: _palette,
+      title: 'Date Calculator',
+      icon: Icons.event_rounded,
+      actions: <Widget>[CalculatorResetButton(onPressed: _reset)],
+      children: <Widget>[
+        AppCard(
+          padding: const EdgeInsets.symmetric(vertical: 10),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                children: [
-                  Text(title, style: TextStyle(fontSize: responsiveText(18), fontWeight: FontWeight.bold)),
-                  Spacer(),
-                  TextButton(
-                    onPressed: (){
-                      Navigator.pop(context,);
-                      valueChanged(_selectedDate);
-                    },
-                    child: Icon(Icons.done)
-                  )
-                ],
+            children: <Widget>[
+              BuildDatePickerField(
+                title: 'From',
+                value: _from,
+                format: _format,
+                palette: _palette,
+                onTap: () => _pickDate(
+                  title: 'From Date',
+                  initial: _from,
+                  onPicked: _onFromPicked,
+                ),
               ),
-              Divider(),
-              DatePickerWidget(
-                looping: true,
-                firstDate: DateTime(1900),
-                lastDate: DateTime(2100),
-                initialDate: DateTime.now(),
-                locale: DateTimePickerLocale.en_us,
-                dateFormat:"dd-MMMM-yyyy",
-                onChange: (DateTime newDate, _) {
-                  _selectedDate = newDate;
-                  valueChanged(newDate);
-                  //print(_selectedDate);
-                },
-                pickerTheme: DateTimePickerTheme(
-                  backgroundColor: ThemesMode.isDarkMode?backgroundDark:backgroundLight,
-                  itemTextStyle: TextStyle(
-                      fontSize: responsiveText(14),
-                      color: ThemesMode.isDarkMode?textWhite:textBlack
+              Center(
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: _swap,
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        gradient: _palette.linear,
+                        shape: BoxShape.circle,
+                        boxShadow: <BoxShadow>[
+                          BoxShadow(
+                            color: _palette.accent.withValues(alpha: 0.4),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(Icons.swap_vert_rounded,
+                          color: Colors.white, size: 22),
+                    ),
                   ),
-                  itemHeight: responsiveHeight(80),
-                  dividerColor: Colors.transparent,
+                ),
+              ),
+              BuildDatePickerField(
+                title: 'To',
+                value: _to,
+                format: _format,
+                palette: _palette,
+                onTap: () => _pickDate(
+                  title: 'To Date',
+                  initial: _to,
+                  onPicked: _onToPicked,
                 ),
               ),
             ],
-          )
-        );
-      },
+          ),
+        ),
+        const SizedBox(height: 6),
+        Row(
+          children: <Widget>[
+            BuildResultCard(
+              title: 'Years',
+              value: '$_years',
+              palette: _palette,
+              icon: Icons.calendar_today_rounded,
+            ),
+            BuildResultCard(
+              title: 'Months',
+              value: '$_months',
+              palette: _palette,
+              icon: Icons.date_range_rounded,
+            ),
+            BuildResultCard(
+              title: 'Days',
+              value: '$_days',
+              palette: _palette,
+              icon: Icons.hourglass_bottom_rounded,
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        AppGradientCard(
+          palette: _palette,
+          child: Row(
+            children: <Widget>[
+              const Icon(Icons.timelapse_rounded, color: Colors.white, size: 24),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  '$_totalDays days in total',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+          child: Text(
+            'Calendar-aware: 1 Mar to 1 Mar next year is exactly 1 year, '
+            'not 365 days.',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ),
+      ],
     );
   }
 }

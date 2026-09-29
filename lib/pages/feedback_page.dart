@@ -1,64 +1,73 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:multi_task_calculator/utils/constant.dart';
-import 'package:multi_task_calculator/utils/screen_config.dart';
-import 'package:multi_task_calculator/utils/themes_mode.dart';
-import 'package:url_launcher/url_launcher.dart';
+﻿import 'package:flutter/material.dart';
 
+import '../utils/constant.dart';
+import '../utils/extensions.dart';
+/// Shown when the user gives 3 stars or fewer and is sent here for feedback.
 class FeedbackPage extends StatelessWidget {
+  const FeedbackPage({super.key});
+
   @override
   Widget build(BuildContext context) {
-    ScreenConfig().init(context);
-    ThemesMode().init(context);
-
-    return SafeArea(
-      child: Scaffold(
-          appBar: AppBar(
-            centerTitle: true,
-            elevation: 0,
-            backgroundColor: Colors.transparent,
-            title: Text(
-              'Feedback',
-              style: TextStyle(
-                  fontSize: responsiveText(22),
-                  fontFamily: 'Audiowide',),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Feedback'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () => Navigator.of(context).maybePop(),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 30, 20, 24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            const Icon(Icons.sentiment_dissatisfied_rounded,
+                size: 72, color: Colors.amber),
+            const SizedBox(height: 18),
+            Text(
+              'We are sorry to hear that',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleLarge,
             ),
-          ),
-          body: Container(
-            padding: EdgeInsets.all(responsiveWidth(50)),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            const SizedBox(height: 10),
+            Text(
+              'Your rating means a lot. Tell us what went wrong or what is '
+              'missing and we will work on it.',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  '◑︵◐',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: responsiveText(60), ),
+              children: <Widget>[
+                OutlinedButton.icon(
+                  onPressed: () => openExternal(context, feedbackMail),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  icon: const Icon(Icons.mail_outline_rounded),
+                  label: const Text('Email us'),
                 ),
-                Text(
-                  'Your rating is too low. '
-                  'Please let us know how we can improve this app to meet your need.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontSize: responsiveText(18),),
+                const SizedBox(height: 10),
+                OutlinedButton.icon(
+                  onPressed: () => openExternal(context, storeLink),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  icon: const Icon(Icons.reviews_outlined),
+                  label: const Text('Leave a Play Store review'),
                 ),
-                CupertinoButton(
-                  color: ThemesMode.isDarkMode?Colors.black26:Colors.grey[200],
-                  onPressed: () async {
-                    if (await canLaunch(feedbackMail)) {
-                      await launch(feedbackMail);
-                    } else {
-                      throw 'Could not launch $feedbackMail';
-                    }
-                  },
-                  child: Text('Send Mail', style: TextStyle(
-                    color: ThemesMode.isDarkMode?textYellow:textBlack,
-                  ),),
-                )
               ],
             ),
-          )),
+          ],
+        ),
+      ),
     );
   }
 }

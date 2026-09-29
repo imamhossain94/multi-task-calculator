@@ -1,75 +1,84 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:multi_task_calculator/services/shared_pref_services.dart';
-import 'package:multi_task_calculator/utils/constant.dart';
-import 'package:multi_task_calculator/utils/screen_config.dart';
 
-
+import '../services/google_ad_service.dart';
+import '../services/shared_pref_services.dart';
+import '../utils/screen_config.dart';
+/// Bottom banner ad, wrapped in a rounded container so it does not look like a
+/// raw platform view glued to the edge of the screen.
 class BuildBannerAd extends StatefulWidget {
+  const BuildBannerAd({super.key});
+
   @override
-  _BuildBannerAdState createState() => _BuildBannerAdState();
+  State<BuildBannerAd> createState() => _BuildBannerAdState();
 }
 
 class _BuildBannerAdState extends State<BuildBannerAd> {
-  BannerAd _bannerAd;
-  bool purchaseStatus;
+  BannerAd? _bannerAd;
+  bool _isLoaded = false;
+  bool _suppressed = false;
+  bool _didFail = false;
 
   @override
   void initState() {
-    purchaseStatus = getAppPurchasedStatus();
-    if(!purchaseStatus){
-      initBannerAds();
-    }
     super.initState();
+    _suppressed = SharedPrefService.isAdFree;
+    if (!_suppressed) _load();
+  }
+
+  void _load() {
+    final BannerAd ad = BannerAd(
+      adUnitId: GoogleAdService.bannerId,
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (Ad ad) {
+          if (!mounted) return;
+          setState(() {
+            _bannerAd = ad as BannerAd;
+            _isLoaded = true;
+          });
+        },
+        onAdFailedToLoad: (Ad ad, LoadAdError error) {
+          ad.dispose();
+          if (!mounted) return;
+          setState(() => _didFail = true);
+        },
+      ),
+    );
+    _bannerAd = ad;
+    ad.load();
   }
 
   @override
   void dispose() {
-    if(!purchaseStatus){
-      _bannerAd?.dispose();
-      _bannerAd = null;
-    }
+    _bannerAd?.dispose();
     super.dispose();
-  }
-
-  void initBannerAds() {
-    _bannerAd = BannerAd(
-      adUnitId: id_banner,
-      request: AdRequest(),
-      size: AdSize.banner,
-      listener: BannerAdListener(
-        onAdLoaded: (Ad ad) {
-          print('$BannerAd loaded.');
-          setState(() {
-            _bannerAd = ad as BannerAd;
-          });
-        },
-        onAdFailedToLoad: (Ad ad, LoadAdError error) {
-          print('$BannerAd failedToLoad: $error');
-          ad.dispose();
-        },
-        onAdOpened: (Ad ad) => print('$BannerAd onAdOpened.'),
-        onAdClosed: (Ad ad) => print('$BannerAd onAdClosed.'),
-      ),
-    );
-    _bannerAd?.load();
   }
 
   @override
   Widget build(BuildContext context) {
-    ScreenConfig().init(context);
+    ScreenConfig.init(context);
 
-    AdWidget adWidget;
-    if(!purchaseStatus){
-      adWidget = AdWidget(ad: _bannerAd);
+    // Reserve no space at all when the ad cannot render, so pages never end up
+    // with a mysterious 50px gap.
+    if (_suppressed || _didFail || !_isLoaded || _bannerAd == null) {
+      return const SizedBox.shrink();
     }
 
-    return !purchaseStatus?Container(
+    return Container(
+      margin: const EdgeInsets.fromLTRB(10, 4, 10, 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      clipBehavior: Clip.antiAlias,
       alignment: Alignment.center,
-      child: adWidget,
-      width: _bannerAd.size.width.toDouble(),
-      height: _bannerAd.size.height.toDouble(),
-      color: Colors.transparent,
-    ):SizedBox();
+      child: SizedBox(
+        width: _bannerAd!.size.width.toDouble(),
+        height: _bannerAd!.size.height.toDouble(),
+        child: AdWidget(ad: _bannerAd!),
+      ),
+    );
   }
 }

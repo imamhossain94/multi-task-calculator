@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 
-class ThemeNotifier with ChangeNotifier {
-  ThemeMode _themeMode;
-
+/// Notifies the platform UI of the current theme so the user sees the change
+/// immediately, and persists the choice.
+class ThemeNotifier extends ChangeNotifier {
   ThemeNotifier(this._themeMode);
 
-  getThemeMode() => _themeMode;
+  ThemeMode _themeMode;
 
-  setThemeMode(ThemeMode mode) async {
+  ThemeMode getThemeMode() => _themeMode;
+
+  void setThemeMode(ThemeMode mode) {
+    if (_themeMode == mode) return;
     _themeMode = mode;
     notifyListeners();
   }
