@@ -150,7 +150,14 @@ class _DateCalcPageState extends State<DateCalcPage> {
       palette: _palette,
       title: 'Date Calculator',
       icon: Icons.event_rounded,
-      actions: <Widget>[CalculatorResetButton(onPressed: _reset)],
+      actions: <Widget>[
+        IconButton(
+          tooltip: 'Swap dates',
+          onPressed: _swap,
+          icon: const Icon(Icons.swap_vert_rounded, size: 22),
+        ),
+        CalculatorResetButton(onPressed: _reset),
+      ],
       children: <Widget>[
         AppInputCard(
           children: <Widget>[
@@ -164,11 +171,6 @@ class _DateCalcPageState extends State<DateCalcPage> {
                 initial: _from,
                 onPicked: _onFromPicked,
               ),
-            ),
-            AppSwapDivider(
-              palette: _palette,
-              onTap: _swap,
-              tooltip: 'Swap dates',
             ),
             BuildDatePickerField(
               title: 'To',

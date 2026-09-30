@@ -126,7 +126,8 @@ double compound({
   if (times <= 0) return principal;
   final double r = ratePercent / 100;
   if (r == 0) return principal + contribution * times;
-  return principal * _pow(1 + r, times) + contribution * ((_pow(1 + r, times) - 1) / r);
+  return principal * _pow(1 + r, times) +
+      contribution * ((_pow(1 + r, times) - 1) / r);
 }
 
 /// Sales tax amount and tax-inclusive total.

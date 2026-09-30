@@ -244,7 +244,14 @@ class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
       icon: Icons.swap_horiz_rounded,
       actions: category == null
           ? const <Widget>[]
-          : <Widget>[CalculatorResetButton(onPressed: _reset)],
+          : <Widget>[
+              IconButton(
+                tooltip: 'Swap units',
+                onPressed: _swap,
+                icon: const Icon(Icons.swap_vert_rounded, size: 22),
+              ),
+              CalculatorResetButton(onPressed: _reset),
+            ],
       children: <Widget>[
         if (_error != null)
           AppCard(
@@ -272,11 +279,6 @@ class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
                 editable: true,
                 palette: _palette,
                 onTapUnit: () => _pickUnit(isFrom: true),
-              ),
-              AppSwapDivider(
-                palette: _palette,
-                onTap: _swap,
-                tooltip: 'Swap units',
               ),
               _UnitField(
                 title: 'To',

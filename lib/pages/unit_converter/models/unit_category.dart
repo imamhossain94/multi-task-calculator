@@ -33,18 +33,15 @@ class UnitCategory {
   /// Strips the enum prefix from a raw unit name.
   String pretty(dynamic raw) {
     final String name = raw.toString();
-    return name.startsWith(prefix)
-        ? name.substring(prefix.length)
-        : name;
+    return name.startsWith(prefix) ? name.substring(prefix.length) : name;
   }
 
   /// Human-friendly label: `square_kilometers` -> `Square Kilometers`.
-  static String labelFor(String key) => key
-      .replaceAll('_', ' ')
-      .replaceAllMapped(
-        RegExp(r'\b[a-z]'),
-        (Match m) => m.group(0)!.toUpperCase(),
-      );
+  static String labelFor(String key) =>
+      key.replaceAll('_', ' ').replaceAllMapped(
+            RegExp(r'\b[a-z]'),
+            (Match m) => m.group(0)!.toUpperCase(),
+          );
 }
 
 /// Builds a converter with the settings the app uses everywhere.

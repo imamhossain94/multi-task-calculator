@@ -12,14 +12,14 @@ class CalculationRecord {
     required this.createdAt,
   });
 
-  factory CalculationRecord.fromJson(Map<String, dynamic> json) => CalculationRecord(
+  factory CalculationRecord.fromJson(Map<String, dynamic> json) =>
+      CalculationRecord(
         id: json['id']?.toString() ?? '',
         tool: json['tool']?.toString() ?? 'Calculation',
         toolRoute: json['toolRoute']?.toString() ?? '',
         summary: json['summary']?.toString() ?? '',
-        createdAt:
-            DateTime.tryParse(json['createdAt']?.toString() ?? '') ??
-                DateTime.fromMillisecondsSinceEpoch(0),
+        createdAt: DateTime.tryParse(json['createdAt']?.toString() ?? '') ??
+            DateTime.fromMillisecondsSinceEpoch(0),
       );
 
   final String id;

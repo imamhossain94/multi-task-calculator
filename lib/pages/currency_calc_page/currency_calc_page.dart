@@ -255,11 +255,6 @@ class _CurrencyCalcPageState extends State<CurrencyCalcPage> {
               palette: _palette,
               onTapCode: () => _pickCurrency(isFrom: true),
             ),
-            AppSwapDivider(
-              palette: _palette,
-              onTap: _swap,
-              tooltip: 'Swap currencies',
-            ),
             _CurrencyField(
               title: 'To',
               code: _toCode,

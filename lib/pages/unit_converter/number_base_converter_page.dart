@@ -241,7 +241,14 @@ class _NumberBaseConverterPageState extends State<NumberBaseConverterPage> {
       palette: _palette,
       title: 'Number Base',
       icon: Icons.tag_rounded,
-      actions: <Widget>[CalculatorResetButton(onPressed: _reset)],
+      actions: <Widget>[
+        IconButton(
+          tooltip: 'Swap bases',
+          onPressed: _swapBases,
+          icon: const Icon(Icons.swap_vert_rounded, size: 22),
+        ),
+        CalculatorResetButton(onPressed: _reset),
+      ],
       children: <Widget>[
         AppInputCard(
           children: <Widget>[
@@ -251,11 +258,6 @@ class _NumberBaseConverterPageState extends State<NumberBaseConverterPage> {
               controller: _inputController,
               palette: _palette,
               onTapBase: () => _pickBase(isFrom: true),
-            ),
-            AppSwapDivider(
-              palette: _palette,
-              onTap: _swapBases,
-              tooltip: 'Swap bases',
             ),
             _BaseField(
               title: 'To',

@@ -37,7 +37,8 @@ abstract final class NumX {
   ///
   /// Non-finite results render as [fallback] (`0.00` by default) so the UI can
   /// never show `NaN` or `Infinity`.
-  static String format(num? value, {int decimals = 2, String fallback = '0.00'}) {
+  static String format(num? value,
+      {int decimals = 2, String fallback = '0.00'}) {
     if (value == null) return fallback;
     final double v = value.toDouble();
     if (!v.isFinite) return fallback;
