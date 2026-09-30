@@ -67,7 +67,7 @@ class _HomePageState extends State<HomePage> {
         appBar: AppTitleBar(
           palette: AppPalettes.general,
           title: appName,
-          leading: const SizedBox.shrink(),
+          icon: Icons.calculate_rounded,
           actions: <Widget>[
             IconButton(
               onPressed: () => Navigator.of(context).pushNamed(historyPage),

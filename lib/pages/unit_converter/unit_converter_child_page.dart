@@ -273,24 +273,10 @@ class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
                 palette: _palette,
                 onTapUnit: () => _pickUnit(isFrom: true),
               ),
-              Center(
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: AppRadii.allLg,
-                    onTap: _swap,
-                    child: Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: _palette.accent,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.swap_vert_rounded,
-                          color: Colors.white, size: 22),
-                    ),
-                  ),
-                ),
+              AppSwapDivider(
+                palette: _palette,
+                onTap: _swap,
+                tooltip: 'Swap units',
               ),
               _UnitField(
                 title: 'To',

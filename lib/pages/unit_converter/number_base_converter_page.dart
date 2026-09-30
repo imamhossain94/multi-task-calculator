@@ -252,24 +252,10 @@ class _NumberBaseConverterPageState extends State<NumberBaseConverterPage> {
               palette: _palette,
               onTapBase: () => _pickBase(isFrom: true),
             ),
-            Center(
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: AppRadii.allLg,
-                  onTap: _swapBases,
-                  child: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: _palette.accent,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.swap_vert_rounded,
-                        color: Colors.white, size: 22),
-                  ),
-                ),
-              ),
+            AppSwapDivider(
+              palette: _palette,
+              onTap: _swapBases,
+              tooltip: 'Swap bases',
             ),
             _BaseField(
               title: 'To',

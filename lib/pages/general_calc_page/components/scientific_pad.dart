@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../utils/screen_config.dart';
-import 'build_calc_pad.dart' show CalcGlyphs;
-import '../../../utils/themes_mode.dart';
 import '../../../utils/app_color.dart';
+import '../../../utils/screen_config.dart';
+import '../../../utils/themes_mode.dart';
+import 'build_calc_pad.dart' show CalcGlyphs;
 
 /// Scientific function labels, written as escapes so they cannot be corrupted
 /// by an editor or shell that mis-guesses the file encoding.
@@ -46,6 +46,13 @@ class ScientificPad extends StatelessWidget {
   /// Emits `'⋯'` when the expand/collapse chip is tapped.
   final ValueChanged<String>? toggleKey;
 
+  /// Chips per row. The grid always shows two even rows.
+  static const int _columns = 6;
+
+  /// Chip height. Two rows plus the header has to leave enough room for a
+  /// full six-row key pad underneath.
+  static const double _chipHeight = 32;
+
   /// Label -> math function applied to the trailing operand.
   static const List<(String, String)> functions = <(String, String)>[
     ('sin', 'sin'),
@@ -69,7 +76,11 @@ class ScientificPad extends StatelessWidget {
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.fromLTRB(
-              AppSpacing.page, AppSpacing.xs, AppSpacing.page, AppSpacing.xs),
+            AppSpacing.page,
+            AppSpacing.xs,
+            AppSpacing.page,
+            AppSpacing.xs,
+          ),
           child: Row(
             children: <Widget>[
               Text(
@@ -90,7 +101,9 @@ class ScientificPad extends StatelessWidget {
                     onTap: () => toggleKey!(SciGlyphs.more),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.xs + 2, vertical: 2),
+                        horizontal: AppSpacing.xs + 2,
+                        vertical: 2,
+                      ),
                       child: Row(
                         children: <Widget>[
                           Text(
@@ -124,22 +137,39 @@ class ScientificPad extends StatelessWidget {
           firstChild: const SizedBox(width: double.infinity),
           secondChild: Padding(
             padding: const EdgeInsets.fromLTRB(
-                AppSpacing.md, 2, AppSpacing.md, AppSpacing.sm),
-            child: GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 6,
-              mainAxisSpacing: AppSpacing.xs + 1,
-              crossAxisSpacing: AppSpacing.xs + 1,
-              childAspectRatio: 1.85,
-              children: functions.map(((String, String) entry) {
-                final (String label, String fn) = entry;
-                return _FunctionChip(
-                  label: label,
-                  color: palette.accent,
-                  onTap: () => onPressed(fn),
-                );
-              }).toList(growable: false),
+              AppSpacing.page,
+              0,
+              AppSpacing.page,
+              AppSpacing.sm,
+            ),
+            // Two fixed rows rather than a GridView: the chips are then always
+            // the same height and never re-flow when the text scale changes.
+            child: Column(
+              children: <Widget>[
+                for (int row = 0; row * _columns < functions.length; row++)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.xs + 1),
+                    child: Row(
+                      children: <Widget>[
+                        for (int col = 0; col < _columns; col++)
+                          Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                right:
+                                    col == _columns - 1 ? 0 : AppSpacing.xs + 1,
+                              ),
+                              child: _FunctionChip(
+                                label: functions[row * _columns + col].$1,
+                                color: palette.accent,
+                                onTap: () => onPressed(
+                                    functions[row * _columns + col].$2),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+              ],
             ),
           ),
         ),
@@ -159,33 +189,39 @@ class _FunctionChip extends StatelessWidget {
   final Color color;
   final VoidCallback onTap;
 
+  /// Fixed so the two rows always match height.
+  static const double height = ScientificPad._chipHeight;
+
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: AppRadii.allSm,
-        onTap: onTap,
-        child: Container(
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.08),
-            borderRadius: AppRadii.allSm,
-            border: Border.all(
-              color: color.withValues(alpha: 0.34),
-              width: AppBorders.hairline,
+    return SizedBox(
+      height: _FunctionChip.height,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: AppRadii.allSm,
+          onTap: onTap,
+          child: Container(
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.08),
+              borderRadius: AppRadii.allSm,
+              border: Border.all(
+                color: color.withValues(alpha: 0.34),
+                width: AppBorders.hairline,
+              ),
             ),
-          ),
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontSize: responsiveText(14),
-                  fontWeight: FontWeight.w700,
-                  color: color,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: responsiveText(14),
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                  ),
                 ),
               ),
             ),

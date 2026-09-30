@@ -255,28 +255,10 @@ class _CurrencyCalcPageState extends State<CurrencyCalcPage> {
               palette: _palette,
               onTapCode: () => _pickCurrency(isFrom: true),
             ),
-            Center(
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: AppRadii.allLg,
-                  onTap: _swap,
-                  child: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: _palette.accent,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: _palette.accent,
-                        width: AppBorders.hairline,
-                      ),
-                    ),
-                    child: const Icon(Icons.swap_vert_rounded,
-                        color: Colors.white, size: 22),
-                  ),
-                ),
-              ),
+            AppSwapDivider(
+              palette: _palette,
+              onTap: _swap,
+              tooltip: 'Swap currencies',
             ),
             _CurrencyField(
               title: 'To',

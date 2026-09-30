@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:function_tree/function_tree.dart';
 
 import '../../components/calculator_scaffold.dart';
-import '../../components/app_surface.dart' show appBorder;
 import '../../utils/constant.dart';
 import '../../services/history_service.dart';
 import 'components/build_calc_pad.dart';
+import 'components/build_display.dart';
 import 'components/scientific_pad.dart';
-import '../../utils/themes_mode.dart';
 import '../../utils/app_color.dart';
-import '../../components/app_surface.dart';
 
 class GeneralCalcPage extends StatefulWidget {
   const GeneralCalcPage({super.key});
@@ -58,14 +56,19 @@ class _GeneralCalcPageState extends State<GeneralCalcPage> {
         CalculatorResetButton(onPressed: _clear),
       ],
       children: <Widget>[
-        _Display(
-          // Empty until the user types, so the card shows a single large `0`
-          // instead of a small "0" floating above a blank result.
-          expression: _expression,
-          preview: _result.isNotEmpty
-              ? _result
-              : (_preview.isEmpty ? '' : '= $_preview'),
-          error: _error,
+        // A fixed height, not a flex share: the display is a readout, so it
+        // needs enough room for a 60 px result and no more. A flex share left
+        // it ~40% of the screen on a tall phone.
+        SizedBox(
+          height: 116,
+          child: BuildDisplay(
+            expression: _expression,
+            preview: _result.isNotEmpty
+                ? _result
+                : (_preview.isEmpty ? '' : '= $_preview'),
+            error: _error,
+            palette: _palette,
+          ),
         ),
         ScientificPad(
           onPressed: _onScientific,
@@ -73,6 +76,8 @@ class _GeneralCalcPageState extends State<GeneralCalcPage> {
           expanded: _showScientific,
           toggleKey: _onKey,
         ),
+        // Everything left over goes to the pad. Keys scale to the smaller of
+        // the two axes, so the grid is always square and never overflows.
         Expanded(child: BuildCalcPad(onPressed: _onKey)),
       ],
     );
@@ -452,83 +457,5 @@ class _GeneralCalcPageState extends State<GeneralCalcPage> {
       text = text.replaceFirst(RegExp(r'\.$'), '');
     }
     return text;
-  }
-}
-
-/// The expression / result display.
-class _Display extends StatelessWidget {
-  const _Display({
-    required this.expression,
-    required this.preview,
-    this.error,
-  });
-
-  final String expression;
-  final String preview;
-  final String? error;
-
-  @override
-  Widget build(BuildContext context) {
-    final bool hasError = error != null;
-    final bool typed = expression.isNotEmpty;
-    return Container(
-      padding: const EdgeInsets.fromLTRB(
-          AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.sm + 2),
-      decoration: BoxDecoration(
-        color: ThemesMode.surface,
-        borderRadius: AppRadii.allLg,
-        border: appBorder(),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          // The expression line only appears once there is something to show, so
-          // an untouched calculator is a single large `0`.
-          if (typed)
-            SizedBox(
-              height: 40,
-              child: SingleChildScrollView(
-                reverse: true,
-                child: Align(
-                  alignment: Alignment.bottomRight,
-                  child: Text(
-                    expression,
-                    textAlign: TextAlign.right,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      height: 1.25,
-                      color: ThemesMode.onSurfaceMuted,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          if (typed && !hasError) const SizedBox(height: AppSpacing.xs),
-          if (hasError)
-            Text(
-              error!,
-              style: const TextStyle(
-                color: AppColors.danger,
-                fontWeight: FontWeight.w700,
-                fontSize: 15,
-              ),
-            )
-          else
-            Text(
-              preview.isEmpty ? '0' : preview,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.right,
-              style: TextStyle(
-                fontSize: preview.isEmpty ? 34 : 30,
-                fontWeight: FontWeight.w900,
-                color: _GeneralCalcPageState._palette.accent,
-              ),
-            ),
-        ],
-      ),
-    );
   }
 }

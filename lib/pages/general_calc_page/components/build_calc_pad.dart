@@ -36,13 +36,24 @@ abstract final class CalcGlyphs {
 
 /// Numeric / operator pad for the general calculator.
 ///
-/// Built from nested `Expanded`s rather than a [Table] so the six rows always
-/// share exactly the height that is left over. A `Table` sizes its rows to
-/// their content, which overflowed on shorter screens.
+/// Every key is the same size: the pad derives one square key dimension from
+/// the smaller of the available width and height, so the six rows are always
+/// evenly proportioned and no key is taller or wider than its neighbours. The
+/// gap is part of the key's footprint, which keeps the rhythm identical
+/// horizontally and vertically.
+///
+/// A [Table] would have been the obvious choice, but it sizes rows to their
+/// content and overflowed on shorter screens.
 class BuildCalcPad extends StatelessWidget {
   const BuildCalcPad({super.key, required this.onPressed});
 
   final ValueChanged<String> onPressed;
+
+  static const int columns = 4;
+
+  /// Gap between keys, applied on all four sides so the outer margins match
+  /// the inner ones.
+  static const double _gap = 5;
 
   static const List<List<String>> _rows = <List<String>>[
     <String>[CalcGlyphs.more, '(', ')', CalcGlyphs.backspace],
@@ -55,37 +66,57 @@ class BuildCalcPad extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.sm,
-        0,
-        AppSpacing.sm,
-        AppSpacing.xs,
-      ),
-      child: Column(
-        children: <Widget>[
-          for (final List<String> row in _rows)
-            Expanded(
-              child: Row(
-                children: <Widget>[
-                  for (final String key in row) Expanded(child: _key(key)),
-                ],
-              ),
+    final int rows = _rows.length;
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        // One key edge, derived from both axes so the grid stays square.
+        final double byWidth =
+            (constraints.maxWidth - _gap * (columns + 1)) / columns;
+        final double byHeight =
+            (constraints.maxHeight - _gap * (rows + 1)) / rows;
+        final double size = byWidth < byHeight ? byWidth : byHeight;
+
+        return Align(
+          alignment: Alignment.topCenter,
+          child: SizedBox(
+            width: size * columns + _gap * (columns + 1),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                for (final List<String> row in _rows)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: _gap),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        for (int i = 0; i < columns; i++)
+                          Padding(
+                            padding: const EdgeInsets.only(right: _gap),
+                            child: SizedBox(
+                              width: size,
+                              height: size,
+                              child: _key(
+                                i < row.length ? row[i] : '',
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+              ],
             ),
-        ],
-      ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _key(String key) => Padding(
-        padding: const EdgeInsets.all(3),
-        child: BuildCalcButton(
-          title: key,
-          icon: _iconFor(key),
-          buttonColor: key == '=' ? AppPalettes.general.accent : null,
-          textColor: key == '=' ? Colors.white : null,
-          onPressed: () => onPressed(key),
-        ),
+  Widget _key(String key) => BuildCalcButton(
+        title: key,
+        icon: _iconFor(key),
+        buttonColor: key == '=' ? AppPalettes.general.accent : null,
+        textColor: key == '=' ? Colors.white : null,
+        onPressed: () => onPressed(key),
       );
 
   /// Icons for the two keys whose glyphs Audiowide cannot draw.
