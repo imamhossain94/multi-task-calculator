@@ -232,14 +232,11 @@ Issues and pull requests are welcome. If you are adding a calculator:
 
 ## Background
 
-This is the author's **second Flutter app**.
+This was my second Flutter app for a cheater.
 
-The first one was built for a client who agreed to pay **$3,000** for the project
-and then refused to pay once it was finished.
+The first one was built for the cheater who agreed to pay 3k BDT for the project and then refused to pay once it was finished.
 
-Rather than let the work sit unused, it was cleaned up and released here under the
-MIT licence instead — free to use, fork and ship. If it saves you a weekend, that
-is the whole point.
+Rather than let the work sit unused, it was cleaned up and released here under the MIT licence instead — free to use, fork and ship. If it saves you a weekend, that is the whole point.
 
 ---
 
