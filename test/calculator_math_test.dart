@@ -76,26 +76,22 @@ void main() {
 
     test('zero or negative inputs return 0 rather than NaN', () {
       expect(
-        loanMonthlyPayment(
-            principal: 0, annualRatePercent: 5, years: 10),
+        loanMonthlyPayment(principal: 0, annualRatePercent: 5, years: 10),
         0,
       );
       expect(
-        loanMonthlyPayment(
-            principal: 1000, annualRatePercent: 5, years: 0),
+        loanMonthlyPayment(principal: 1000, annualRatePercent: 5, years: 0),
         0,
       );
       expect(
-        loanMaxBorrow(
-            monthlyPayment: 0, annualRatePercent: 5, years: 10),
+        loanMaxBorrow(monthlyPayment: 0, annualRatePercent: 5, years: 10),
         0,
       );
     });
 
     test('interest is never negative', () {
       expect(
-        loanTotalInterest(
-            principal: 1000, annualRatePercent: -5, years: 5),
+        loanTotalInterest(principal: 1000, annualRatePercent: -5, years: 5),
         greaterThanOrEqualTo(0),
       );
     });

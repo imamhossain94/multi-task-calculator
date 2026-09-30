@@ -85,15 +85,21 @@ class BuildCalcPad extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: gap),
                 child: Row(
+                  // A gap *before every key and one after the last*, which is
+                  // `columns + 1` of them - the same count `key` is sized
+                  // against. Emitting only the internal gaps leaves the row
+                  // `2 * gap` short of the available width, so the right edge
+                  // stops short of the display card's.
                   children: <Widget>[
                     for (int i = 0; i < columns; i++) ...<Widget>[
-                      if (i > 0) const SizedBox(width: gap),
+                      const SizedBox(width: gap),
                       SizedBox(
                         width: key,
                         height: key / aspect,
                         child: _key(i < row.length ? row[i] : ''),
                       ),
                     ],
+                    const SizedBox(width: gap),
                   ],
                 ),
               ),

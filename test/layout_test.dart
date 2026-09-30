@@ -151,6 +151,23 @@ void main() {
     expect(lefts, hasLength(4));
     final Set<double> tops = keys.map((Rect r) => r.top).toSet();
     expect(tops, hasLength(6));
+
+    // The grid is horizontally centred inside the display card. The bug this
+    // guards against sized each key against `columns + 1` gaps but only emitted
+    // `columns - 1`, leaving the row short and flush to the left edge.
+    final Rect card = tester.getRect(find.byType(BuildDisplay));
+    final double insetLeft = keys.first.left - card.left;
+    final double insetRight = card.right - keys.last.right;
+    expect(
+      insetRight,
+      closeTo(insetLeft, 0.01),
+      reason: 'key pad is not horizontally centred: '
+          'left inset $insetLeft, right inset $insetRight',
+    );
+
+    // And the outer margin equals the gap between keys.
+    final double innerGap = keys[1].left - keys[0].right;
+    expect(insetLeft, closeTo(innerGap, 0.01));
   });
 }
 
