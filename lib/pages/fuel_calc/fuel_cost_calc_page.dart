@@ -1,15 +1,16 @@
-﻿import 'package:flutter/material.dart';
-import '../../services/google_ad_service.dart';
+import 'package:flutter/material.dart';
 
 import '../../components/build_result_card.dart';
 import '../../components/build_text_field.dart';
 import '../../components/calculator_scaffold.dart';
 import '../../services/history_service.dart';
-import '../../utils/app_color.dart';
 import '../../utils/calculator_math.dart';
 import '../../utils/constant.dart';
 import '../../utils/extensions.dart';
 import '../../utils/num_x.dart';
+import '../../components/app_surface.dart';
+import '../../utils/app_color.dart';
+
 class FuelCostCalcPage extends StatefulWidget {
   const FuelCostCalcPage({super.key});
 
@@ -46,8 +47,7 @@ class _FuelCostCalcPageState extends State<FuelCostCalcPage> {
 
   void _recalculate() {
     final double distance = double.tryParse(_distanceController.text) ?? 0;
-    final double efficiency =
-        double.tryParse(_efficiencyController.text) ?? 0;
+    final double efficiency = double.tryParse(_efficiencyController.text) ?? 0;
     final double price = double.tryParse(_priceController.text) ?? 0;
 
     // Efficiency must be > 0 or the result is `Infinity`. Require both a real
@@ -97,9 +97,7 @@ class _FuelCostCalcPageState extends State<FuelCostCalcPage> {
     );
   }
 
-  Future<void> _reset() async {
-    await showInterstitialAd();
-    if (!mounted) return;
+  void _reset() {
     resetPage(context, const FuelCostCalcPage());
   }
 
@@ -111,51 +109,36 @@ class _FuelCostCalcPageState extends State<FuelCostCalcPage> {
       icon: Icons.local_gas_station_rounded,
       actions: <Widget>[CalculatorResetButton(onPressed: _reset)],
       children: <Widget>[
-        Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.06),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              BuildTextField(
-                title: 'Distance to Travel',
-                hint: '0.00',
-                isEnabled: true,
-                textController: _distanceController,
-                palette: _palette,
-                onPressedAction: null,
-                widget: const Text('km'),
-              ),
-              BuildTextField(
-                title: 'Fuel Efficiency',
-                hint: '0.00',
-                isEnabled: true,
-                textController: _efficiencyController,
-                palette: _palette,
-                onPressedAction: null,
-                widget: const Text('km/l'),
-              ),
-              BuildTextField(
-                title: 'Fuel Price',
-                hint: '0.00',
-                isEnabled: true,
-                textController: _priceController,
-                palette: _palette,
-                onPressedAction: null,
-                widget: const Text(r'$/l'),
-              ),
-            ],
-          ),
+        AppInputCard(
+          children: <Widget>[
+            BuildTextField(
+              title: 'Distance to Travel',
+              hint: '0.00',
+              isEnabled: true,
+              textController: _distanceController,
+              palette: _palette,
+              onPressedAction: null,
+              widget: const Text('km'),
+            ),
+            BuildTextField(
+              title: 'Fuel Efficiency',
+              hint: '0.00',
+              isEnabled: true,
+              textController: _efficiencyController,
+              palette: _palette,
+              onPressedAction: null,
+              widget: const Text('km/l'),
+            ),
+            BuildTextField(
+              title: 'Fuel Price',
+              hint: '0.00',
+              isEnabled: true,
+              textController: _priceController,
+              palette: _palette,
+              onPressedAction: null,
+              widget: const Text(r'$/l'),
+            ),
+          ],
         ),
         const SizedBox(height: 6),
         Row(
@@ -179,7 +162,7 @@ class _FuelCostCalcPageState extends State<FuelCostCalcPage> {
         ),
         if (!_hasInput)
           Padding(
-            padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+            padding: const EdgeInsets.fromLTRB(4, 2, 4, 8),
             child: Text(
               'Enter a distance and a fuel efficiency above 0 to see the cost.',
               textAlign: TextAlign.center,

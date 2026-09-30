@@ -1,14 +1,14 @@
-﻿import 'package:another_flushbar/flushbar.dart';
+import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../utils/app_color.dart';
 import '../utils/constant.dart';
 import '../utils/provider.dart';
 import '../utils/screen_config.dart';
-import '../utils/themes_mode.dart';
+import 'app_color.dart';
+import 'themes_mode.dart';
 // ===========================================================================
 // Navigation helpers
 // ===========================================================================
@@ -41,7 +41,9 @@ Future<void> openExternal(BuildContext context, String url) async {
   }
   try {
     final bool ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
-    if (!ok) _showFlush(messenger, 'Could not open link', Icons.link_off_rounded);
+    if (!ok) {
+      _showFlush(messenger, 'Could not open link', Icons.link_off_rounded);
+    }
   } catch (_) {
     _showFlush(messenger, 'Could not open link', Icons.link_off_rounded);
   }
@@ -77,7 +79,7 @@ Future<T?> showAppBottomSheet<T>({
             decoration: BoxDecoration(
               color: ThemesMode.surface,
               borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(26),
+                top: Radius.circular(AppRadii.lg),
               ),
             ),
             child: SafeArea(
@@ -86,7 +88,7 @@ Future<T?> showAppBottomSheet<T>({
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   Container(
-                    margin: const EdgeInsets.only(top: 10, bottom: 4),
+                    margin: const EdgeInsets.only(top: 8, bottom: 4),
                     width: 44,
                     height: 5,
                     decoration: BoxDecoration(
@@ -144,7 +146,7 @@ void _showFlush(
         content: Row(
           children: <Widget>[
             Icon(icon, size: 18, color: Colors.white),
-            const SizedBox(width: 10),
+            const SizedBox(width: AppSpacing.sm),
             Expanded(child: Text(message)),
           ],
         ),
@@ -159,11 +161,10 @@ void showMessage(BuildContext context, String? title, String message) {
   // ignore: use_build_context_synchronously
   Flushbar(
     flushbarPosition: FlushbarPosition.TOP,
-    borderRadius: BorderRadius.circular(14),
+    borderRadius: AppRadii.allMd,
     margin: const EdgeInsets.all(12),
-    backgroundColor: ThemesMode.isDarkMode
-        ? AppColors.darkSurfaceAlt
-        : AppColors.textDark,
+    backgroundColor:
+        ThemesMode.isDarkMode ? AppColors.darkSurfaceAlt : AppColors.textDark,
     icon: const Icon(Icons.info_outline_rounded, color: Colors.white),
     title: title?.isEmpty ?? true ? null : title,
     message: message,
@@ -176,14 +177,14 @@ void showMessage(BuildContext context, String? title, String message) {
 // Dialogs
 // ===========================================================================
 
-/// "Rate this app" sheet. 1â€“3 stars routes to feedback, 4â€“5 to the store.
+/// "Rate this app" sheet. 1–3 stars routes to feedback, 4–5 to the store.
 Future<void> onRatingPressed(BuildContext context) async {
   await showAppBottomSheet<void>(
     context: context,
     title: 'Rate the app',
     maxChildSize: 0.5,
     builder: (BuildContext sheetContext, _) => Padding(
-      padding: const EdgeInsets.fromLTRB(20, 18, 20, 10),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -209,7 +210,7 @@ Future<void> onRatingPressed(BuildContext context) async {
             'It really helps.',
             style: TextStyle(fontSize: 15, color: ThemesMode.onSurfaceMuted),
           ),
-          const SizedBox(height: 22),
+          const SizedBox(height: AppSpacing.xl),
           Row(
             children: List<Widget>.generate(5, (int i) {
               final int value = i + 1;
@@ -221,12 +222,11 @@ Future<void> onRatingPressed(BuildContext context) async {
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: AppRadii.allMd,
                       onTap: () {
                         Navigator.of(sheetContext).pop();
                         if (value <= 3) {
-                          Navigator.of(context)
-                              .pushNamed(feedbackPage);
+                          Navigator.of(context).pushNamed(feedbackPage);
                         } else {
                           openExternal(context, appLink);
                         }
@@ -236,7 +236,7 @@ Future<void> onRatingPressed(BuildContext context) async {
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                           color: color.withValues(alpha: 0.14),
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: AppRadii.allMd,
                         ),
                         child: Text(
                           '$value',
@@ -268,7 +268,7 @@ Future<bool> onBackPressed(BuildContext context) async {
       title: Row(
         children: <Widget>[
           const Icon(Icons.logout_rounded, color: AppColors.danger),
-          const SizedBox(width: 10),
+          const SizedBox(width: AppSpacing.sm),
           Text(
             'Exit app?',
             style: TextStyle(
@@ -306,7 +306,7 @@ Future<void> themeChoiceDialogue(BuildContext context) async {
     title: 'Choose theme',
     maxChildSize: 0.55,
     builder: (BuildContext sheetContext, _) => Padding(
-      padding: const EdgeInsets.fromLTRB(20, 18, 20, 10),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: const <Widget>[
@@ -355,7 +355,7 @@ class _ThemeOption extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: AppRadii.allLg,
           onTap: () async {
             final ThemeNotifier notifier =
                 Provider.of<ThemeNotifier>(context, listen: false);
@@ -374,20 +374,21 @@ class _ThemeOption extends StatelessWidget {
             if (context.mounted) Navigator.of(context).pop();
           },
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: AppRadii.allLg,
             ),
             child: Row(
               children: <Widget>[
                 Container(
                   width: 38,
                   height: 38,
-                  decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                  decoration:
+                      BoxDecoration(color: color, shape: BoxShape.circle),
                   child: Icon(icon, size: 20, color: Colors.white),
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: AppSpacing.md),
                 Text(
                   label,
                   style: TextStyle(

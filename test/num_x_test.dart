@@ -1,4 +1,4 @@
-﻿// Tests for `NumX` â€” the guard layer that stops `Infinity` / `NaN` from
+// Tests for `NumX` —” the guard layer that stops `Infinity` / `NaN` from
 // reaching the UI, and the thousands-separator formatter.
 
 import 'package:flutter_test/flutter_test.dart';
@@ -57,7 +57,7 @@ void main() {
     test('renders non-finite values as the fallback', () {
       expect(NumX.format(double.infinity), '0.00');
       expect(NumX.format(double.nan), '0.00');
-      expect(NumX.format(double.infinity, fallback: 'â€”'), 'â€”');
+      expect(NumX.format(double.infinity, fallback: '—”'), '—”');
     });
 
     test('handles null', () {

@@ -1,12 +1,13 @@
-﻿import 'package:flutter/material.dart';
-import '../../services/google_ad_service.dart';
+import 'package:flutter/material.dart';
 
-import '../../components/app_surface.dart';
 import '../../components/calculator_scaffold.dart';
 import '../../services/history_service.dart';
-import '../../utils/app_color.dart';
 import '../../utils/constant.dart';
 import '../../utils/extensions.dart';
+import '../../utils/app_color.dart';
+import '../../components/app_surface.dart';
+import '../../utils/themes_mode.dart';
+
 /// The four number bases the app supports.
 enum NumberBase {
   decimal('Decimal', 'DEC', 10, Icons.pin_rounded),
@@ -22,13 +23,14 @@ enum NumberBase {
   final IconData icon;
 
   /// Parses [input] in this base. Returns `null` when [input] is not a valid
-  /// number for this radix â€” e.g. `8` is not valid binary, `G` is not valid
+  /// number for this radix —” e.g. `8` is not valid binary, `G` is not valid
   /// hex.
   BigInt? parse(String input) {
     final String cleaned = input.trim().toUpperCase().replaceAll(' ', '');
     if (cleaned.isEmpty) return null;
     // Only allow the digits valid for this radix, plus a leading sign.
-    final int signOffset = (cleaned.startsWith('-') || cleaned.startsWith('+')) ? 1 : 0;
+    final int signOffset =
+        (cleaned.startsWith('-') || cleaned.startsWith('+')) ? 1 : 0;
     for (int i = signOffset; i < cleaned.length; i++) {
       final int digit = cleaned.codeUnitAt(i) - 0x30;
       final int alphaDigit = cleaned.codeUnitAt(i) - 0x41 + 10;
@@ -36,9 +38,7 @@ enum NumberBase {
       if (value < 0 || value >= radix) return null;
     }
     return BigInt.tryParse(
-      cleaned[0] == '-' || cleaned[0] == '+'
-          ? cleaned.substring(1)
-          : cleaned,
+      cleaned[0] == '-' || cleaned[0] == '+' ? cleaned.substring(1) : cleaned,
       radix: radix,
     );
   }
@@ -124,6 +124,9 @@ class _NumberBaseConverterPageState extends State<NumberBaseConverterPage> {
 
   String? _lastSaved;
   Future<void> _maybeSave(String raw, BigInt value) async {
+    // Skip the seeded "0": the field starts as 0 and saving that produces a
+    // meaningless duplicate entry in the history list.
+    if (value == BigInt.zero) return;
     final String signature = '${_fromBase.name}|$raw';
     if (_lastSaved == signature) return;
     _lastSaved = signature;
@@ -155,17 +158,14 @@ class _NumberBaseConverterPageState extends State<NumberBaseConverterPage> {
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: AppRadii.allMd,
                 onTap: () => Navigator.of(sheetContext).pop(base),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 14),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
-                    gradient: selected ? _palette.linear : null,
-                    color: selected
-                        ? null
-                        : Theme.of(context).colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(14),
+                    color: selected ? _palette.accent : ThemesMode.subtleFill,
+                    borderRadius: AppRadii.allMd,
                   ),
                   child: Row(
                     children: <Widget>[
@@ -174,7 +174,7 @@ class _NumberBaseConverterPageState extends State<NumberBaseConverterPage> {
                           color: selected
                               ? Colors.white
                               : Theme.of(context).hintColor),
-                      const SizedBox(width: 14),
+                      const SizedBox(width: AppSpacing.md),
                       Text(
                         base.label,
                         style: TextStyle(
@@ -229,9 +229,7 @@ class _NumberBaseConverterPageState extends State<NumberBaseConverterPage> {
     });
   }
 
-  Future<void> _reset() async {
-    await showInterstitialAd();
-    if (!mounted) return;
+  void _reset() {
     resetPage(context, const NumberBaseConverterPage());
   }
 
@@ -245,48 +243,44 @@ class _NumberBaseConverterPageState extends State<NumberBaseConverterPage> {
       icon: Icons.tag_rounded,
       actions: <Widget>[CalculatorResetButton(onPressed: _reset)],
       children: <Widget>[
-        AppCard(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              _BaseField(
-                title: 'From',
-                base: _fromBase,
-                controller: _inputController,
-                palette: _palette,
-                onTapBase: () => _pickBase(isFrom: true),
-              ),
-              Center(
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(20),
-                    onTap: _swapBases,
-                    child: Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        gradient: _palette.linear,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.swap_vert_rounded,
-                          color: Colors.white, size: 22),
+        AppInputCard(
+          children: <Widget>[
+            _BaseField(
+              title: 'From',
+              base: _fromBase,
+              controller: _inputController,
+              palette: _palette,
+              onTapBase: () => _pickBase(isFrom: true),
+            ),
+            Center(
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: AppRadii.allLg,
+                  onTap: _swapBases,
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: _palette.accent,
+                      shape: BoxShape.circle,
                     ),
+                    child: const Icon(Icons.swap_vert_rounded,
+                        color: Colors.white, size: 22),
                   ),
                 ),
               ),
-              _BaseField(
-                title: 'To',
-                base: _toBase,
-                // Read-only: pass the formatted string rather than a controller
-                // so we don't allocate (and leak) one on every build.
-                text: value == null ? '' : _toBase.format(value),
-                palette: _palette,
-                onTapBase: () => _pickBase(isFrom: false),
-              ),
-            ],
-          ),
+            ),
+            _BaseField(
+              title: 'To',
+              base: _toBase,
+              // Read-only: pass the formatted string rather than a controller
+              // so we don't allocate (and leak) one on every build.
+              text: value == null ? '' : _toBase.format(value),
+              palette: _palette,
+              onTapBase: () => _pickBase(isFrom: false),
+            ),
+          ],
         ),
         const SizedBox(height: 8),
         if (_error != null)
@@ -310,7 +304,7 @@ class _NumberBaseConverterPageState extends State<NumberBaseConverterPage> {
           ...NumberBase.values
               .where((NumberBase b) => b != _toBase)
               .map((NumberBase base) => Padding(
-                    padding: const EdgeInsets.only(bottom: 7),
+                    padding: const EdgeInsets.only(bottom: 6),
                     child: _ResultRow(
                       base: base,
                       text: base.format(value),
@@ -319,7 +313,7 @@ class _NumberBaseConverterPageState extends State<NumberBaseConverterPage> {
                   )),
         const SizedBox(height: 4),
         Padding(
-          padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+          padding: const EdgeInsets.fromLTRB(4, 2, 4, 8),
           child: Text(
             'Type a number in the "from" base. Invalid digits are rejected, '
             'so 8 in binary or G in hexadecimal will not be accepted.',
@@ -375,14 +369,14 @@ class _BaseField extends StatelessWidget {
               Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: AppRadii.allMd,
                   onTap: onTapBase,
                   child: Container(
                     height: 48,
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     decoration: BoxDecoration(
-                      gradient: palette.linear,
-                      borderRadius: BorderRadius.circular(14),
+                      color: palette.accent,
+                      borderRadius: AppRadii.allMd,
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -404,14 +398,14 @@ class _BaseField extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Container(
                   height: 48,
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(14),
+                    color: ThemesMode.subtleFill,
+                    borderRadius: AppRadii.allMd,
                   ),
                   alignment: Alignment.centerLeft,
                   // A plain Text for the read-only side: no cursor, no
@@ -471,10 +465,10 @@ class _ResultRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(16),
+        color: ThemesMode.surface,
+        borderRadius: AppRadii.allLg,
       ),
       child: Row(
         children: <Widget>[
@@ -483,8 +477,8 @@ class _ResultRow extends StatelessWidget {
             height: 34,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              gradient: palette.linear,
-              borderRadius: BorderRadius.circular(10),
+              color: palette.accent,
+              borderRadius: AppRadii.allSm,
             ),
             child: Text(
               base.shortLabel,

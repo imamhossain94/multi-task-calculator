@@ -29,8 +29,6 @@ dependencies:
   another_flushbar: ^2.2.4
 
   # Ads
-  google_mobile_ads: ^9.1.0
-
   # Calculation engines
   function_tree: ^0.9.1
   units_converter: ^3.3.2

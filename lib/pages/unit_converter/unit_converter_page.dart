@@ -1,11 +1,11 @@
-﻿import 'package:flutter/material.dart';
-import '../../services/google_ad_service.dart';
+import 'package:flutter/material.dart';
 
-import '../../components/app_surface.dart';
 import '../../components/calculator_scaffold.dart';
-import '../../utils/app_color.dart';
 import '../../utils/constant.dart';
 import 'models/unit_category.dart';
+import '../../utils/themes_mode.dart';
+import '../../components/app_surface.dart';
+import '../../utils/app_color.dart';
 
 /// Category picker for the unit converter.
 class UnitConverterPage extends StatelessWidget {
@@ -21,14 +21,14 @@ class UnitConverterPage extends StatelessWidget {
       icon: Icons.swap_horiz_rounded,
       children: <Widget>[
         Padding(
-          padding: const EdgeInsets.fromLTRB(4, 4, 4, 10),
+          padding: const EdgeInsets.only(bottom: AppSpacing.md),
           child: Text(
             'Pick a category to convert between its units.',
             style: Theme.of(context).textTheme.bodySmall,
           ),
         ),
         _CategoryGrid(categories: unitCategories, palette: _palette),
-        const SizedBox(height: 14),
+        const SizedBox(height: AppSpacing.md),
         AppButton(
           label: 'Number Base Converter',
           icon: Icons.tag_rounded,
@@ -57,9 +57,9 @@ class _CategoryGrid extends StatelessWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           crossAxisCount: columns,
-          mainAxisSpacing: 10,
-          crossAxisSpacing: 10,
-          childAspectRatio: 1.05,
+          mainAxisSpacing: AppSpacing.sm,
+          crossAxisSpacing: AppSpacing.sm,
+          childAspectRatio: 0.98,
           children: categories.map((UnitCategory category) {
             return _CategoryTile(
               category: category,
@@ -73,7 +73,6 @@ class _CategoryGrid extends StatelessWidget {
   }
 
   Future<void> _open(BuildContext context, UnitCategory category) async {
-    await showInterstitialAd();
     if (!context.mounted) return;
     await Navigator.of(context).pushNamed(
       unitConverterChildPage,
@@ -138,50 +137,62 @@ class _CategoryTile extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: AppRadii.allLg,
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(AppSpacing.sm),
           decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(18),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            color: ThemesMode.surface,
+            borderRadius: AppRadii.allLg,
+            border: appBorder(),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Container(
-                width: 42,
-                height: 42,
+                width: 36,
+                height: 36,
+                alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  gradient: palette.linear,
-                  shape: BoxShape.circle,
+                  color: palette.accent,
+                  borderRadius: AppRadii.allMd,
                 ),
-                child: Icon(iconFor(category.iconKey),
-                    color: Colors.white, size: 21),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                category.label,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w800,
-                  height: 1.2,
+                child: Icon(
+                  iconFor(category.iconKey),
+                  color: Colors.white,
+                  size: 19,
                 ),
               ),
-              const SizedBox(height: 2),
-              Text(
-                '${category.units.length} units',
-                style: const TextStyle(fontSize: 10.5),
+              const SizedBox(height: AppSpacing.sm),
+              Flexible(
+                child: FittedBox(
+                  // Long category names shrink rather than overflow the cell.
+                  fit: BoxFit.scaleDown,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text(
+                        category.label,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          height: 1.25,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.xxs),
+                      Text(
+                        '${category.units.length} units',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: ThemesMode.onSurfaceMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),

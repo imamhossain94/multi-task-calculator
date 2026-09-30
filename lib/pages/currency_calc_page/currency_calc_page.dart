@@ -1,15 +1,15 @@
-﻿import 'package:flutter/material.dart';
-import '../../services/google_ad_service.dart';
+import 'package:flutter/material.dart';
 
-import '../../components/app_surface.dart';
 import '../../components/calculator_scaffold.dart';
 import '../../services/currency_api.dart';
-import '../../utils/app_color.dart';
 import '../../utils/constant.dart';
 import '../../utils/extensions.dart';
 import '../../utils/num_x.dart';
 import 'model/exchange_rate_api.dart';
 import 'model/exchange_rate_api_response.dart';
+import '../../utils/app_color.dart';
+import '../../components/app_surface.dart';
+import '../../utils/themes_mode.dart';
 
 class CurrencyCalcPage extends StatefulWidget {
   const CurrencyCalcPage({super.key});
@@ -19,7 +19,8 @@ class CurrencyCalcPage extends StatefulWidget {
 }
 
 class _CurrencyCalcPageState extends State<CurrencyCalcPage> {
-  final TextEditingController _fromController = TextEditingController(text: '1');
+  final TextEditingController _fromController =
+      TextEditingController(text: '1');
   final TextEditingController _toController = TextEditingController(text: '1');
   final TextEditingController _searchController = TextEditingController();
 
@@ -91,7 +92,7 @@ class _CurrencyCalcPageState extends State<CurrencyCalcPage> {
     _syncTarget();
   }
 
-  /// Recomputes every row from the cached rate table â€” no refetch needed.
+  /// Recomputes every row from the cached rate table —” no refetch needed.
   void _onAmountChanged() {
     setState(() => _rates = _buildRates(_searchController.text));
     _syncTarget();
@@ -146,24 +147,24 @@ class _CurrencyCalcPageState extends State<CurrencyCalcPage> {
           itemBuilder: (BuildContext _, int index) {
             final String code = codes[index].key;
             final String name = codes[index].value;
-            final bool selected =
-                isFrom ? code == _fromCode : code == _toCode;
+            final bool selected = isFrom ? code == _fromCode : code == _toCode;
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 3),
+              padding: const EdgeInsets.symmetric(vertical: 2),
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: AppRadii.allMd,
                   onTap: () => Navigator.of(sheetContext).pop(code),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 12),
+                        horizontal: 12, vertical: 12),
                     decoration: BoxDecoration(
-                      gradient: selected ? _palette.linear : null,
                       color: selected
-                          ? null
-                          : Theme.of(context).colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(12),
+                          ? _palette.accent
+                          : Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest,
+                      borderRadius: AppRadii.allMd,
                     ),
                     child: Row(
                       children: <Widget>[
@@ -174,7 +175,10 @@ class _CurrencyCalcPageState extends State<CurrencyCalcPage> {
                             fontSize: 15,
                             color: selected
                                 ? Colors.white
-                                : Theme.of(context).textTheme.titleMedium?.color,
+                                : Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.color,
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -241,55 +245,48 @@ class _CurrencyCalcPageState extends State<CurrencyCalcPage> {
         CalculatorResetButton(onPressed: _reload),
       ],
       children: <Widget>[
-        AppCard(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              _CurrencyField(
-                title: 'From',
-                code: _fromCode,
-                controller: _fromController,
-                editable: true,
-                palette: _palette,
-                onTapCode: () => _pickCurrency(isFrom: true),
-              ),
-              Center(
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(20),
-                    onTap: _swap,
-                    child: Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        gradient: _palette.linear,
-                        shape: BoxShape.circle,
-                        boxShadow: <BoxShadow>[
-                          BoxShadow(
-                            color: _palette.accent.withValues(alpha: 0.4),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
+        AppInputCard(
+          children: <Widget>[
+            _CurrencyField(
+              title: 'From',
+              code: _fromCode,
+              controller: _fromController,
+              editable: true,
+              palette: _palette,
+              onTapCode: () => _pickCurrency(isFrom: true),
+            ),
+            Center(
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: AppRadii.allLg,
+                  onTap: _swap,
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: _palette.accent,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: _palette.accent,
+                        width: AppBorders.hairline,
                       ),
-                      child: const Icon(Icons.swap_vert_rounded,
-                          color: Colors.white, size: 22),
                     ),
+                    child: const Icon(Icons.swap_vert_rounded,
+                        color: Colors.white, size: 22),
                   ),
                 ),
               ),
-              _CurrencyField(
-                title: 'To',
-                code: _toCode,
-                controller: _toController,
-                editable: false,
-                palette: _palette,
-                onTapCode: () => _pickCurrency(isFrom: false),
-              ),
-            ],
-          ),
+            ),
+            _CurrencyField(
+              title: 'To',
+              code: _toCode,
+              controller: _toController,
+              editable: false,
+              palette: _palette,
+              onTapCode: () => _pickCurrency(isFrom: false),
+            ),
+          ],
         ),
         const SizedBox(height: 8),
         _SearchField(
@@ -312,7 +309,6 @@ class _CurrencyCalcPageState extends State<CurrencyCalcPage> {
   }
 
   Future<void> _reload() async {
-    await showInterstitialAd();
     if (!mounted) return;
     await _load();
   }
@@ -355,13 +351,13 @@ class _CurrencyField extends StatelessWidget {
           Row(
             children: <Widget>[
               _CodeChip(code: code, palette: palette, onTap: onTapCode),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Container(
                   height: 48,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(14),
+                    color: ThemesMode.subtleFill,
+                    borderRadius: AppRadii.allMd,
                   ),
                   child: TextField(
                     controller: controller,
@@ -375,7 +371,7 @@ class _CurrencyField extends StatelessWidget {
                       border: InputBorder.none,
                       enabledBorder: InputBorder.none,
                       disabledBorder: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 14),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12),
                       hintText: '0.00',
                     ),
                     keyboardType: const TextInputType.numberWithOptions(
@@ -409,14 +405,14 @@ class _CodeChip extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: AppRadii.allMd,
         onTap: onTap,
         child: Container(
           height: 48,
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            gradient: palette.linear,
-            borderRadius: BorderRadius.circular(14),
+            color: palette.accent,
+            borderRadius: AppRadii.allMd,
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -460,8 +456,8 @@ class _SearchField extends StatelessWidget {
         style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
         decoration: InputDecoration(
           hintText: 'Search currency code or name',
-          prefixIcon: Icon(Icons.search_rounded,
-              color: palette.accent, size: 21),
+          prefixIcon:
+              Icon(Icons.search_rounded, color: palette.accent, size: 21),
           suffixIcon: ValueListenableBuilder<TextEditingValue>(
             valueListenable: controller,
             builder: (BuildContext _, TextEditingValue value, Widget? child) =>
@@ -472,7 +468,7 @@ class _SearchField extends StatelessWidget {
                         onPressed: onClear,
                       ),
           ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 14),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12),
         ),
       ),
     );
@@ -502,7 +498,7 @@ class _RateList extends StatelessWidget {
   Widget build(BuildContext context) {
     if (isLoading) {
       return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 48),
+        padding: EdgeInsets.symmetric(vertical: 32),
         child: Center(child: CircularProgressIndicator()),
       );
     }
@@ -512,14 +508,15 @@ class _RateList extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            const Icon(Icons.cloud_off_rounded, size: 40, color: AppColors.danger),
-            const SizedBox(height: 10),
+            const Icon(Icons.cloud_off_rounded,
+                size: 40, color: AppColors.danger),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               error!,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: AppSpacing.md),
             AppButton(
               label: 'Retry',
               icon: Icons.refresh_rounded,
@@ -564,14 +561,14 @@ class _RateList extends StatelessWidget {
         ...rates.map((CurrencyRates rate) {
           final bool selected = rate.code == selectedCode;
           return Padding(
-            padding: const EdgeInsets.only(bottom: 7),
+            padding: const EdgeInsets.only(bottom: 6),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
               decoration: BoxDecoration(
                 color: selected
                     ? palette.accent.withValues(alpha: 0.16)
-                    : Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(16),
+                    : ThemesMode.surface,
+                borderRadius: AppRadii.allLg,
               ),
               child: Row(
                 children: <Widget>[
@@ -580,8 +577,8 @@ class _RateList extends StatelessWidget {
                     height: 38,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      gradient: palette.linear,
-                      borderRadius: BorderRadius.circular(11),
+                      color: palette.accent,
+                      borderRadius: AppRadii.allSm,
                     ),
                     child: Text(
                       rate.code ?? '',
@@ -599,7 +596,8 @@ class _RateList extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 13,
-                        fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
+                        fontWeight:
+                            selected ? FontWeight.w800 : FontWeight.w500,
                         color: selected
                             ? palette.accent
                             : Theme.of(context).hintColor,
@@ -608,7 +606,8 @@ class _RateList extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    NumX.format(double.tryParse(rate.rates ?? '0'), decimals: 2),
+                    NumX.format(double.tryParse(rate.rates ?? '0'),
+                        decimals: 2),
                     style: const TextStyle(
                       fontWeight: FontWeight.w900,
                       fontSize: 16,

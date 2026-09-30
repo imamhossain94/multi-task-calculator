@@ -1,16 +1,17 @@
-﻿import 'package:flutter/material.dart';
-import '../../services/google_ad_service.dart';
+import 'package:flutter/material.dart';
 
-import '../../components/app_surface.dart';
 import '../../components/build_result_card.dart';
 import '../../components/build_text_field.dart';
 import '../../components/calculator_scaffold.dart';
 import '../../services/history_service.dart';
-import '../../utils/app_color.dart';
 import '../../utils/calculator_math.dart';
 import '../../utils/constant.dart';
 import '../../utils/extensions.dart';
 import '../../utils/num_x.dart';
+import '../../utils/app_color.dart';
+import '../../components/app_surface.dart';
+import '../../utils/themes_mode.dart';
+
 class HealthCalcPage extends StatefulWidget {
   const HealthCalcPage({super.key});
 
@@ -116,9 +117,7 @@ class _HealthCalcPageState extends State<HealthCalcPage> {
     _recalculate();
   }
 
-  Future<void> _reset() async {
-    await showInterstitialAd();
-    if (!mounted) return;
+  void _reset() {
     resetPage(context, const HealthCalcPage());
   }
 
@@ -130,78 +129,15 @@ class _HealthCalcPageState extends State<HealthCalcPage> {
       icon: Icons.favorite_rounded,
       actions: <Widget>[CalculatorResetButton(onPressed: _reset)],
       children: <Widget>[
-        AppCard(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.fromLTRB(2, 0, 2, 8),
-                child: Text(
-                  'Gender',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.2,
-                    color: Theme.of(context).textTheme.titleMedium?.color,
-                  ),
-                ),
-              ),
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: _GenderButton(
-                      label: 'Male',
-                      icon: Icons.male_rounded,
-                      color: const Color(0xFF3B82F6),
-                      selected: _isMale,
-                      onTap: () => _onGenderChanged(true),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _GenderButton(
-                      label: 'Female',
-                      icon: Icons.female_rounded,
-                      color: const Color(0xFFEC4899),
-                      selected: !_isMale,
-                      onTap: () => _onGenderChanged(false),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              BuildTextField(
-                title: 'Height',
-                hint: '0.00',
-                isEnabled: true,
-                textController: _heightController,
-                palette: _palette,
-                onPressedAction: null,
-                widget: const Text('cm'),
-              ),
-              BuildTextField(
-                title: 'Weight',
-                hint: '0.00',
-                isEnabled: true,
-                textController: _weightController,
-                palette: _palette,
-                onPressedAction: null,
-                widget: const Text('kg'),
-              ),
-              BuildTextField(
-                title: 'Age',
-                hint: '0',
-                isEnabled: true,
-                textController: _ageController,
-                palette: _palette,
-                onPressedAction: null,
-                widget: const Text('yrs'),
-              ),
-            ],
-          ),
+        AppInputCard(
+          children: <Widget>[
+            _genderField(context),
+            _heightField(context),
+            _weightField(context),
+            _ageField(context),
+          ],
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: AppSpacing.md),
         Row(
           children: <Widget>[
             BuildResultCard(
@@ -219,8 +155,9 @@ class _HealthCalcPageState extends State<HealthCalcPage> {
             ),
           ],
         ),
-        if (_hasBmi)
-          AppGradientCard(
+        if (_hasBmi) ...<Widget>[
+          const SizedBox(height: AppSpacing.md),
+          AppAccentCard(
             palette: _palette,
             child: Row(
               children: <Widget>[
@@ -240,7 +177,7 @@ class _HealthCalcPageState extends State<HealthCalcPage> {
                         ),
                       ),
                       Text(
-                        'BMI = weight (kg) / heightÂ² (m). '
+                        'BMI = weight (kg) / height² (m). '
                         'Add your age to see BMR.',
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.9),
@@ -253,9 +190,10 @@ class _HealthCalcPageState extends State<HealthCalcPage> {
               ],
             ),
           ),
+        ],
         if (!_hasBmi)
           Padding(
-            padding: const EdgeInsets.fromLTRB(4, 6, 4, 8),
+            padding: const EdgeInsets.only(top: AppSpacing.sm),
             child: Text(
               'Enter your height and weight to see your BMI.',
               textAlign: TextAlign.center,
@@ -265,6 +203,79 @@ class _HealthCalcPageState extends State<HealthCalcPage> {
       ],
     );
   }
+
+  // ------------------------------------------------------------------ fields
+
+  Widget _genderField(BuildContext context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(left: 2, bottom: AppSpacing.xs + 2),
+            child: Text(
+              'GENDER',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.5,
+                color: ThemesMode.onSurfaceMuted,
+              ),
+            ),
+          ),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: _GenderButton(
+                  label: 'Male',
+                  icon: Icons.male_rounded,
+                  color: const Color(0xFF3B82F6),
+                  selected: _isMale,
+                  onTap: () => _onGenderChanged(true),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: _GenderButton(
+                  label: 'Female',
+                  icon: Icons.female_rounded,
+                  color: const Color(0xFFEC4899),
+                  selected: !_isMale,
+                  onTap: () => _onGenderChanged(false),
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
+
+  Widget _heightField(BuildContext context) => BuildTextField(
+        title: 'Height',
+        hint: '0.00',
+        isEnabled: true,
+        textController: _heightController,
+        palette: _palette,
+        onPressedAction: null,
+        widget: const Text('cm'),
+      );
+
+  Widget _weightField(BuildContext context) => BuildTextField(
+        title: 'Weight',
+        hint: '0.00',
+        isEnabled: true,
+        textController: _weightController,
+        palette: _palette,
+        onPressedAction: null,
+        widget: const Text('kg'),
+      );
+
+  Widget _ageField(BuildContext context) => BuildTextField(
+        title: 'Age',
+        hint: '0',
+        isEnabled: true,
+        textController: _ageController,
+        palette: _palette,
+        onPressedAction: null,
+        widget: const Text('yrs'),
+      );
 }
 
 class _GenderButton extends StatelessWidget {
@@ -287,24 +298,14 @@ class _GenderButton extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: AppRadii.allMd,
         onTap: onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 160),
           height: 46,
           decoration: BoxDecoration(
-            gradient: selected ? LinearGradient(colors: <Color>[color, color]) : null,
-            color: selected ? null : Theme.of(context).colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: selected
-                ? <BoxShadow>[
-                    BoxShadow(
-                      color: color.withValues(alpha: 0.35),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ]
-                : null,
+            color: selected ? color : ThemesMode.subtleFill,
+            borderRadius: AppRadii.allMd,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,

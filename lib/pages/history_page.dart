@@ -1,9 +1,10 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
-import '../components/app_surface.dart';
 import '../services/history_service.dart';
-import '../utils/app_color.dart';
 import '../utils/extensions.dart';
+import '../utils/app_color.dart';
+import '../components/app_surface.dart';
+
 /// Saved calculation history.
 ///
 /// The General Calculator's history button used to just show a "Coming soon"
@@ -72,13 +73,13 @@ class _HistoryPageState extends State<HistoryPage> {
       body: _records.isEmpty
           ? _EmptyState()
           : ListView.builder(
-              padding: const EdgeInsets.fromLTRB(14, 8, 14, 24),
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
               physics: const BouncingScrollPhysics(),
               itemCount: _records.length,
               itemBuilder: (BuildContext context, int index) {
                 final CalculationRecord record = _records[index];
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 9),
+                  padding: const EdgeInsets.only(bottom: 8),
                   child: _HistoryCard(
                     record: record,
                     onTap: () => _reopen(record),
@@ -104,7 +105,7 @@ class _EmptyState extends StatelessWidget {
               width: 92,
               height: 92,
               decoration: BoxDecoration(
-                gradient: AppPalettes.history.linear,
+                color: AppPalettes.history.accent,
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.history_rounded,
@@ -183,8 +184,6 @@ class _HistoryCard extends StatelessWidget {
     );
 
     return AppCard(
-      radius: 16,
-      elevation: 4,
       padding: const EdgeInsets.fromLTRB(12, 12, 6, 12),
       child: Row(
         children: <Widget>[
@@ -192,11 +191,10 @@ class _HistoryCard extends StatelessWidget {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              gradient: palette.linear,
-              borderRadius: BorderRadius.circular(13),
+              color: palette.accent,
+              borderRadius: AppRadii.allMd,
             ),
-            child: Icon(_iconFor(record.tool),
-                color: Colors.white, size: 20),
+            child: Icon(_iconFor(record.tool), color: Colors.white, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -213,7 +211,7 @@ class _HistoryCard extends StatelessWidget {
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-                  const SizedBox(height: 3),
+                  const SizedBox(height: AppSpacing.xxs),
                   Text(
                     record.summary,
                     style: TextStyle(
@@ -222,7 +220,7 @@ class _HistoryCard extends StatelessWidget {
                       color: Theme.of(context).textTheme.bodySmall?.color,
                     ),
                   ),
-                  const SizedBox(height: 5),
+                  const SizedBox(height: AppSpacing.xs),
                   Text(
                     _formatDate(record.createdAt),
                     style: TextStyle(

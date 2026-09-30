@@ -1,8 +1,8 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-import '../../../utils/app_color.dart';
 import '../../../utils/themes_mode.dart';
+import '../../../utils/app_color.dart';
+
 /// Read-only date field that opens a picker when tapped.
 ///
 /// The old page exposed a disabled `TextField` whose hint said
@@ -44,19 +44,18 @@ class BuildDatePickerField extends StatelessWidget {
           Material(
             color: Colors.transparent,
             child: InkWell(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: AppRadii.allMd,
               onTap: onTap,
               child: Container(
                 height: 50,
-                padding: const EdgeInsets.symmetric(horizontal: 14),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
                   color: ThemesMode.subtleFill,
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: AppRadii.allMd,
                 ),
                 child: Row(
                   children: <Widget>[
-                    Icon(Icons.event_rounded,
-                        size: 19, color: palette.accent),
+                    Icon(Icons.event_rounded, size: 19, color: palette.accent),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(

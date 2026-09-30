@@ -1,4 +1,3 @@
-
 // ===========================================================================
 // App identity
 // ===========================================================================
@@ -23,45 +22,15 @@ const String privacyPolicyLink =
     'https://play.google.com/store/apps/details?id=com.newagedevs.multicalc';
 
 const String appIconLight = 'assets/images/ic_launcher_light.png';
+
+/// The app's display typeface.
 const String fontAudioWide = 'Audiowide';
 
-// ===========================================================================
-// AdMob
-//
-// AdMob *app* and *unit* ids are public identifiers that ship inside every
-// published APK/AAB — they are not secrets. They are still overridable at
-// build time so a fork can switch to the official Google test ids without
-// touching the source:
-//
-//   flutter build apk --dart-define=ADMOB_APP_ID=... --dart-define=ADMOB_BANNER_ID=...
-// ===========================================================================
-const String _admobAppId = String.fromEnvironment(
-  'ADMOB_APP_ID',
-  defaultValue: 'ca-app-pub-4061500537427923~1513034907',
-);
-const String _admobBannerId = String.fromEnvironment(
-  'ADMOB_BANNER_ID',
-  defaultValue: 'ca-app-pub-4061500537427923/1659857645',
-);
-const String _admobInterstitialId = String.fromEnvironment(
-  'ADMOB_INTERSTITIAL_ID',
-  defaultValue: 'ca-app-pub-4061500537427923/7088795214',
-);
-
-const String idMobAppId = _admobAppId;
-const String idMobBanner = _admobBannerId;
-const String idMobInterstitial = _admobInterstitialId;
-
-// Google's official *test* ad ids, used automatically in debug builds.
-const String testAdApp = 'ca-app-pub-3940256099942544~3347511713';
-const String testAdBanner = 'ca-app-pub-3940256099942544/6300978111';
-const String testInterstitial = 'ca-app-pub-3940256099942544/1033173712';
-
-/// Number of taps between two interstitials.
-const int interstitialTapInterval = 5;
-
-/// Seconds of ad-free time granted by the reward flow.
-const int rewardTime = 300;
+/// Fallback for glyphs [fontAudioWide] does not contain - the calculator keys
+/// use U+221A, U+03C0, U+00B1, U+22EF, U+232B and superscripts, none of which
+/// are in that font. Roboto ships with the Flutter engine on Android; on other
+/// platforms the engine resolves it to the system face.
+const String fontSymbolFallback = 'Roboto';
 
 // ===========================================================================
 // Routes
@@ -102,10 +71,9 @@ const List<String> themes = <String>[systemDefault, light, dark];
 // ===========================================================================
 // Shared preferences keys
 // ===========================================================================
+// Shared preferences keys
+// ===========================================================================
 const String appVersionKey = 'app_version';
-const String appPurchasedStatusKey = 'app_purchase_status';
-const String adFreeTimeKey = 'ad_free_time';
-const String itemClickKey = 'itemClick';
 const String historyKey = 'calculation_history';
 const String lastUpdateCheckKey = 'last_update_check';
 
@@ -132,7 +100,7 @@ const String updateManifestUrl = String.fromEnvironment(
 
 /// Shown on the About screen. Keep the list short and specific.
 const List<String> appFeature = <String>[
-  'Works fully offline — no account, no sign-in, no data collection.',
+  'Works fully offline —” no account, no sign-in, no data collection.',
   'Saves every calculation so you can look it up later.',
   '16 purpose-built calculators and 17 unit-conversion categories.',
   'Light, dark and system themes with a custom font.',
@@ -141,90 +109,198 @@ const List<String> appFeature = <String>[
 const Map<String, String> appHelp = <String, String>{
   'What is a General Calculator?':
       'The general calculator evaluates full expressions with + − × ÷, powers, '
-      'percentages and brackets. Press the ⋯ key for scientific functions.',
+          'percentages and brackets. Press the ⋯ key for scientific functions.',
   'How is the BMI calculated?':
       'BMI = weight (kg) ÷ height² (m). Below 18.5 is underweight, 18.5–24.9 is '
-      'healthy, 25–29.9 is overweight and 30+ is obese. It is a rough screen, '
-      'not a diagnosis.',
+          'healthy, 25–29.9 is overweight and 30+ is obese. It is a rough screen, '
+          'not a diagnosis.',
   'What is BMR?':
       'Basal Metabolic Rate is the energy your body uses at rest, using the '
-      'Mifflin–St Jeor equation. Multiply it by your activity level to estimate '
-      'your daily calorie needs.',
+          'Mifflin–St Jeor equation. Multiply it by your activity level to estimate '
+          'your daily calorie needs.',
   'How is the Loan / Mortgage payment calculated?':
       'The monthly payment uses the standard amortisation formula '
-      'P × r(1+r)ⁿ / ((1+r)ⁿ − 1) where r is the monthly interest rate and n is '
-      'the number of months. Switch to "Maximum Loan" to work backwards from a '
-      'monthly budget instead.',
+          'P × r(1+r)ⁿ / ((1+r)ⁿ − 1) where r is the monthly interest rate and n is '
+          'the number of months. Switch to "Maximum Loan" to work backwards from a '
+          'monthly budget instead.',
   'How does the Savings calculator work?':
       'It compounds daily at your annual rate and adds your contribution on the '
-      'interval you pick (weekly, bi-weekly, monthly, quarterly, annually).',
+          'interval you pick (weekly, bi-weekly, monthly, quarterly, annually).',
   'How is the Tip split between people?':
       'Final amount = bill + tax + tip, split evenly across the number of '
-      'people. Tap the dollar or percent chip to switch the tip and tax inputs '
-      'between an amount and a percentage.',
+          'people. Tap the dollar or percent chip to switch the tip and tax inputs '
+          'between an amount and a percentage.',
   'Why is my Fuel Efficiency result 0?':
       'Fuel efficiency needs both a non-zero amount of fuel and a distance '
-      'greater than the starting odometer reading. Results are blanked until '
-      'both are provided.',
+          'greater than the starting odometer reading. Results are blanked until '
+          'both are provided.',
   'How does the Date calculator split the difference?':
       'It uses a calendar-aware breakdown, so 1 Mar → 1 Mar next year is exactly '
-      '1 year rather than 365 days. Tap the ⇄ chip to swap the two dates.',
+          '1 year rather than 365 days. Tap the ⇄ chip to swap the two dates.',
   'Where do the exchange rates come from?':
       'Live rates are fetched from exchangerate-api.com and refreshed on open. '
-      'Use the ⇄ chip to swap the two currencies instantly.',
+          'Use the ⇄ chip to swap the two currencies instantly.',
 };
 
 const Map<String, String> currencyCodeList = <String, String>{
-  'AED': 'UAEDirham', 'AFN': 'Afghani', 'ALL': 'Lek', 'AMD': 'ArmenianDram',
-  'ANG': 'NetherlandsAntilleanGuilder', 'AOA': 'Kwanza', 'ARS': 'ArgentinePeso',
-  'AUD': 'AustralianDollar', 'AWG': 'ArubanFlorin', 'AZN': 'AzerbaijanManat',
-  'BAM': 'ConvertibleMark', 'BBD': 'BarbadosDollar', 'BDT': 'Taka',
-  'BGN': 'BulgarianLev', 'BHD': 'BahrainiDinar', 'BIF': 'BurundiFranc',
-  'BMD': 'BermudianDollar', 'BND': 'BruneiDollar', 'BOB': 'Boliviano',
-  'BOP': 'BolivianoMvdol', 'BRL': 'BrazilianReal', 'BSD': 'BahamianDollar',
-  'BTN': 'Ngultrum', 'BWP': 'Pula', 'BYN': 'BelarusianRuble',
-  'BZD': 'BelizeDollar', 'CAD': 'CanadianDollar', 'CDF': 'CongoleseFranc',
-  'CHF': 'SwissFranc', 'CLP': 'ChileanPeso', 'CNY': 'YuanRenminbi',
-  'COP': 'ColombianPeso', 'CRC': 'CostaRicanColon', 'CUC': 'PesoConvertible',
-  'CUP': 'CubanPeso', 'CVE': 'CaboVerdeEscudo', 'CZK': 'CzechKoruna',
-  'DJF': 'DjiboutiFranc', 'DKK': 'DanishKrone', 'DOP': 'DominicanPeso',
-  'DZD': 'AlgeriaDinar', 'EGP': 'EgyptianPound', 'ERN': 'Nakfa',
-  'ETB': 'EthiopianBirr', 'EUR': 'Euro', 'FJD': 'FijiDollar',
-  'FKP': 'FalklandIslandsPound', 'GBP': 'PoundSterling', 'GEL': 'Lari',
-  'GGP': 'GuernseyPound', 'GHS': 'GhanaCedi', 'GIP': 'GibraltarPound',
-  'GMD': 'Dalasi', 'GNF': 'GuineanFranc', 'GTQ': 'Quetzal', 'GYD': 'GuyanaDollar',
-  'HKD': 'HongKongDollar', 'HNL': 'Lempira', 'HRK': 'Kuna', 'HTG': 'Gourde',
-  'HUF': 'Forint', 'IDR': 'Rupiah', 'ILS': 'NewIsraeliSheqel',
-  'INR': 'IndianRupee', 'IQD': 'IraqiDinar', 'IRR': 'IranianRial',
-  'ISK': 'IcelandKrona', 'JEP': 'JerseyPound', 'JMD': 'JamaicanDollar',
-  'JOD': 'JordanianDinar', 'JPY': 'Yen', 'KES': 'KenyanShilling',
-  'KGS': 'Som', 'KHR': 'Riel', 'KMF': 'ComorianFranc', 'KPW': 'NorthKoreanWon',
-  'KRW': 'Won', 'KWD': 'KuwaitiDinar', 'KYD': 'CaymanIslandsDollar',
-  'KZT': 'Tenge', 'LAK': 'LaoKip', 'LBP': 'LebanesePound', 'LKR': 'SriLankaRupee',
-  'LRD': 'LiberianDollar', 'LSL': 'Loti', 'LYD': 'LibyanDinar',
-  'MAD': 'MoroccanDirham', 'MDL': 'MoldovanLeu', 'MGA': 'MalagasyAriary',
-  'MKD': 'Denar', 'MMK': 'Kyat', 'MNT': 'Tugrik', 'MOP': 'Pataca',
-  'MRU': 'Ouguiya', 'MUR': 'MauritiusRupee', 'MVR': 'Rufiyaa',
-  'MWK': 'MalawiKwacha', 'MXN': 'MexicanPeso', 'MYR': 'MalaysianRinggit',
-  'MZN': 'MozambiqueMetical', 'NAD': 'NamibiaDollar', 'NGN': 'Naira',
-  'NIO': 'CordobaOro', 'NOK': 'NorwegianKrone', 'NPR': 'NepaleseRupee',
-  'NZD': 'NewZealandDollar', 'OMR': 'RialOmani', 'PAB': 'PanamanianBalboa',
-  'PEN': 'Sol', 'PGK': 'Kina', 'PHP': 'PhilippinePeso', 'PKR': 'PakistanRupee',
-  'PLN': 'Zloty', 'PYG': 'Guarani', 'QAR': 'QatariRial', 'RON': 'RomanianLeu',
-  'RSD': 'SerbianDinar', 'RUB': 'RussianRuble', 'RWF': 'RwandaFranc',
-  'SAR': 'SaudiRiyal', 'SBD': 'SolomonIslandsDollar', 'SCR': 'SeychelloisRupee',
-  'SDG': 'SudanesePound', 'SEK': 'SwedishKrona', 'SGD': 'SingaporeDollar',
-  'SHP': 'SaintHelenaPound', 'SLL': 'Leone', 'SOS': 'SomaliShilling',
-  'SRD': 'SurinamDollar', 'SSP': 'SouthSudanesePound', 'STN': 'Dobra',
-  'SVC': 'SalvadorColon', 'SYP': 'SyrianPound', 'SZL': 'Lilangeni',
-  'THB': 'Baht', 'TJS': 'Somoni', 'TMT': 'TurkmenistanManat', 'TND': 'TunisianDinar',
-  'TOP': 'Paanga', 'TRY': 'TurkishLira', 'TTD': 'TrinidadAndTobagoDollar',
-  'TWD': 'NewTaiwanDollar', 'TZS': 'TanzanianShilling', 'UAH': 'Hryvnia',
-  'UGX': 'UgandaShilling', 'USD': 'UnitedStatesDollar', 'UYU': 'PesoUruguayo',
-  'UZS': 'UzbekistanSum', 'VES': 'BolivarSoberano', 'VND': 'Dong',
-  'VUV': 'Vatu', 'WST': 'Tala', 'XAF': 'CFAFrancBEAC', 'XCD': 'EastCaribbeanDollar',
-  'XOF': 'CFAFrancBCEAO', 'XPF': 'CFPFranc', 'YER': 'YemeniRial',
-  'ZAR': 'Rand', 'ZMW': 'ZambianKwacha', 'ZWL': 'ZimbabweDollar',
+  'AED': 'UAEDirham',
+  'AFN': 'Afghani',
+  'ALL': 'Lek',
+  'AMD': 'ArmenianDram',
+  'ANG': 'NetherlandsAntilleanGuilder',
+  'AOA': 'Kwanza',
+  'ARS': 'ArgentinePeso',
+  'AUD': 'AustralianDollar',
+  'AWG': 'ArubanFlorin',
+  'AZN': 'AzerbaijanManat',
+  'BAM': 'ConvertibleMark',
+  'BBD': 'BarbadosDollar',
+  'BDT': 'Taka',
+  'BGN': 'BulgarianLev',
+  'BHD': 'BahrainiDinar',
+  'BIF': 'BurundiFranc',
+  'BMD': 'BermudianDollar',
+  'BND': 'BruneiDollar',
+  'BOB': 'Boliviano',
+  'BOP': 'BolivianoMvdol',
+  'BRL': 'BrazilianReal',
+  'BSD': 'BahamianDollar',
+  'BTN': 'Ngultrum',
+  'BWP': 'Pula',
+  'BYN': 'BelarusianRuble',
+  'BZD': 'BelizeDollar',
+  'CAD': 'CanadianDollar',
+  'CDF': 'CongoleseFranc',
+  'CHF': 'SwissFranc',
+  'CLP': 'ChileanPeso',
+  'CNY': 'YuanRenminbi',
+  'COP': 'ColombianPeso',
+  'CRC': 'CostaRicanColon',
+  'CUC': 'PesoConvertible',
+  'CUP': 'CubanPeso',
+  'CVE': 'CaboVerdeEscudo',
+  'CZK': 'CzechKoruna',
+  'DJF': 'DjiboutiFranc',
+  'DKK': 'DanishKrone',
+  'DOP': 'DominicanPeso',
+  'DZD': 'AlgeriaDinar',
+  'EGP': 'EgyptianPound',
+  'ERN': 'Nakfa',
+  'ETB': 'EthiopianBirr',
+  'EUR': 'Euro',
+  'FJD': 'FijiDollar',
+  'FKP': 'FalklandIslandsPound',
+  'GBP': 'PoundSterling',
+  'GEL': 'Lari',
+  'GGP': 'GuernseyPound',
+  'GHS': 'GhanaCedi',
+  'GIP': 'GibraltarPound',
+  'GMD': 'Dalasi',
+  'GNF': 'GuineanFranc',
+  'GTQ': 'Quetzal',
+  'GYD': 'GuyanaDollar',
+  'HKD': 'HongKongDollar',
+  'HNL': 'Lempira',
+  'HRK': 'Kuna',
+  'HTG': 'Gourde',
+  'HUF': 'Forint',
+  'IDR': 'Rupiah',
+  'ILS': 'NewIsraeliSheqel',
+  'INR': 'IndianRupee',
+  'IQD': 'IraqiDinar',
+  'IRR': 'IranianRial',
+  'ISK': 'IcelandKrona',
+  'JEP': 'JerseyPound',
+  'JMD': 'JamaicanDollar',
+  'JOD': 'JordanianDinar',
+  'JPY': 'Yen',
+  'KES': 'KenyanShilling',
+  'KGS': 'Som',
+  'KHR': 'Riel',
+  'KMF': 'ComorianFranc',
+  'KPW': 'NorthKoreanWon',
+  'KRW': 'Won',
+  'KWD': 'KuwaitiDinar',
+  'KYD': 'CaymanIslandsDollar',
+  'KZT': 'Tenge',
+  'LAK': 'LaoKip',
+  'LBP': 'LebanesePound',
+  'LKR': 'SriLankaRupee',
+  'LRD': 'LiberianDollar',
+  'LSL': 'Loti',
+  'LYD': 'LibyanDinar',
+  'MAD': 'MoroccanDirham',
+  'MDL': 'MoldovanLeu',
+  'MGA': 'MalagasyAriary',
+  'MKD': 'Denar',
+  'MMK': 'Kyat',
+  'MNT': 'Tugrik',
+  'MOP': 'Pataca',
+  'MRU': 'Ouguiya',
+  'MUR': 'MauritiusRupee',
+  'MVR': 'Rufiyaa',
+  'MWK': 'MalawiKwacha',
+  'MXN': 'MexicanPeso',
+  'MYR': 'MalaysianRinggit',
+  'MZN': 'MozambiqueMetical',
+  'NAD': 'NamibiaDollar',
+  'NGN': 'Naira',
+  'NIO': 'CordobaOro',
+  'NOK': 'NorwegianKrone',
+  'NPR': 'NepaleseRupee',
+  'NZD': 'NewZealandDollar',
+  'OMR': 'RialOmani',
+  'PAB': 'PanamanianBalboa',
+  'PEN': 'Sol',
+  'PGK': 'Kina',
+  'PHP': 'PhilippinePeso',
+  'PKR': 'PakistanRupee',
+  'PLN': 'Zloty',
+  'PYG': 'Guarani',
+  'QAR': 'QatariRial',
+  'RON': 'RomanianLeu',
+  'RSD': 'SerbianDinar',
+  'RUB': 'RussianRuble',
+  'RWF': 'RwandaFranc',
+  'SAR': 'SaudiRiyal',
+  'SBD': 'SolomonIslandsDollar',
+  'SCR': 'SeychelloisRupee',
+  'SDG': 'SudanesePound',
+  'SEK': 'SwedishKrona',
+  'SGD': 'SingaporeDollar',
+  'SHP': 'SaintHelenaPound',
+  'SLL': 'Leone',
+  'SOS': 'SomaliShilling',
+  'SRD': 'SurinamDollar',
+  'SSP': 'SouthSudanesePound',
+  'STN': 'Dobra',
+  'SVC': 'SalvadorColon',
+  'SYP': 'SyrianPound',
+  'SZL': 'Lilangeni',
+  'THB': 'Baht',
+  'TJS': 'Somoni',
+  'TMT': 'TurkmenistanManat',
+  'TND': 'TunisianDinar',
+  'TOP': 'Paanga',
+  'TRY': 'TurkishLira',
+  'TTD': 'TrinidadAndTobagoDollar',
+  'TWD': 'NewTaiwanDollar',
+  'TZS': 'TanzanianShilling',
+  'UAH': 'Hryvnia',
+  'UGX': 'UgandaShilling',
+  'USD': 'UnitedStatesDollar',
+  'UYU': 'PesoUruguayo',
+  'UZS': 'UzbekistanSum',
+  'VES': 'BolivarSoberano',
+  'VND': 'Dong',
+  'VUV': 'Vatu',
+  'WST': 'Tala',
+  'XAF': 'CFAFrancBEAC',
+  'XCD': 'EastCaribbeanDollar',
+  'XOF': 'CFAFrancBCEAO',
+  'XPF': 'CFPFranc',
+  'YER': 'YemeniRial',
+  'ZAR': 'Rand',
+  'ZMW': 'ZambianKwacha',
+  'ZWL': 'ZimbabweDollar',
 };
-
-

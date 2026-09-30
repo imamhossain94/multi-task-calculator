@@ -1,17 +1,16 @@
-﻿import 'package:flutter/material.dart';
-import '../../services/google_ad_service.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_holo_date_picker/flutter_holo_date_picker.dart';
 import 'package:intl/intl.dart';
 
-import '../../components/app_surface.dart';
 import '../../components/build_result_card.dart';
 import '../../components/calculator_scaffold.dart';
 import '../../services/history_service.dart';
-import '../../utils/app_color.dart';
 import '../../utils/calculator_math.dart';
 import '../../utils/constant.dart';
 import '../../utils/extensions.dart';
 import 'components/build_date_picker_field.dart';
+import '../../utils/app_color.dart';
+import '../../components/app_surface.dart';
 
 class DateCalcPage extends StatefulWidget {
   const DateCalcPage({super.key});
@@ -76,7 +75,8 @@ class _DateCalcPageState extends State<DateCalcPage> {
 
   String? _lastSaved;
   void _maybeSave() {
-    final String signature = '${_from.toIso8601String()}|${_to.toIso8601String()}';
+    final String signature =
+        '${_from.toIso8601String()}|${_to.toIso8601String()}';
     if (_lastSaved == signature) return;
     _lastSaved = signature;
     HistoryService.add(
@@ -124,7 +124,7 @@ class _DateCalcPageState extends State<DateCalcPage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 10, 16, 6),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
             child: AppButton(
               label: 'Select',
               icon: Icons.check_rounded,
@@ -140,9 +140,7 @@ class _DateCalcPageState extends State<DateCalcPage> {
     );
   }
 
-  Future<void> _reset() async {
-    await showInterstitialAd();
-    if (!mounted) return;
+  void _reset() {
     resetPage(context, const DateCalcPage());
   }
 
@@ -154,61 +152,54 @@ class _DateCalcPageState extends State<DateCalcPage> {
       icon: Icons.event_rounded,
       actions: <Widget>[CalculatorResetButton(onPressed: _reset)],
       children: <Widget>[
-        AppCard(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              BuildDatePickerField(
-                title: 'From',
-                value: _from,
-                format: _format,
-                palette: _palette,
-                onTap: () => _pickDate(
-                  title: 'From Date',
-                  initial: _from,
-                  onPicked: _onFromPicked,
-                ),
+        AppInputCard(
+          children: <Widget>[
+            BuildDatePickerField(
+              title: 'From',
+              value: _from,
+              format: _format,
+              palette: _palette,
+              onTap: () => _pickDate(
+                title: 'From Date',
+                initial: _from,
+                onPicked: _onFromPicked,
               ),
-              Center(
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(20),
-                    onTap: _swap,
-                    child: Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        gradient: _palette.linear,
-                        shape: BoxShape.circle,
-                        boxShadow: <BoxShadow>[
-                          BoxShadow(
-                            color: _palette.accent.withValues(alpha: 0.4),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
+            ),
+            Center(
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: AppRadii.allLg,
+                  onTap: _swap,
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: _palette.accent,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: _palette.accent,
+                        width: AppBorders.hairline,
                       ),
-                      child: const Icon(Icons.swap_vert_rounded,
-                          color: Colors.white, size: 22),
                     ),
+                    child: const Icon(Icons.swap_vert_rounded,
+                        color: Colors.white, size: 22),
                   ),
                 ),
               ),
-              BuildDatePickerField(
-                title: 'To',
-                value: _to,
-                format: _format,
-                palette: _palette,
-                onTap: () => _pickDate(
-                  title: 'To Date',
-                  initial: _to,
-                  onPicked: _onToPicked,
-                ),
+            ),
+            BuildDatePickerField(
+              title: 'To',
+              value: _to,
+              format: _format,
+              palette: _palette,
+              onTap: () => _pickDate(
+                title: 'To Date',
+                initial: _to,
+                onPicked: _onToPicked,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
         const SizedBox(height: 6),
         Row(
@@ -234,11 +225,12 @@ class _DateCalcPageState extends State<DateCalcPage> {
           ],
         ),
         const SizedBox(height: 6),
-        AppGradientCard(
+        AppAccentCard(
           palette: _palette,
           child: Row(
             children: <Widget>[
-              const Icon(Icons.timelapse_rounded, color: Colors.white, size: 24),
+              const Icon(Icons.timelapse_rounded,
+                  color: Colors.white, size: 24),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
@@ -254,7 +246,7 @@ class _DateCalcPageState extends State<DateCalcPage> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+          padding: const EdgeInsets.fromLTRB(4, 2, 4, 8),
           child: Text(
             'Calendar-aware: 1 Mar to 1 Mar next year is exactly 1 year, '
             'not 365 days.',

@@ -1,16 +1,17 @@
-﻿import 'package:flutter/material.dart';
-import '../../services/google_ad_service.dart';
+import 'package:flutter/material.dart';
 
-import '../../components/app_surface.dart';
 import '../../components/build_result_card.dart';
 import '../../components/build_text_field.dart';
 import '../../components/calculator_scaffold.dart';
 import '../../services/history_service.dart';
-import '../../utils/app_color.dart';
 import '../../utils/calculator_math.dart';
 import '../../utils/constant.dart';
 import '../../utils/extensions.dart';
 import '../../utils/num_x.dart';
+import '../../utils/app_color.dart';
+import '../../components/app_surface.dart';
+import '../../utils/themes_mode.dart';
+
 class SavingsCalcPage extends StatefulWidget {
   const SavingsCalcPage({super.key});
 
@@ -20,8 +21,7 @@ class SavingsCalcPage extends StatefulWidget {
 
 class _SavingsCalcPageState extends State<SavingsCalcPage> {
   final TextEditingController _principalController = TextEditingController();
-  final TextEditingController _contributionController =
-      TextEditingController();
+  final TextEditingController _contributionController = TextEditingController();
   final TextEditingController _rateController = TextEditingController();
   final TextEditingController _yearsController = TextEditingController();
 
@@ -126,7 +126,8 @@ class _SavingsCalcPageState extends State<SavingsCalcPage> {
         id: HistoryService.newId(),
         tool: 'Savings',
         toolRoute: savingCalcPage,
-        summary: '${NumX.money(principal)} + ${NumX.money(contribution)}/$_intervalName '
+        summary:
+            '${NumX.money(principal)} + ${NumX.money(contribution)}/$_intervalName '
             '@ ${NumX.percentText(rate, decimals: 2)} for $years yrs '
             '= ${NumX.money(balance)}',
         createdAt: DateTime.now(),
@@ -153,7 +154,7 @@ class _SavingsCalcPageState extends State<SavingsCalcPage> {
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: AppRadii.allMd,
                   onTap: () {
                     setState(() {
                       _intervalName = name;
@@ -164,13 +165,14 @@ class _SavingsCalcPageState extends State<SavingsCalcPage> {
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 14),
+                        horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
-                      gradient: selected ? _palette.linear : null,
                       color: selected
-                          ? null
-                          : Theme.of(context).colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(14),
+                          ? _palette.accent
+                          : Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest,
+                      borderRadius: AppRadii.allMd,
                     ),
                     child: Row(
                       children: <Widget>[
@@ -181,7 +183,10 @@ class _SavingsCalcPageState extends State<SavingsCalcPage> {
                             fontSize: 15,
                             color: selected
                                 ? Colors.white
-                                : Theme.of(context).textTheme.titleMedium?.color,
+                                : Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.color,
                           ),
                         ),
                         const Spacer(),
@@ -211,9 +216,7 @@ class _SavingsCalcPageState extends State<SavingsCalcPage> {
     );
   }
 
-  Future<void> _reset() async {
-    await showInterstitialAd();
-    if (!mounted) return;
+  void _reset() {
     resetPage(context, const SavingsCalcPage());
   }
 
@@ -225,54 +228,50 @@ class _SavingsCalcPageState extends State<SavingsCalcPage> {
       icon: Icons.savings_rounded,
       actions: <Widget>[CalculatorResetButton(onPressed: _reset)],
       children: <Widget>[
-        AppCard(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              _FrequencyRow(
-                name: _intervalName,
-                onTap: _pickFrequency,
-                palette: _palette,
-              ),
-              BuildTextField(
-                title: 'Initial Deposit',
-                hint: '0.00',
-                isEnabled: true,
-                textController: _principalController,
-                palette: _palette,
-                onPressedAction: null,
-                widget: const Text(r'$'),
-              ),
-              BuildTextField(
-                title: 'Regular Contribution',
-                hint: '0.00',
-                isEnabled: true,
-                textController: _contributionController,
-                palette: _palette,
-                onPressedAction: null,
-                widget: Text('/$_intervalName'),
-              ),
-              BuildTextField(
-                title: 'Annual Interest Rate',
-                hint: '0.00',
-                isEnabled: true,
-                textController: _rateController,
-                palette: _palette,
-                onPressedAction: null,
-                widget: const Text('%'),
-              ),
-              BuildTextField(
-                title: 'Time Period',
-                hint: '0',
-                isEnabled: true,
-                textController: _yearsController,
-                palette: _palette,
-                onPressedAction: null,
-                widget: const Text('yrs'),
-              ),
-            ],
-          ),
+        AppInputCard(
+          children: <Widget>[
+            _FrequencyRow(
+              name: _intervalName,
+              onTap: _pickFrequency,
+              palette: _palette,
+            ),
+            BuildTextField(
+              title: 'Initial Deposit',
+              hint: '0.00',
+              isEnabled: true,
+              textController: _principalController,
+              palette: _palette,
+              onPressedAction: null,
+              widget: const Text(r'$'),
+            ),
+            BuildTextField(
+              title: 'Regular Contribution',
+              hint: '0.00',
+              isEnabled: true,
+              textController: _contributionController,
+              palette: _palette,
+              onPressedAction: null,
+              widget: Text('/$_intervalName'),
+            ),
+            BuildTextField(
+              title: 'Annual Interest Rate',
+              hint: '0.00',
+              isEnabled: true,
+              textController: _rateController,
+              palette: _palette,
+              onPressedAction: null,
+              widget: const Text('%'),
+            ),
+            BuildTextField(
+              title: 'Time Period',
+              hint: '0',
+              isEnabled: true,
+              textController: _yearsController,
+              palette: _palette,
+              onPressedAction: null,
+              widget: const Text('yrs'),
+            ),
+          ],
         ),
         const SizedBox(height: 6),
         BuildResultCard(
@@ -304,7 +303,7 @@ class _SavingsCalcPageState extends State<SavingsCalcPage> {
         ),
         if (_hasInput)
           Padding(
-            padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+            padding: const EdgeInsets.fromLTRB(4, 2, 4, 8),
             child: Text(
               'Compounded daily at ${NumX.percentText(double.tryParse(_rateController.text) ?? 0, decimals: 2)} '
               'over ${int.tryParse(_yearsController.text) ?? 0} years, '
@@ -332,7 +331,7 @@ class _FrequencyRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -348,14 +347,14 @@ class _FrequencyRow extends StatelessWidget {
           Material(
             color: Colors.transparent,
             child: InkWell(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: AppRadii.allMd,
               onTap: onTap,
               child: Container(
                 height: 48,
-                padding: const EdgeInsets.symmetric(horizontal: 14),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(14),
+                  color: ThemesMode.subtleFill,
+                  borderRadius: AppRadii.allMd,
                 ),
                 child: Row(
                   children: <Widget>[
@@ -372,8 +371,8 @@ class _FrequencyRow extends StatelessWidget {
                       width: 30,
                       height: 30,
                       decoration: BoxDecoration(
-                        gradient: palette.linear,
-                        borderRadius: BorderRadius.circular(9),
+                        color: palette.accent,
+                        borderRadius: AppRadii.allMd,
                       ),
                       child: const Icon(Icons.expand_more_rounded,
                           size: 18, color: Colors.white),

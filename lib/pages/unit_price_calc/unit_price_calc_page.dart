@@ -1,15 +1,16 @@
-﻿import 'package:flutter/material.dart';
-import '../../services/google_ad_service.dart';
+import 'package:flutter/material.dart';
 
-import '../../components/app_surface.dart';
 import '../../components/build_result_card.dart';
 import '../../components/calculator_scaffold.dart';
 import '../../services/history_service.dart';
-import '../../utils/app_color.dart';
 import '../../utils/calculator_math.dart';
 import '../../utils/constant.dart';
 import '../../utils/extensions.dart';
 import '../../utils/num_x.dart';
+import '../../utils/app_color.dart';
+import '../../components/app_surface.dart';
+import '../../utils/themes_mode.dart';
+
 /// Compare products by their true unit price.
 class UnitPriceCalcPage extends StatefulWidget {
   const UnitPriceCalcPage({super.key});
@@ -93,9 +94,7 @@ class _UnitPriceCalcPageState extends State<UnitPriceCalcPage> {
     setState(_recalculate);
   }
 
-  Future<void> _reset() async {
-    await showInterstitialAd();
-    if (!mounted) return;
+  void _reset() {
     resetPage(context, const UnitPriceCalcPage());
   }
 
@@ -171,7 +170,7 @@ class _UnitPriceCalcPageState extends State<UnitPriceCalcPage> {
             ],
           ),
         ],
-        const SizedBox(height: 10),
+        const SizedBox(height: AppSpacing.sm),
         AppCard(
           padding: const EdgeInsets.fromLTRB(8, 12, 8, 8),
           child: Column(
@@ -202,7 +201,7 @@ class _UnitPriceCalcPageState extends State<UnitPriceCalcPage> {
                       onPressed: _items.length >= _maxRows ? null : _addRow,
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: AppButton(
                       label: 'Save summary',
@@ -277,7 +276,7 @@ class _PriceHeaderRow extends StatelessWidget {
 
     return Padding(
       // Leaves room for the remove button.
-      padding: const EdgeInsets.only(right: 40),
+      padding: const EdgeInsets.only(right: 32),
       child: Row(
         children: <Widget>[
           header('TOTAL PRICE'),
@@ -320,11 +319,8 @@ class _PriceRow extends StatelessWidget {
             height: 44,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              gradient: unit > 0 ? palette.linear : null,
-              color: unit > 0
-                  ? null
-                  : Theme.of(context).colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(12),
+              color: unit > 0 ? palette.accent : ThemesMode.subtleFill,
+              borderRadius: AppRadii.allMd,
             ),
             child: FittedBox(
               fit: BoxFit.scaleDown,
@@ -335,9 +331,8 @@ class _PriceRow extends StatelessWidget {
                   style: TextStyle(
                     fontWeight: FontWeight.w900,
                     fontSize: 14,
-                    color: unit > 0
-                        ? Colors.white
-                        : Theme.of(context).hintColor,
+                    color:
+                        unit > 0 ? Colors.white : Theme.of(context).hintColor,
                   ),
                 ),
               ),
@@ -370,8 +365,8 @@ class _Cell extends StatelessWidget {
     return Container(
       height: 44,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12),
+        color: ThemesMode.subtleFill,
+        borderRadius: AppRadii.allMd,
       ),
       child: TextField(
         controller: controller,

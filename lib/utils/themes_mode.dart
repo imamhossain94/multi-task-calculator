@@ -1,6 +1,6 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../utils/app_color.dart';
+import 'app_color.dart';
 
 /// Tracks whether the app is currently rendering in dark mode and keeps the
 /// system status / navigation bars in sync with it.
@@ -46,5 +46,10 @@ abstract final class ThemesMode {
 
   /// Low-emphasis fill used for inputs, chips and inert tiles.
   static Color get subtleFill =>
-      isDarkMode ? AppColors.darkSurfaceAlt : const Color(0xFFEDEFF7);
+      isDarkMode ? AppColors.darkSurfaceAlt : AppColors.lightSurfaceAlt;
+
+  /// Hairline outline colour. Flat design uses this in place of a shadow, so
+  /// every edge in the app comes from here.
+  static Color get border =>
+      isDarkMode ? AppColors.darkBorder : AppColors.lightBorder;
 }

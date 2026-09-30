@@ -1,7 +1,9 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
+import '../utils/app_color.dart';
 import '../utils/constant.dart';
 import '../utils/extensions.dart';
+
 /// Shown when the user gives 3 stars or fewer and is sent here for feedback.
 class FeedbackPage extends StatelessWidget {
   const FeedbackPage({super.key});
@@ -17,20 +19,20 @@ class FeedbackPage extends StatelessWidget {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 30, 20, 24),
+        padding: const EdgeInsets.fromLTRB(20, 32, 20, 24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             const Icon(Icons.sentiment_dissatisfied_rounded,
                 size: 72, color: Colors.amber),
-            const SizedBox(height: 18),
+            const SizedBox(height: AppSpacing.lg),
             Text(
               'We are sorry to hear that',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleLarge,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               'Your rating means a lot. Tell us what went wrong or what is '
               'missing and we will work on it.',
@@ -45,19 +47,19 @@ class FeedbackPage extends StatelessWidget {
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size.fromHeight(50),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: AppRadii.allMd,
                     ),
                   ),
                   icon: const Icon(Icons.mail_outline_rounded),
                   label: const Text('Email us'),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: AppSpacing.sm),
                 OutlinedButton.icon(
                   onPressed: () => openExternal(context, storeLink),
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size.fromHeight(50),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: AppRadii.allMd,
                     ),
                   ),
                   icon: const Icon(Icons.reviews_outlined),

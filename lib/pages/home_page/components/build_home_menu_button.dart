@@ -1,9 +1,16 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
-import '../../../utils/app_color.dart';
 import '../../../utils/constant.dart';
 import '../../../utils/screen_config.dart';
+import '../../../components/app_surface.dart' show appBorder;
+import '../../../utils/themes_mode.dart';
+import '../../../components/app_surface.dart';
+import '../../../utils/app_color.dart';
+
 /// A single calculator tile on the home screen.
+///
+/// Flat and outlined: a plain surface with a hairline border, a solid square
+/// of the tool's accent for the icon, and no shadow.
 class BuildHomeMenuButton extends StatelessWidget {
   const BuildHomeMenuButton({
     super.key,
@@ -20,68 +27,59 @@ class BuildHomeMenuButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = ThemesMode.isDarkMode;
+
     // Deliberately *not* wrapped in `Expanded`: this widget is used as a
     // `GridView` child, where the grid already controls sizing and an
     // `Expanded` parent-data widget would throw at runtime.
     return Padding(
-      padding: const EdgeInsets.all(5),
+      padding: const EdgeInsets.all(AppSpacing.xs),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: AppRadii.allMd,
           onTap: onPressed,
           child: Ink(
             decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: <BoxShadow>[
-                BoxShadow(
-                  color: color.withValues(alpha: 0.18),
-                  blurRadius: 14,
-                  spreadRadius: 0.5,
-                  offset: const Offset(0, 5),
-                ),
-              ],
+              color: ThemesMode.surface,
+              borderRadius: AppRadii.allMd,
+              border: appBorder(),
             ),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 6),
+              padding: const EdgeInsets.symmetric(
+                  vertical: AppSpacing.sm + 2, horizontal: AppSpacing.xs),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Container(
-                    width: 48,
-                    height: 48,
+                    width: 40,
+                    height: 40,
+                    alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: <Color>[
-                          color,
-                          Color.lerp(color, Colors.white, 0.28)!,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(15),
-                      boxShadow: <BoxShadow>[
-                        BoxShadow(
-                          color: color.withValues(alpha: 0.45),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+                      color: color,
+                      borderRadius: AppRadii.allMd,
                     ),
-                    child: Icon(icon, color: Colors.white, size: 22),
+                    child: Icon(icon, color: Colors.white, size: 21),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: AppSpacing.sm),
                   Flexible(
-                    child: Text(
-                      title,
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: responsiveText(12.5),
-                        fontWeight: FontWeight.w800,
-                        height: 1.2,
+                    child: FittedBox(
+                      // Long labels ("Fuel Efficiency") shrink rather than
+                      // pushing the icon out of the tile.
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        title,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: responsiveText(12),
+                          fontWeight: FontWeight.w700,
+                          height: 1.25,
+                          color: isDark
+                              ? ThemesMode.onSurface
+                              : AppColors.textDark,
+                        ),
                       ),
                     ),
                   ),

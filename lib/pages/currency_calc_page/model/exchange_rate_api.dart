@@ -1,4 +1,5 @@
-﻿import '../../../utils/constant.dart';
+import '../../../utils/constant.dart';
+
 /// Exchange-rate API payload.
 ///
 /// `conversion_rates` is a flat `{"USD": 1.0, "EUR": 0.92, ...}` map, so it is

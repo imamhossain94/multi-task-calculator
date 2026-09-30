@@ -1,6 +1,7 @@
-﻿import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/constant.dart';
+
 /// Thin, typed wrapper around [SharedPreferences].
 ///
 /// The previous implementation kept the instance in a mutable static and read
@@ -35,33 +36,6 @@ class SharedPrefService {
     return _prefs!.setString(appVersionKey, value);
   }
 
-  // -------------------------------------------------------------------- ads
-  static bool get isAdFree =>
-      _p?.getBool(appPurchasedStatusKey) ?? false;
-
-  static Future<bool> setAdFree(bool value) async {
-    await init();
-    return _prefs!.setBool(appPurchasedStatusKey, value);
-  }
-
-  /// Records that an interstitial was shown. Returns `true` when this tap is
-  /// the one that should actually show an ad (i.e. every Nth tap).
-  static Future<bool> shouldShowInterstitial() async {
-    await init();
-    final int counter = (_prefs!.getInt(itemClickKey) ?? 0) + 1;
-    await _prefs!.setInt(itemClickKey, counter);
-    if (isAdFree) return false;
-    return counter % interstitialTapInterval == 0;
-  }
-
-  // ------------------------------------------------------- reward ad timer
-  static String get adFreeUntil => _p?.getString(adFreeTimeKey) ?? 'zero';
-
-  static Future<bool> setAdFreeUntil(String value) async {
-    await init();
-    return _prefs!.setString(adFreeTimeKey, value);
-  }
-
   // ---------------------------------------------------------------- history
   static String get historyJson => _p?.getString(historyKey) ?? '[]';
 
@@ -76,8 +50,7 @@ class SharedPrefService {
   }
 
   // -------------------------------------------------------- update checking
-  static int get lastUpdateCheck =>
-      _p?.getInt(lastUpdateCheckKey) ?? 0;
+  static int get lastUpdateCheck => _p?.getInt(lastUpdateCheckKey) ?? 0;
 
   static Future<bool> setLastUpdateCheck(int millis) async {
     await init();

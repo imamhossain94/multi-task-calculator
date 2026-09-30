@@ -1,13 +1,16 @@
-﻿import 'package:flutter/material.dart';
-import '../../services/google_ad_service.dart';
+import 'package:flutter/material.dart';
 
 import '../../components/build_result_card.dart';
 import '../../components/build_text_field.dart';
 import '../../components/calculator_scaffold.dart';
-import '../../utils/app_color.dart';
+import '../../services/history_service.dart';
 import '../../utils/calculator_math.dart';
+import '../../utils/constant.dart';
 import '../../utils/extensions.dart';
 import '../../utils/num_x.dart';
+import '../../components/app_surface.dart';
+import '../../utils/app_color.dart';
+
 class DiscountCalcPage extends StatefulWidget {
   const DiscountCalcPage({super.key});
 
@@ -74,11 +77,35 @@ class _DiscountCalcPageState extends State<DiscountCalcPage> {
       _amountSaved = result.saved;
       _finalPrice = result.finalPrice;
     });
+    _maybeSave(price, tax, off, result.saved, result.finalPrice);
   }
 
-  Future<void> _reset() async {
-    await showInterstitialAd();
-    if (!mounted) return;
+  String? _lastSaved;
+  void _maybeSave(
+    double price,
+    double tax,
+    double off,
+    double saved,
+    double finalPrice,
+  ) {
+    final String signature = '$price|$tax|$off';
+    if (_lastSaved == signature) return;
+    _lastSaved = signature;
+    HistoryService.add(
+      CalculationRecord(
+        id: HistoryService.newId(),
+        tool: 'Discount',
+        toolRoute: discountCalcPage,
+        summary: '${NumX.money(price)}'
+            '${tax > 0 ? ' + ${NumX.percentText(tax)} tax' : ''}'
+            '${off > 0 ? ' - ${NumX.percentText(off)} off' : ''}'
+            ' = ${NumX.money(finalPrice)} (saved ${NumX.money(saved)})',
+        createdAt: DateTime.now(),
+      ),
+    );
+  }
+
+  void _reset() {
     resetPage(context, const DiscountCalcPage());
   }
 
@@ -142,7 +169,7 @@ class _DiscountCalcPageState extends State<DiscountCalcPage> {
         ),
         if (_hasInput)
           Padding(
-            padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+            padding: const EdgeInsets.fromLTRB(4, 2, 4, 8),
             child: Text(
               'Tax is applied first, then the discount. '
               'You save ${NumX.percentText(NumX.percent(_amountSaved, _finalPrice + _amountSaved))} of what you pay.',
@@ -162,21 +189,5 @@ class _InputCard extends StatelessWidget {
   final List<Widget> children;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Column(mainAxisSize: MainAxisSize.min, children: children),
-    );
-  }
+  Widget build(BuildContext context) => AppInputCard(children: children);
 }

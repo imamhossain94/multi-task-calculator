@@ -1,13 +1,16 @@
-﻿import 'package:flutter/material.dart';
-import '../../services/google_ad_service.dart';
+import 'package:flutter/material.dart';
 
 import '../../components/build_result_card.dart';
 import '../../components/build_text_field.dart';
 import '../../components/calculator_scaffold.dart';
-import '../../utils/app_color.dart';
+import '../../services/history_service.dart';
 import '../../utils/calculator_math.dart';
+import '../../utils/constant.dart';
 import '../../utils/extensions.dart';
 import '../../utils/num_x.dart';
+import '../../components/app_surface.dart';
+import '../../utils/app_color.dart';
+
 /// Adds a sales tax to a price.
 ///
 /// The previous version divided nothing unguarded but never reset its results,
@@ -65,11 +68,27 @@ class _SalesTaxCalcPageState extends State<SalesTaxCalcPage> {
       _tax = result.tax;
       _totalPrice = result.total;
     });
+    _maybeSave(price, rate, result.tax, result.total);
   }
 
-  Future<void> _reset() async {
-    await showInterstitialAd();
-    if (!mounted) return;
+  String? _lastSaved;
+  void _maybeSave(double price, double rate, double tax, double total) {
+    final String signature = '$price|$rate';
+    if (_lastSaved == signature) return;
+    _lastSaved = signature;
+    HistoryService.add(
+      CalculationRecord(
+        id: HistoryService.newId(),
+        tool: 'Sales Tax',
+        toolRoute: salesTaxCalcPage,
+        summary: '${NumX.money(price)} + ${NumX.percentText(rate)} tax '
+            '= ${NumX.money(total)} (tax ${NumX.money(tax)})',
+        createdAt: DateTime.now(),
+      ),
+    );
+  }
+
+  void _reset() {
     resetPage(context, const SalesTaxCalcPage());
   }
 
@@ -81,42 +100,27 @@ class _SalesTaxCalcPageState extends State<SalesTaxCalcPage> {
       icon: Icons.receipt_long_rounded,
       actions: <Widget>[CalculatorResetButton(onPressed: _reset)],
       children: <Widget>[
-        Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.06),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              BuildTextField(
-                title: 'Original Price',
-                hint: '0.00',
-                isEnabled: true,
-                textController: _priceController,
-                palette: _palette,
-                onPressedAction: null,
-                widget: const Text(r'$'),
-              ),
-              BuildTextField(
-                title: 'Tax Rate',
-                hint: '0.00',
-                isEnabled: true,
-                textController: _rateController,
-                palette: _palette,
-                onPressedAction: null,
-                widget: const Text('%'),
-              ),
-            ],
-          ),
+        AppInputCard(
+          children: <Widget>[
+            BuildTextField(
+              title: 'Original Price',
+              hint: '0.00',
+              isEnabled: true,
+              textController: _priceController,
+              palette: _palette,
+              onPressedAction: null,
+              widget: const Text(r'$'),
+            ),
+            BuildTextField(
+              title: 'Tax Rate',
+              hint: '0.00',
+              isEnabled: true,
+              textController: _rateController,
+              palette: _palette,
+              onPressedAction: null,
+              widget: const Text('%'),
+            ),
+          ],
         ),
         const SizedBox(height: 6),
         Row(
@@ -139,7 +143,7 @@ class _SalesTaxCalcPageState extends State<SalesTaxCalcPage> {
         ),
         if (_hasInput)
           Padding(
-            padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+            padding: const EdgeInsets.fromLTRB(4, 2, 4, 8),
             child: Text(
               '${NumX.money(_totalPrice - _tax)} + '
               '${NumX.money(_tax)} tax = ${NumX.money(_totalPrice)}.',

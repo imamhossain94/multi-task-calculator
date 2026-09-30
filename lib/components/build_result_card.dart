@@ -1,9 +1,10 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
-import '../utils/app_color.dart';
 import '../utils/num_x.dart';
 import '../utils/screen_config.dart';
-/// A single result tile, filled with the tool's gradient.
+import '../utils/app_color.dart';
+
+/// A single result tile: one flat block of the tool's accent colour.
 ///
 /// Values are rendered through [NumX.format], so a degenerate calculation
 /// (empty field, division by zero) shows `0.00` instead of the `Infinity` the
@@ -41,30 +42,25 @@ class BuildResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String text = numeric != null
-        ? NumX.format(numeric, decimals: decimals)
-        : value;
+    final String text =
+        numeric != null ? NumX.format(numeric, decimals: decimals) : value;
+
+    final Color onAccent = palette.onAccent;
 
     final Widget tile = Container(
-      padding: const EdgeInsets.fromLTRB(10, 16, 10, 14),
+      padding: const EdgeInsets.fromLTRB(
+          AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.md - 2),
       decoration: BoxDecoration(
-        gradient: palette.diagonal,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: palette.accent.withValues(alpha: 0.34),
-            blurRadius: 16,
-            spreadRadius: 1,
-            offset: const Offset(0, 7),
-          ),
-        ],
+        color: palette.accent,
+        borderRadius: AppRadii.allLg,
+        border: Border.all(color: palette.accent, width: AppBorders.hairline),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           if (icon != null) ...<Widget>[
-            Icon(icon, size: 22, color: Colors.white.withValues(alpha: 0.9)),
-            const SizedBox(height: 8),
+            Icon(icon, size: 20, color: onAccent.withValues(alpha: 0.85)),
+            const SizedBox(height: 6),
           ],
           FittedBox(
             fit: BoxFit.scaleDown,
@@ -72,39 +68,44 @@ class BuildResultCard extends StatelessWidget {
               '$prefix$text$suffix',
               maxLines: 1,
               style: TextStyle(
-                fontSize: responsiveText(24),
+                fontSize: responsiveText(23),
                 fontWeight: FontWeight.w900,
-                color: Colors.white,
-                shadows: const <Shadow>[
-                  Shadow(color: Color(0x33000000), blurRadius: 6),
-                ],
+                color: onAccent,
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Container(
-            height: 1.5,
-            margin: const EdgeInsets.symmetric(horizontal: 10),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.35),
-              borderRadius: BorderRadius.circular(2),
-            ),
+            height: 1,
+            width: 26,
+            color: onAccent.withValues(alpha: 0.40),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             title,
             textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 11.5,
               fontWeight: FontWeight.w800,
-              letterSpacing: 0.3,
-              color: Colors.white.withValues(alpha: 0.92),
+              letterSpacing: 0.5,
+              color: onAccent.withValues(alpha: 0.88),
             ),
           ),
         ],
       ),
     );
 
-    return group ? Expanded(child: tile) : tile;
+    // A fixed gutter so every row of result tiles has the same rhythm, whether
+    // it holds two tiles or four.
+    return group
+        ? Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+              child: tile,
+            ),
+          )
+        : tile;
   }
 }

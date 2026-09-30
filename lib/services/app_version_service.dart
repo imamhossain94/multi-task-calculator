@@ -1,10 +1,11 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pub_semver/pub_semver.dart';
 
 import '../utils/constant.dart';
+
 /// The outcome of an update check.
 enum UpdateStatus {
   /// Installed version is current.
@@ -82,7 +83,8 @@ class AppVersionService {
         currentVersion ?? await AppVersionService.installedVersion();
 
     try {
-      final Response<dynamic> response = await _dio.get<dynamic>(updateManifestUrl);
+      final Response<dynamic> response =
+          await _dio.get<dynamic>(updateManifestUrl);
       final dynamic body = response.data;
 
       final Map<String, dynamic> json = switch (body) {
@@ -104,7 +106,9 @@ class AppVersionService {
           : Version.parse(installed);
 
       final UpdateStatus status = latest > current
-          ? (forceUpdate ? UpdateStatus.forceUpdate : UpdateStatus.updateAvailable)
+          ? (forceUpdate
+              ? UpdateStatus.forceUpdate
+              : UpdateStatus.updateAvailable)
           : UpdateStatus.upToDate;
 
       return UpdateInfo(

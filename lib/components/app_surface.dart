@@ -1,39 +1,37 @@
-﻿import 'package:flutter/material.dart';
-
+import 'package:flutter/material.dart';
 import '../utils/app_color.dart';
-import '../utils/screen_config.dart';
 import '../utils/themes_mode.dart';
+
 /// Shared visual primitives used by every screen.
 ///
-/// The goal is a consistent, colourful look with a very small number of
-/// building blocks: [AppPage] for the gradient background, [AppCard] for
-/// neutral surfaces and [AppGradientCard] for the accent-heavy result tiles.
+/// The design language is flat and outlined:
+///  * **No gradients.** Every accent is one solid colour.
+///  * **No shadows.** Depth comes from a 1 px outline instead.
+///  * **Small radii** (3-8 px) rather than the Material 3 pills.
+///  * **Colour from the accent**, never from the background.
+///
+/// The building blocks are [AppPage] for the page shell, [AppCard] for
+/// neutral surfaces, [AppAccentCard] for solid colour blocks, and the small
+/// controls below.
 
-/// Soft drop shadow used by every raised surface.
-List<BoxShadow> appShadow({double elevation = 6, Color? tint}) {
-  final Color color = tint ??
-      (ThemesMode.isDarkMode ? Colors.black38 : Colors.black.withValues(alpha: 0.07));
-  return <BoxShadow>[
-    BoxShadow(
-      color: color,
-      blurRadius: elevation * 2.4,
-      spreadRadius: elevation * 0.2,
-      offset: Offset(0, elevation * 0.6),
-    ),
-  ];
-}
+/// Standard 1 px outline for the current theme.
+Border appBorder({
+  Color? color,
+  double width = AppBorders.hairline,
+}) =>
+    Border.all(color: color ?? ThemesMode.border, width: width);
 
-/// Standard rounded surface.
+/// Neutral surface: a flat fill with a hairline outline. No shadow.
 class AppCard extends StatelessWidget {
   const AppCard({
     super.key,
     required this.child,
-    this.padding = const EdgeInsets.all(12),
+    this.padding = const EdgeInsets.all(AppSpacing.md),
     this.margin = EdgeInsets.zero,
-    this.radius = 20,
+    this.radius = AppRadii.lg,
     this.color,
-    this.gradient,
-    this.elevation = 6,
+    this.borderColor,
+    this.borderWidth = AppBorders.hairline,
   });
 
   final Widget child;
@@ -41,8 +39,8 @@ class AppCard extends StatelessWidget {
   final EdgeInsetsGeometry margin;
   final double radius;
   final Color? color;
-  final Gradient? gradient;
-  final double elevation;
+  final Color? borderColor;
+  final double borderWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -50,27 +48,29 @@ class AppCard extends StatelessWidget {
       margin: margin,
       padding: padding,
       decoration: BoxDecoration(
-        color: gradient == null ? (color ?? ThemesMode.surface) : null,
-        gradient: gradient,
+        color: color ?? ThemesMode.surface,
         borderRadius: BorderRadius.circular(radius),
-        boxShadow: appShadow(elevation: elevation),
+        border: appBorder(color: borderColor, width: borderWidth),
       ),
       child: child,
     );
   }
 }
 
-/// Surface filled with a tool's gradient. Used for headers and result tiles.
-class AppGradientCard extends StatelessWidget {
-  const AppGradientCard({
+/// A solid block of a tool's accent colour.
+///
+/// The replacement for the old gradient result tile: one flat fill, one flat
+/// foreground, hairline outline of the same accent so the block keeps its edge
+/// against a light background.
+class AppAccentCard extends StatelessWidget {
+  const AppAccentCard({
     super.key,
     required this.child,
     required this.palette,
-    this.padding = const EdgeInsets.all(16),
+    this.padding = const EdgeInsets.all(AppSpacing.lg),
     this.margin = EdgeInsets.zero,
-    this.radius = 20,
-    this.diagonal = true,
-    this.elevation = 8,
+    this.radius = AppRadii.lg,
+    this.background,
   });
 
   final Widget child;
@@ -78,8 +78,9 @@ class AppGradientCard extends StatelessWidget {
   final EdgeInsetsGeometry padding;
   final EdgeInsetsGeometry margin;
   final double radius;
-  final bool diagonal;
-  final double elevation;
+
+  /// Override the solid fill, e.g. to render a muted variant.
+  final Color? background;
 
   @override
   Widget build(BuildContext context) {
@@ -87,42 +88,179 @@ class AppGradientCard extends StatelessWidget {
       margin: margin,
       padding: padding,
       decoration: BoxDecoration(
-        gradient: diagonal ? palette.diagonal : palette.linear,
+        color: background ?? palette.accent,
         borderRadius: BorderRadius.circular(radius),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: palette.accent.withValues(alpha: 0.32),
-            blurRadius: elevation * 2.6,
-            spreadRadius: elevation * 0.15,
-            offset: Offset(0, elevation * 0.7),
-          ),
-        ],
+        border: Border.all(
+          color: palette.accent,
+          width: AppBorders.hairline,
+        ),
       ),
-      child: child,
+      child: DefaultTextStyle.merge(
+        style: TextStyle(color: palette.onAccent),
+        child: child,
+      ),
     );
   }
 }
 
-/// A coloured strip that visually connects a header to its card.
+/// A thin solid accent bar, used to cap a card or mark a section.
 class AppAccentStrip extends StatelessWidget {
-  const AppAccentStrip({super.key, required this.palette, this.height = 5});
+  const AppAccentStrip({
+    super.key,
+    required this.palette,
+    this.height = 3,
+    this.radius = AppRadii.lg,
+  });
 
   final ToolPalette palette;
   final double height;
+  final double radius;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: height,
       decoration: BoxDecoration(
-        gradient: palette.linear,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        color: palette.accent,
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(radius),
+        ),
       ),
     );
   }
 }
 
-/// Page scaffold with the app's gradient background.
+/// A small square/rounded tile filled with a tool's accent.
+///
+/// Used for the home-screen tile icons and the app-bar leading mark, so both
+/// read as the same visual unit.
+class AppAccentMark extends StatelessWidget {
+  const AppAccentMark({
+    super.key,
+    required this.palette,
+    required this.icon,
+    this.size = 34,
+    this.iconSize = 18,
+    this.radius = AppRadii.md,
+  });
+
+  final ToolPalette palette;
+  final IconData icon;
+  final double size;
+  final double iconSize;
+  final double radius;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: palette.accent,
+        borderRadius: BorderRadius.circular(radius),
+      ),
+      child: Icon(icon, size: iconSize, color: palette.onAccent),
+    );
+  }
+}
+
+/// Neutral surface that groups a calculator's input fields.
+///
+/// Owns the internal padding and the gap between fields, so every calculator
+/// lines its inputs up identically.
+class AppInputCard extends StatelessWidget {
+  const AppInputCard({super.key, required this.children});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        vertical: AppSpacing.md,
+        horizontal: AppSpacing.md,
+      ),
+      decoration: BoxDecoration(
+        color: ThemesMode.surface,
+        borderRadius: AppRadii.allLg,
+        border: appBorder(),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          for (int i = 0; i < children.length; i++) ...<Widget>[
+            if (i > 0) const SizedBox(height: AppSpacing.md),
+            children[i],
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// App bar shared by every page: a flat accent tint with a hairline underline
+/// instead of a translucent overlay.
+class AppTitleBar extends StatelessWidget implements PreferredSizeWidget {
+  const AppTitleBar({
+    super.key,
+    required this.palette,
+    required this.title,
+    this.icon,
+    this.actions = const <Widget>[],
+    this.leading,
+  });
+
+  final ToolPalette palette;
+  final String title;
+  final IconData? icon;
+  final List<Widget> actions;
+  final Widget? leading;
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      toolbarHeight: kToolbarHeight,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      backgroundColor: palette.soft(ThemesMode.isDarkMode, 0.07, 0.16),
+      foregroundColor: ThemesMode.onSurface,
+      surfaceTintColor: Colors.transparent,
+      leading: leading,
+      actions: actions,
+      titleSpacing: icon == null ? null : 0,
+      title: Row(
+        children: <Widget>[
+          if (icon != null) ...<Widget>[
+            AppAccentMark(palette: palette, icon: icon!),
+            const SizedBox(width: AppSpacing.sm),
+          ],
+          Flexible(
+            child: Text(
+              title,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontFamily: 'Audiowide',
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                color: ThemesMode.onSurface,
+              ),
+            ),
+          ),
+        ],
+      ),
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(1),
+        child: Container(height: 1, color: ThemesMode.border),
+      ),
+    );
+  }
+}
+
+/// Page shell for the informational screens (about, help, feedback, ...).
 class AppPage extends StatelessWidget {
   const AppPage({
     super.key,
@@ -141,69 +279,25 @@ class AppPage extends StatelessWidget {
   final Widget body;
   final List<Widget> actions;
   final Widget? leading;
-
-  /// Optional panel rendered directly under the app bar.
   final Widget? bottom;
-
   final IconData? titleIcon;
-
-  /// Pinned widget (typically the banner ad) at the bottom of the page.
   final Widget? bottomBar;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        leading: leading,
+      appBar: AppTitleBar(
+        palette: palette,
+        title: title,
+        icon: titleIcon,
         actions: actions,
-        titleSpacing: titleIcon == null ? null : 0,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            if (titleIcon != null) ...<Widget>[
-              Container(
-                width: 34,
-                height: 34,
-                decoration: BoxDecoration(
-                  gradient: palette.linear,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(titleIcon, size: 19, color: Colors.white),
-              ),
-              const SizedBox(width: 10),
-            ],
-            Flexible(
-              child: Text(
-                title,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontFamily: 'Audiowide',
-                  fontSize: responsiveText(19),
-                  fontWeight: FontWeight.w700,
-                  color: ThemesMode.onSurface,
-                ),
-              ),
-            ),
-          ],
-        ),
+        leading: leading,
       ),
       body: Column(
         children: <Widget>[
           Expanded(
             child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: <Color>[
-                    palette.accent.withValues(alpha: 0.10),
-                    ThemesMode.background,
-                    ThemesMode.background,
-                  ],
-                  stops: const <double>[0, 0.22, 1],
-                ),
-              ),
+              color: ThemesMode.background,
               child: SafeArea(top: false, bottom: false, child: body),
             ),
           ),
@@ -215,7 +309,7 @@ class AppPage extends StatelessWidget {
   }
 }
 
-/// Small pill used for units, currencies and toggles.
+/// Flat chip: outlined when unselected, solid accent when selected.
 class AppChip extends StatelessWidget {
   const AppChip({
     super.key,
@@ -236,32 +330,38 @@ class AppChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = ThemesMode.isDarkMode;
     final Color accent = color ?? ThemesMode.onSurfaceMuted;
-    final Color fg = selected ? Colors.white : ThemesMode.onSurfaceMuted;
+    final Color border = selected
+        ? accent
+        : (isDark ? AppColors.darkBorder : AppColors.lightBorder);
+    final Color foreground = selected ? accent : ThemesMode.onSurfaceMuted;
 
-    final Widget content = AnimatedContainer(
-      duration: const Duration(milliseconds: 160),
-      height: dense ? 32 : 40,
-      padding: EdgeInsets.symmetric(horizontal: dense ? 10 : 14),
+    final Widget content = Container(
+      height: dense ? 28 : 34,
+      padding: EdgeInsets.symmetric(horizontal: dense ? AppSpacing.sm : 10),
       decoration: BoxDecoration(
-        gradient: selected ? accent.asLinearGradient() : null,
-        color: selected ? null : ThemesMode.subtleFill,
-        borderRadius: BorderRadius.circular(dense ? 10 : 12),
+        color: selected ? accent.withValues(alpha: isDark ? 0.18 : 0.10) : null,
+        borderRadius: AppRadii.allSm,
+        border: appBorder(
+          color: border,
+          width: selected ? AppBorders.strong : AppBorders.hairline,
+        ),
       ),
       alignment: Alignment.center,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           if (icon != null) ...<Widget>[
-            Icon(icon, size: dense ? 14 : 18, color: fg),
-            const SizedBox(width: 6),
+            Icon(icon, size: dense ? 13 : 15, color: foreground),
+            const SizedBox(width: AppSpacing.xs + 2),
           ],
           Text(
             label,
             style: TextStyle(
-              color: fg,
+              color: foreground,
               fontWeight: FontWeight.w700,
-              fontSize: dense ? 12 : 14,
+              fontSize: dense ? 12 : 13.5,
             ),
           ),
         ],
@@ -272,7 +372,7 @@ class AppChip extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(dense ? 10 : 12),
+        borderRadius: AppRadii.allSm,
         onTap: onTap,
         child: content,
       ),
@@ -281,6 +381,9 @@ class AppChip extends StatelessWidget {
 }
 
 /// Two-to-three option segmented selector (gender, loan type, frequency).
+///
+/// Unselected segments are transparent with a hairline outline; the selected
+/// one is a solid accent block. No shadow, no gradient.
 class AppSegmented<T> extends StatelessWidget {
   const AppSegmented({
     super.key,
@@ -289,6 +392,7 @@ class AppSegmented<T> extends StatelessWidget {
     required this.selected,
     required this.onChanged,
     required this.palette,
+    this.labelOf,
   });
 
   final String label;
@@ -297,28 +401,36 @@ class AppSegmented<T> extends StatelessWidget {
   final ValueChanged<T> onChanged;
   final ToolPalette palette;
 
+  /// How to render an option. Defaults to `toString()`, which is wrong for
+  /// enums - those render as `SomeEnum.value`.
+  final String Function(T option)? labelOf;
+
+  String _text(T option) => labelOf?.call(option) ?? option.toString();
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8, left: 2),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.2,
-              color: ThemesMode.onSurface,
+        if (label.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.sm, left: 2),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.4,
+                color: ThemesMode.onSurfaceMuted,
+              ),
             ),
           ),
-        ),
         Container(
-          padding: const EdgeInsets.all(4),
+          padding: const EdgeInsets.all(2),
           decoration: BoxDecoration(
-            color: ThemesMode.subtleFill,
-            borderRadius: BorderRadius.circular(14),
+            color: ThemesMode.surface,
+            borderRadius: AppRadii.allMd,
+            border: appBorder(),
           ),
           child: Row(
             children: options.map((T option) {
@@ -328,32 +440,30 @@ class AppSegmented<T> extends StatelessWidget {
                   behavior: HitTestBehavior.opaque,
                   onTap: () => onChanged(option),
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
+                    duration: const Duration(milliseconds: 160),
                     curve: Curves.easeOut,
-                    height: 42,
+                    height: 38,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      gradient: isSelected ? palette.linear : null,
-                      borderRadius: BorderRadius.circular(11),
-                      boxShadow: isSelected
-                          ? <BoxShadow>[
-                              BoxShadow(
-                                color: palette.accent.withValues(alpha: 0.35),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ]
-                          : null,
+                      color: isSelected ? palette.accent : null,
+                      borderRadius: AppRadii.allSm,
+                      border: isSelected
+                          ? null
+                          : appBorder(
+                              color: AppColors.lightBorder,
+                            ),
                     ),
                     child: Text(
-                      option.toString(),
+                      _text(option),
                       textAlign: TextAlign.center,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: isSelected ? Colors.white : ThemesMode.onSurfaceMuted,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 13.5,
+                        color: isSelected
+                            ? palette.onAccent
+                            : ThemesMode.onSurfaceMuted,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
                       ),
                     ),
                   ),
@@ -367,7 +477,7 @@ class AppSegmented<T> extends StatelessWidget {
   }
 }
 
-/// Filled primary button with a gradient.
+/// Primary action button: solid accent, no shadow.
 class AppButton extends StatelessWidget {
   const AppButton({
     super.key,
@@ -387,31 +497,32 @@ class AppButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool enabled = onPressed != null;
+    final Color fill = enabled
+        ? palette.accent
+        : (ThemesMode.isDarkMode
+            ? AppColors.darkSurfaceAlt
+            : AppColors.lightSurfaceAlt);
+    final Color foreground =
+        enabled ? palette.onAccent : ThemesMode.onSurfaceMuted;
+
     final Widget content = Container(
-      height: 50,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      height: 48,
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        gradient: enabled ? palette.linear : null,
-        color: enabled ? null : ThemesMode.subtleFill,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: enabled
-            ? <BoxShadow>[
-                BoxShadow(
-                  color: palette.accent.withValues(alpha: 0.32),
-                  blurRadius: 14,
-                  offset: const Offset(0, 6),
-                ),
-              ]
-            : null,
+        color: fill,
+        borderRadius: AppRadii.allMd,
+        border: enabled
+            ? Border.all(color: palette.accent, width: AppBorders.hairline)
+            : appBorder(),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           if (icon != null) ...<Widget>[
-            Icon(icon, size: 18, color: enabled ? Colors.white : ThemesMode.onSurfaceMuted),
-            const SizedBox(width: 8),
+            Icon(icon, size: 17, color: foreground),
+            const SizedBox(width: AppSpacing.sm),
           ],
           Flexible(
             child: Text(
@@ -419,9 +530,9 @@ class AppButton extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color: enabled ? Colors.white : ThemesMode.onSurfaceMuted,
+                color: foreground,
                 fontWeight: FontWeight.w800,
-                fontSize: 15,
+                fontSize: 14.5,
               ),
             ),
           ),
@@ -429,23 +540,85 @@ class AppButton extends StatelessWidget {
       ),
     );
 
-    return expand
-        ? SizedBox(width: double.infinity, child: _wrap(content, enabled))
-        : _wrap(content, enabled);
-  }
+    final Widget wrapped = Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: AppRadii.allMd,
+        onTap: onPressed,
+        child: content,
+      ),
+    );
 
-  Widget _wrap(Widget child, bool enabled) => Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(14),
-          onTap: onPressed,
-          child: child,
-        ),
-      );
+    return expand ? SizedBox(width: double.infinity, child: wrapped) : wrapped;
+  }
 }
 
-/// Small helper so widgets can accept either a flat colour or a gradient.
-extension GradientFromColor on Color {
-  LinearGradient asLinearGradient() =>
-      LinearGradient(colors: <Color>[this, this]);
+/// Secondary action button: transparent fill, 1.5 px accent outline.
+class AppOutlinedButton extends StatelessWidget {
+  const AppOutlinedButton({
+    super.key,
+    required this.label,
+    required this.onPressed,
+    this.palette = AppPalettes.neutral,
+    this.icon,
+    this.expand = false,
+  });
+
+  final String label;
+  final VoidCallback? onPressed;
+  final ToolPalette palette;
+  final IconData? icon;
+  final bool expand;
+
+  @override
+  Widget build(BuildContext context) {
+    final bool enabled = onPressed != null;
+    final Color foreground =
+        enabled ? palette.accent : ThemesMode.onSurfaceMuted;
+
+    final Widget content = Container(
+      height: 40,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        borderRadius: AppRadii.allMd,
+        border: Border.all(
+          color: enabled ? palette.accent : ThemesMode.border,
+          width: AppBorders.strong,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          if (icon != null) ...<Widget>[
+            Icon(icon, size: 16, color: foreground),
+            const SizedBox(width: 6),
+          ],
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: foreground,
+                fontWeight: FontWeight.w800,
+                fontSize: 13.5,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    final Widget wrapped = Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: AppRadii.allMd,
+        onTap: onPressed,
+        child: content,
+      ),
+    );
+
+    return expand ? SizedBox(width: double.infinity, child: wrapped) : wrapped;
+  }
 }

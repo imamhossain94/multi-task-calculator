@@ -1,6 +1,6 @@
-﻿import 'package:flutter/material.dart';
-import '../../../services/google_ad_service.dart';
+import 'package:flutter/material.dart';
 
+import '../../../utils/app_color.dart';
 import 'build_home_menu_button.dart';
 
 /// The grid of calculator tiles on the home screen.
@@ -16,12 +16,13 @@ class BuildHomeMenuPad extends StatelessWidget {
         return GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(6, 4, 6, 10),
+          padding: const EdgeInsets.fromLTRB(
+              AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.page),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: columns,
-            childAspectRatio: 0.92,
-            mainAxisSpacing: 4,
-            crossAxisSpacing: 4,
+            childAspectRatio: 1.08,
+            mainAxisSpacing: AppSpacing.sm,
+            crossAxisSpacing: AppSpacing.sm,
           ),
           itemCount: homeMenuEntries.length,
           itemBuilder: (BuildContext context, int index) {
@@ -38,9 +39,7 @@ class BuildHomeMenuPad extends StatelessWidget {
     );
   }
 
-  Future<void> _open(BuildContext context, String route) async {
-    await showInterstitialAd();
-    if (!context.mounted) return;
-    await Navigator.of(context).pushNamed(route);
+  void _open(BuildContext context, String route) {
+    Navigator.of(context).pushNamed(route);
   }
 }

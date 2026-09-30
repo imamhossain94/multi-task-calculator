@@ -1,16 +1,16 @@
-﻿import 'package:flutter/material.dart';
-import '../../services/google_ad_service.dart';
+import 'package:flutter/material.dart';
 
-import '../../components/app_surface.dart';
 import '../../components/build_result_card.dart';
 import '../../components/build_text_field.dart';
 import '../../components/calculator_scaffold.dart';
 import '../../services/history_service.dart';
-import '../../utils/app_color.dart';
 import '../../utils/calculator_math.dart';
 import '../../utils/constant.dart';
 import '../../utils/extensions.dart';
 import '../../utils/num_x.dart';
+import '../../utils/app_color.dart';
+import '../../components/app_surface.dart';
+
 class TipCalcPage extends StatefulWidget {
   const TipCalcPage({super.key});
 
@@ -71,8 +71,12 @@ class _TipCalcPageState extends State<TipCalcPage> {
       return;
     }
 
-    final ({double tip, double tax, double finalAmount, double perPerson}) result =
-        tip(
+    final ({
+      double tip,
+      double tax,
+      double finalAmount,
+      double perPerson
+    }) result = tip(
       bill: bill,
       tipInput: tipInput,
       taxInput: taxInput,
@@ -165,9 +169,7 @@ class _TipCalcPageState extends State<TipCalcPage> {
     });
   }
 
-  Future<void> _reset() async {
-    await showInterstitialAd();
-    if (!mounted) return;
+  void _reset() {
     resetPage(context, const TipCalcPage());
   }
 
@@ -179,50 +181,46 @@ class _TipCalcPageState extends State<TipCalcPage> {
       icon: Icons.receipt_rounded,
       actions: <Widget>[CalculatorResetButton(onPressed: _reset)],
       children: <Widget>[
-        AppCard(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              BuildTextField(
-                title: 'Bill Amount',
-                hint: '0.00',
-                isEnabled: true,
-                textController: _billController,
-                palette: _palette,
-                onPressedAction: null,
-                widget: const Text(r'$'),
-              ),
-              BuildTextField(
-                title: 'Tax Amount',
-                hint: '0.00',
-                isEnabled: true,
-                textController: _taxController,
-                palette: _palette,
-                onPressedAction: _toggleTaxMode,
-                widget: Text(_taxIsAmount ? r'$' : '%'),
-              ),
-              BuildTextField(
-                title: 'Tip Amount',
-                hint: '0.00',
-                isEnabled: true,
-                textController: _tipController,
-                palette: _palette,
-                onPressedAction: _toggleTipMode,
-                widget: Text(_tipIsAmount ? r'$' : '%'),
-              ),
-              BuildTextField(
-                title: 'Split Between',
-                hint: '1',
-                isEnabled: true,
-                textController: _peopleController,
-                palette: _palette,
-                onPressedAction: null,
-                widget: const Icon(Icons.group_rounded, size: 19),
-              ),
-              _QuickTipRow(onSelected: _applyTipPreset),
-            ],
-          ),
+        AppInputCard(
+          children: <Widget>[
+            BuildTextField(
+              title: 'Bill Amount',
+              hint: '0.00',
+              isEnabled: true,
+              textController: _billController,
+              palette: _palette,
+              onPressedAction: null,
+              widget: const Text(r'$'),
+            ),
+            BuildTextField(
+              title: 'Tax Amount',
+              hint: '0.00',
+              isEnabled: true,
+              textController: _taxController,
+              palette: _palette,
+              onPressedAction: _toggleTaxMode,
+              widget: Text(_taxIsAmount ? r'$' : '%'),
+            ),
+            BuildTextField(
+              title: 'Tip Amount',
+              hint: '0.00',
+              isEnabled: true,
+              textController: _tipController,
+              palette: _palette,
+              onPressedAction: _toggleTipMode,
+              widget: Text(_tipIsAmount ? r'$' : '%'),
+            ),
+            BuildTextField(
+              title: 'Split Between',
+              hint: '1',
+              isEnabled: true,
+              textController: _peopleController,
+              palette: _palette,
+              onPressedAction: null,
+              widget: const Icon(Icons.group_rounded, size: 19),
+            ),
+            _QuickTipRow(onSelected: _applyTipPreset),
+          ],
         ),
         const SizedBox(height: 6),
         Row(
@@ -245,7 +243,7 @@ class _TipCalcPageState extends State<TipCalcPage> {
         ),
         if (_hasInput)
           Padding(
-            padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+            padding: const EdgeInsets.fromLTRB(4, 2, 4, 8),
             child: Text(
               'Bill ${NumX.money(_finalAmount - _tip - _tax)}'
               '${_tax > 0 ? ' + tax ${NumX.money(_tax)}' : ''}'
@@ -276,18 +274,18 @@ class _QuickTipRow extends StatelessWidget {
         children: presets.map((int preset) {
           return Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 3),
+              padding: const EdgeInsets.symmetric(horizontal: 2),
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: AppRadii.allSm,
                   onTap: () => onSelected(preset),
                   child: Container(
                     height: 34,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: AppPalettes.tip.accent.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: AppRadii.allSm,
                     ),
                     child: Text(
                       '$preset%',

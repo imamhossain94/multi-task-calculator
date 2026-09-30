@@ -1,10 +1,11 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
-import '../components/app_surface.dart';
 import '../services/shared_pref_services.dart';
-import '../utils/app_color.dart';
 import '../utils/constant.dart';
 import '../utils/extensions.dart';
+import '../utils/app_color.dart';
+import '../components/app_surface.dart';
+
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
 
@@ -19,7 +20,7 @@ class AboutPage extends StatelessWidget {
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(14, 6, 14, 24),
+        padding: const EdgeInsets.fromLTRB(12, 6, 12, 24),
         physics: const BouncingScrollPhysics(),
         children: <Widget>[
           _LogoCard(),
@@ -29,8 +30,8 @@ class AboutPage extends StatelessWidget {
             rows: <(String, String)>[
               ('Developer', developerName),
               ('UI design', designerName),
-              ('Platforms', 'Android Â· iOS'),
-              ('Icons', 'Font Awesome Â· custom'),
+              ('Platforms', 'Android · iOS'),
+              ('Icons', 'Font Awesome · custom'),
             ],
           ),
           const SizedBox(height: 12),
@@ -42,7 +43,7 @@ class AboutPage extends StatelessWidget {
                   'What is $appName?',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: AppSpacing.sm),
                 ...appFeature.map(
                   (String feature) => Padding(
                     padding: const EdgeInsets.only(bottom: 8),
@@ -51,7 +52,7 @@ class AboutPage extends StatelessWidget {
                       children: <Widget>[
                         const Icon(Icons.check_circle_rounded,
                             size: 17, color: AppColors.success),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: AppSpacing.sm),
                         Expanded(
                           child: Text(
                             feature,
@@ -84,14 +85,14 @@ class AboutPage extends StatelessWidget {
                   palette: AppPalettes.unitConverter,
                   onPressed: () => openExternal(context, storeLink),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: AppSpacing.sm),
                 AppButton(
                   label: 'Rate $appName',
                   icon: Icons.star_rounded,
                   palette: AppPalettes.discount,
                   onPressed: () => onRatingPressed(context),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: AppSpacing.sm),
                 AppButton(
                   label: 'Privacy policy',
                   icon: Icons.privacy_tip_rounded,
@@ -110,13 +111,13 @@ class AboutPage extends StatelessWidget {
 class _LogoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return AppGradientCard(
+    return AppAccentCard(
       palette: AppPalettes.general,
-      padding: const EdgeInsets.symmetric(vertical: 26, horizontal: 20),
+      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
       child: Column(
         children: <Widget>[
           Image.asset(appIconLight, height: 84, width: 84),
-          const SizedBox(height: 14),
+          const SizedBox(height: AppSpacing.md),
           Text(
             appName,
             textAlign: TextAlign.center,
@@ -155,7 +156,7 @@ class _InfoCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(title, style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppSpacing.sm),
           ...rows.map(
             ((String, String) row) => Padding(
               padding: const EdgeInsets.symmetric(vertical: 4),

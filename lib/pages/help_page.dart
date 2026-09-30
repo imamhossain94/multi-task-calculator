@@ -1,9 +1,10 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
-import '../components/app_surface.dart';
-import '../utils/app_color.dart';
 import '../utils/constant.dart';
 import '../utils/extensions.dart';
+import '../utils/app_color.dart';
+import '../components/app_surface.dart';
+
 class HelpPage extends StatelessWidget {
   const HelpPage({super.key});
 
@@ -18,7 +19,7 @@ class HelpPage extends StatelessWidget {
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(14, 6, 14, 24),
+        padding: const EdgeInsets.fromLTRB(12, 6, 12, 24),
         physics: const BouncingScrollPhysics(),
         children: <Widget>[
           AppCard(
@@ -28,13 +29,13 @@ class HelpPage extends StatelessWidget {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    gradient: AppPalettes.general.linear,
+                    color: AppPalettes.general.accent,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.help_rounded,
                       color: Colors.white, size: 22),
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Text(
                     'Answers to the questions people ask most often.',
@@ -47,7 +48,7 @@ class HelpPage extends StatelessWidget {
           const SizedBox(height: 12),
           ...appHelp.entries.map(
             (MapEntry<String, String> entry) => Padding(
-              padding: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.only(bottom: 8),
               child: _QuestionCard(
                 question: entry.key,
                 answer: entry.value,
@@ -68,7 +69,7 @@ class HelpPage extends StatelessWidget {
                   'Send us a message and we will get back to you.',
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: AppSpacing.md),
                 AppButton(
                   label: 'Send feedback',
                   icon: Icons.mail_outline_rounded,
@@ -93,8 +94,6 @@ class _QuestionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppCard(
-      radius: 16,
-      elevation: 4,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -106,7 +105,7 @@ class _QuestionCard extends StatelessWidget {
                 size: 19,
                 color: AppColors.brand,
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(
                   question,
@@ -119,7 +118,7 @@ class _QuestionCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppSpacing.sm),
           Text(
             answer,
             style: TextStyle(

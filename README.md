@@ -93,7 +93,7 @@ no account and no data collection.
 | State | `provider` (`ChangeNotifier`) |
 | Persistence | `shared_preferences` |
 | Build | Gradle Kotlin DSL (AGP 9.0.1, Gradle 9.1, Kotlin 2.3.20) |
-| Ads | `google_mobile_ads` (AdMob) — Google's test units in debug builds |
+| Ads | **None.** Completely ad-free, no ad SDK in the dependency tree |
 | Networking | `dio` |
 | Calculation | `function_tree`, `units_converter` |
 | Tests | `flutter_test` + `flutter_lints` |
@@ -194,22 +194,12 @@ at `version.json` in this repository.
 
 ---
 
-## AdMob configuration
+## No ads, no tracking
 
-AdMob **app and unit ids are public identifiers** — they ship inside every
-published APK — so they are not secrets. They are still overridable at build
-time, which is how you point a fork at Google's test units without editing
-source:
-
-```bash
-flutter build apk --debug \
-  --dart-define=ADMOB_APP_ID=... \
-  --dart-define=ADMOB_BANNER_ID=... \
-  --dart-define=ADMOB_INTERSTITIAL_ID=...
-```
-
-Debug builds use Google's official test ad units automatically, so you cannot
-accidentally generate invalid traffic while developing.
+There is no ad SDK in the dependency tree at all — not AdMob, not anything
+else. No banner, no interstitial, no analytics, no identifiers. The
+"Support" page in the drawer is a thank-you and a link to leave a review, not
+a paywall.
 
 ---
 
@@ -225,8 +215,8 @@ This repository is public, and the following are deliberately **excluded**:
 These paths were also purged from the Git history, so they are not recoverable
 from old commits.
 
-The app itself collects nothing, has no analytics, and makes exactly one
-network request: fetching exchange rates, and optionally the update manifest.
+The app collects nothing, has no analytics, and makes no network request
+unless you open the currency converter (exchange rates) or the update screen.
 
 ---
 

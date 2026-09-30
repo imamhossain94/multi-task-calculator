@@ -1,16 +1,16 @@
-﻿import 'package:flutter/material.dart';
-import '../utils/app_color.dart';
+import 'package:flutter/material.dart';
+
 import '../utils/constant.dart';
+import 'app_color.dart';
 
 /// App themes.
 ///
-/// Kept deliberately plain so individual screens can apply their own
-/// [ToolPalette] gradients on top; the theme only provides the base surfaces,
-/// typography defaults and component shapes.
+/// Flat design: no elevation anywhere, small radii, and every surface defined
+/// by a fill plus a hairline outline rather than a drop shadow. The theme only
+/// provides base surfaces, typography and component shapes; each screen layers
+/// its own [ToolPalette] accent on top.
 class AppTheme {
   const AppTheme._();
-
-  static const double _radius = 18;
 
   static ThemeData get light => _build(Brightness.light);
   static ThemeData get dark => _build(Brightness.dark);
@@ -19,9 +19,14 @@ class AppTheme {
     final bool isDark = brightness == Brightness.dark;
 
     final Color background = isDark ? AppColors.darkBg : AppColors.lightBg;
-    final Color surface = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final Color surface =
+        isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final Color surfaceAlt =
+        isDark ? AppColors.darkSurfaceAlt : AppColors.lightSurfaceAlt;
+    final Color border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
     final Color onSurface = isDark ? AppColors.textLight : AppColors.textDark;
-    final Color muted = isDark ? AppColors.textMutedLight : AppColors.textMutedDark;
+    final Color muted =
+        isDark ? AppColors.textMutedLight : AppColors.textMutedDark;
 
     final ColorScheme scheme = ColorScheme.fromSeed(
       seedColor: AppColors.brand,
@@ -31,6 +36,8 @@ class AppTheme {
       onSurface: onSurface,
       primary: AppColors.brand,
       secondary: AppColors.brandAlt,
+      outline: border,
+      surfaceContainerHighest: surfaceAlt,
     );
 
     return ThemeData(
@@ -40,7 +47,8 @@ class AppTheme {
       scaffoldBackgroundColor: background,
       canvasColor: background,
       splashFactory: InkSparkle.splashFactory,
-      fontFamily: null,
+      highlightColor: Colors.transparent,
+      splashColor: AppColors.brand.withValues(alpha: 0.06),
       textTheme: TextTheme(
         titleLarge: TextStyle(
           fontSize: 20,
@@ -54,16 +62,25 @@ class AppTheme {
         ),
         bodyMedium: TextStyle(fontSize: 15, color: onSurface),
         bodySmall: TextStyle(fontSize: 13, color: muted),
-      ).apply(fontFamily: fontAudioWide, bodyColor: onSurface, displayColor: onSurface),
+      ).apply(
+        fontFamily: fontAudioWide,
+        // Audiowide is a display face: it has no glyphs for the calculator
+        // symbols (U+22EF, U+232B, U+221A, U+03C0, U+00B1, superscripts), so
+        // without a fallback those keys render blank on device.
+        fontFamilyFallback: const <String>[fontSymbolFallback],
+        bodyColor: onSurface,
+        displayColor: onSurface,
+      ),
       appBarTheme: AppBarTheme(
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
         backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
         foregroundColor: onSurface,
         titleTextStyle: TextStyle(
           fontFamily: fontAudioWide,
-          fontSize: 20,
+          fontSize: 17,
           fontWeight: FontWeight.w700,
           color: onSurface,
         ),
@@ -71,59 +88,89 @@ class AppTheme {
       ),
       cardTheme: CardThemeData(
         color: surface,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(_radius),
+          borderRadius: AppRadii.allLg,
+          side: BorderSide(color: border, width: AppBorders.hairline),
         ),
       ),
       dividerTheme: DividerThemeData(
-        color: muted.withValues(alpha: 0.18),
-        thickness: 1,
+        color: border,
+        thickness: AppBorders.hairline,
         space: 1,
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: isDark ? AppColors.darkSurfaceAlt : const Color(0xFFEDEFF7),
-        border: InputBorder.none,
-        enabledBorder: InputBorder.none,
-        focusedBorder: InputBorder.none,
-        disabledBorder: InputBorder.none,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        fillColor: surfaceAlt,
+        border: OutlineInputBorder(
+          borderRadius: AppRadii.allMd,
+          borderSide: BorderSide(color: border, width: AppBorders.hairline),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: AppRadii.allMd,
+          borderSide: BorderSide(color: border, width: AppBorders.hairline),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: AppRadii.allMd,
+          borderSide: const BorderSide(
+            color: AppColors.brand,
+            width: AppBorders.strong,
+          ),
+        ),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 12),
         hintStyle: TextStyle(color: muted, fontWeight: FontWeight.w600),
       ),
       iconTheme: IconThemeData(color: onSurface),
-      listTileTheme: ListTileThemeData(iconColor: onSurface, textColor: onSurface),
+      listTileTheme: ListTileThemeData(
+        iconColor: onSurface,
+        textColor: onSurface,
+        shape: RoundedRectangleBorder(borderRadius: AppRadii.allMd),
+      ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
+        elevation: 0,
         backgroundColor: isDark ? AppColors.darkSurfaceAlt : AppColors.textDark,
         contentTextStyle: const TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.w600,
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadii.allMd,
         ),
       ),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: surface,
         modalBackgroundColor: surface,
         surfaceTintColor: Colors.transparent,
+        elevation: 0,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppRadii.lg),
+          ),
+          side: BorderSide(width: 0),
         ),
       ),
       dialogTheme: DialogThemeData(
         backgroundColor: surface,
         surfaceTintColor: Colors.transparent,
+        elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: AppRadii.allLg,
+          side: BorderSide(color: border, width: AppBorders.hairline),
         ),
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
-        color: isDark ? Colors.white24 : Colors.black26,
-        linearTrackColor: muted.withValues(alpha: 0.2),
-        circularTrackColor: muted.withValues(alpha: 0.2),
+        color: AppColors.brand,
+        linearTrackColor: border,
+        circularTrackColor: border,
+      ),
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: AppColors.brand,
+        selectionColor: AppColors.brand.withValues(alpha: 0.22),
+        selectionHandleColor: AppColors.brand,
       ),
     );
   }

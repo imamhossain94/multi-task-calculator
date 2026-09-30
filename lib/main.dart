@@ -1,10 +1,7 @@
-﻿import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-import 'services/google_ad_service.dart';
 import 'services/shared_pref_services.dart';
 import 'utils/constant.dart';
 import 'utils/provider.dart';
@@ -21,11 +18,6 @@ Future<void> main() async {
   ]);
 
   await SharedPrefService.init();
-
-  // Never block first paint on the network: a slow or failed AdMob init must
-  // not stop the app from opening. `showInterstitialAd` no-ops if the SDK
-  // never finished initialising.
-  unawaited(GoogleAdService.init());
 
   runApp(const MultiTaskCalculator());
 }
@@ -92,4 +84,3 @@ class _AppView extends StatelessWidget {
     );
   }
 }
-

@@ -1,16 +1,17 @@
-﻿import 'package:flutter/material.dart';
-import '../../services/google_ad_service.dart';
+import 'package:flutter/material.dart';
 
-import '../../components/app_surface.dart';
 import '../../components/build_result_card.dart';
 import '../../components/build_text_field.dart';
 import '../../components/calculator_scaffold.dart';
 import '../../services/history_service.dart';
-import '../../utils/app_color.dart';
 import '../../utils/calculator_math.dart';
 import '../../utils/constant.dart';
 import '../../utils/extensions.dart';
 import '../../utils/num_x.dart';
+import '../../utils/app_color.dart';
+import '../../utils/themes_mode.dart';
+import '../../components/app_surface.dart';
+
 /// The two directions the loan calculator can work in.
 enum LoanMode {
   /// Given a loan amount, work out the monthly payment.
@@ -168,9 +169,7 @@ class _LoanCalcPageState extends State<LoanCalcPage> {
     _recalculate();
   }
 
-  Future<void> _reset() async {
-    await showInterstitialAd();
-    if (!mounted) return;
+  void _reset() {
     resetPage(context, const LoanCalcPage());
   }
 
@@ -183,7 +182,7 @@ class _LoanCalcPageState extends State<LoanCalcPage> {
       actions: <Widget>[CalculatorResetButton(onPressed: _reset)],
       children: <Widget>[
         AppCard(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
@@ -192,6 +191,7 @@ class _LoanCalcPageState extends State<LoanCalcPage> {
                 options: LoanMode.values,
                 selected: _mode,
                 palette: _palette,
+                labelOf: (LoanMode mode) => mode.label,
                 onChanged: _onModeChanged,
               ),
               const SizedBox(height: 8),
@@ -258,7 +258,7 @@ class _LoanCalcPageState extends State<LoanCalcPage> {
           ),
           if (_hasInput)
             Padding(
-              padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+              padding: const EdgeInsets.fromLTRB(4, 2, 4, 8),
               child: Text(
                 'Of which ${NumX.money(_totalInterest)} is interest.',
                 textAlign: TextAlign.center,
@@ -286,7 +286,7 @@ class _LoanCalcPageState extends State<LoanCalcPage> {
           ),
           if (_hasInput)
             Padding(
-              padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+              padding: const EdgeInsets.fromLTRB(4, 2, 4, 8),
               child: Text(
                 'Of which ${NumX.money(_totalInterest)} is interest.',
                 textAlign: TextAlign.center,
@@ -294,54 +294,64 @@ class _LoanCalcPageState extends State<LoanCalcPage> {
               ),
             ),
         ],
-        _SuggestionCard(),
+        const SizedBox(height: AppSpacing.md),
+        const _SuggestionCard(),
       ],
     );
   }
 }
 
 class _SuggestionCard extends StatelessWidget {
+  const _SuggestionCard();
+
+  static const ToolPalette _palette = AppPalettes.loan;
+
   @override
   Widget build(BuildContext context) {
-    return AppGradientCard(
-      palette: AppPalettes.loan,
-      radius: 18,
+    final bool isDark = ThemesMode.isDarkMode;
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: _palette.soft(isDark),
+        borderRadius: AppRadii.allLg,
+        border: Border.all(color: _palette.accent, width: AppBorders.strong),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Row(
             children: <Widget>[
-              const Icon(Icons.auto_awesome_rounded,
-                  color: Colors.white, size: 20),
-              const SizedBox(width: 8),
-              const Expanded(
+              Icon(Icons.auto_awesome_rounded,
+                  color: _palette.accent, size: 18),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
                 child: Text(
                   'Need a full amortisation schedule?',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: ThemesMode.onSurface,
                     fontWeight: FontWeight.w800,
-                    fontSize: 15,
+                    fontSize: 14.5,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           Text(
             'Our Mortgage Calculator app generates a downloadable '
             'amortisation schedule PDF.',
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.92),
-              fontSize: 13.5,
+              color: ThemesMode.onSurfaceMuted,
+              fontSize: 13,
               height: 1.35,
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: AppSpacing.md),
           AppButton(
             label: 'Download Mortgage Calculator',
             icon: Icons.download_rounded,
-            palette: AppPalettes.general,
+            palette: _palette,
             onPressed: () => openExternal(context, loanAppLink),
           ),
         ],

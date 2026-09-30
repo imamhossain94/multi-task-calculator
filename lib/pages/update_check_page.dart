@@ -1,16 +1,17 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
-import '../components/app_surface.dart';
 import '../services/app_version_service.dart';
 import '../services/shared_pref_services.dart';
-import '../utils/app_color.dart';
 import '../utils/constant.dart';
 import '../utils/extensions.dart';
+import '../utils/app_color.dart';
+import '../components/app_surface.dart';
+
 /// Manual "check for update" screen.
 ///
 /// The previous version read the latest version from a Firestore collection.
 /// Firebase has been removed, so this now fetches a small JSON manifest over
-/// HTTPS â€” which also fixes the crash that happened whenever the collection
+/// HTTPS —” which also fixes the crash that happened whenever the collection
 /// had no document (both `latestAppVersion` and `currentAppVersion` were left
 /// null and then compared).
 class UpdateCheckPage extends StatefulWidget {
@@ -72,15 +73,15 @@ class _UpdateCheckPageState extends State<UpdateCheckPage> {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(14, 10, 14, 24),
+        padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
         physics: const BouncingScrollPhysics(),
         children: <Widget>[
-          AppGradientCard(
+          AppAccentCard(
             palette: AppPalettes.neutral,
             child: Row(
               children: <Widget>[
                 Image.asset(appIconLight, height: 56, width: 56),
-                const SizedBox(width: 14),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,7 +97,7 @@ class _UpdateCheckPageState extends State<UpdateCheckPage> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Installed: ${_info?.currentVersion.isNotEmpty ?? false ? _info!.currentVersion : 'â€”'}',
+                        'Installed: ${_info?.currentVersion.isNotEmpty ?? false ? _info!.currentVersion : '—”'}',
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.9),
                           fontSize: 13.5,
@@ -112,12 +113,12 @@ class _UpdateCheckPageState extends State<UpdateCheckPage> {
           const SizedBox(height: 16),
           if (_isChecking)
             const Padding(
-              padding: EdgeInsets.symmetric(vertical: 40),
+              padding: EdgeInsets.symmetric(vertical: 32),
               child: Column(
                 children: <Widget>[
                   CircularProgressIndicator(),
-                  SizedBox(height: 18),
-                  Text('Checking for an updateâ€¦'),
+                  SizedBox(height: AppSpacing.lg),
+                  Text('Checking for an update…'),
                 ],
               ),
             )
@@ -184,7 +185,7 @@ class _StatusCard extends StatelessWidget {
                 ),
                 child: Icon(icon, color: color, size: 28),
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Text(
                   title,
@@ -212,7 +213,7 @@ class _StatusCard extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: AppRadii.allMd,
               ),
               child: Text(
                 info.notes!,
@@ -220,7 +221,7 @@ class _StatusCard extends StatelessWidget {
               ),
             ),
           ],
-          const SizedBox(height: 18),
+          const SizedBox(height: AppSpacing.lg),
           if (showUpdate || force)
             AppButton(
               label: 'Update now',

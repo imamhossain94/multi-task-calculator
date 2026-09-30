@@ -1,21 +1,21 @@
-﻿import 'package:flutter/material.dart';
-import '../../services/google_ad_service.dart';
+import 'package:flutter/material.dart';
 
 import '../../components/build_result_card.dart';
 import '../../components/build_text_field.dart';
 import '../../components/calculator_scaffold.dart';
 import '../../services/history_service.dart';
-import '../../utils/app_color.dart';
 import '../../utils/calculator_math.dart';
 import '../../utils/constant.dart';
 import '../../utils/extensions.dart';
 import '../../utils/num_x.dart';
+import '../../components/app_surface.dart';
+import '../../utils/app_color.dart';
+
 class FuelEfficiencyCalcPage extends StatefulWidget {
   const FuelEfficiencyCalcPage({super.key});
 
   @override
-  State<FuelEfficiencyCalcPage> createState() =>
-      _FuelEfficiencyCalcPageState();
+  State<FuelEfficiencyCalcPage> createState() => _FuelEfficiencyCalcPageState();
 }
 
 class _FuelEfficiencyCalcPageState extends State<FuelEfficiencyCalcPage> {
@@ -64,8 +64,8 @@ class _FuelEfficiencyCalcPageState extends State<FuelEfficiencyCalcPage> {
     }
 
     final double distance = after - before;
-    final double efficiency =
-        fuelEfficiency(startOdometer: before, endOdometer: after, litres: litres);
+    final double efficiency = fuelEfficiency(
+        startOdometer: before, endOdometer: after, litres: litres);
 
     setState(() {
       _hasInput = true;
@@ -86,16 +86,15 @@ class _FuelEfficiencyCalcPageState extends State<FuelEfficiencyCalcPage> {
         id: HistoryService.newId(),
         tool: 'Fuel Efficiency',
         toolRoute: fuelEfficiencyCalcPage,
-        summary: '${NumX.format(_distance)} km on ${NumX.format(litres, decimals: 2)} l '
+        summary:
+            '${NumX.format(_distance)} km on ${NumX.format(litres, decimals: 2)} l '
             '= ${NumX.format(_efficiency, decimals: 2)} km/l',
         createdAt: DateTime.now(),
       ),
     );
   }
 
-  Future<void> _reset() async {
-    await showInterstitialAd();
-    if (!mounted) return;
+  void _reset() {
     resetPage(context, const FuelEfficiencyCalcPage());
   }
 
@@ -107,51 +106,36 @@ class _FuelEfficiencyCalcPageState extends State<FuelEfficiencyCalcPage> {
       icon: Icons.eco_rounded,
       actions: <Widget>[CalculatorResetButton(onPressed: _reset)],
       children: <Widget>[
-        Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.06),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              BuildTextField(
-                title: 'Odometer Before Refuelling',
-                hint: '0.00',
-                isEnabled: true,
-                textController: _beforeController,
-                palette: _palette,
-                onPressedAction: null,
-                widget: const Text('km'),
-              ),
-              BuildTextField(
-                title: 'Fuel Added',
-                hint: '0.00',
-                isEnabled: true,
-                textController: _litresController,
-                palette: _palette,
-                onPressedAction: null,
-                widget: const Text('l'),
-              ),
-              BuildTextField(
-                title: 'Odometer After Driving',
-                hint: '0.00',
-                isEnabled: true,
-                textController: _afterController,
-                palette: _palette,
-                onPressedAction: null,
-                widget: const Text('km'),
-              ),
-            ],
-          ),
+        AppInputCard(
+          children: <Widget>[
+            BuildTextField(
+              title: 'Odometer Before Refuelling',
+              hint: '0.00',
+              isEnabled: true,
+              textController: _beforeController,
+              palette: _palette,
+              onPressedAction: null,
+              widget: const Text('km'),
+            ),
+            BuildTextField(
+              title: 'Fuel Added',
+              hint: '0.00',
+              isEnabled: true,
+              textController: _litresController,
+              palette: _palette,
+              onPressedAction: null,
+              widget: const Text('l'),
+            ),
+            BuildTextField(
+              title: 'Odometer After Driving',
+              hint: '0.00',
+              isEnabled: true,
+              textController: _afterController,
+              palette: _palette,
+              onPressedAction: null,
+              widget: const Text('km'),
+            ),
+          ],
         ),
         const SizedBox(height: 6),
         Row(
@@ -176,7 +160,7 @@ class _FuelEfficiencyCalcPageState extends State<FuelEfficiencyCalcPage> {
         ),
         if (!_hasInput)
           Padding(
-            padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+            padding: const EdgeInsets.fromLTRB(4, 2, 4, 8),
             child: Text(
               'Fill the tank, drive, then enter the fuel added and both '
               'odometer readings.',
@@ -186,7 +170,7 @@ class _FuelEfficiencyCalcPageState extends State<FuelEfficiencyCalcPage> {
           )
         else
           Padding(
-            padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+            padding: const EdgeInsets.fromLTRB(4, 2, 4, 8),
             child: Text(
               'That is ${NumX.format(NumX.divide(100, _efficiency, 0), decimals: 1)} l '
               'per 100 km.',

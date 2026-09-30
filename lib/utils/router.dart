@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
 import '../pages/about_page.dart';
@@ -80,7 +80,8 @@ Route<dynamic>? generateRoute(RouteSettings settings) {
     case unitConverterPage:
       return _slide(UnitConverterPage(), settings);
     case unitConverterChildPage:
-      return _fade(UnitConverterChildPage(arguments: settings.arguments), settings);
+      return _fade(
+          UnitConverterChildPage(arguments: settings.arguments), settings);
     case numberBaseConverterPage:
       return _fade(NumberBaseConverterPage(), settings);
 
@@ -89,13 +90,15 @@ Route<dynamic>? generateRoute(RouteSettings settings) {
   }
 }
 
-PageRoute<dynamic> _fade(Widget child, RouteSettings settings) => PageTransition(
+PageRoute<dynamic> _fade(Widget child, RouteSettings settings) =>
+    PageTransition(
       child: child,
       type: PageTransitionType.fade,
       settings: settings,
     );
 
-PageRoute<dynamic> _slide(Widget child, RouteSettings settings) => PageTransition(
+PageRoute<dynamic> _slide(Widget child, RouteSettings settings) =>
+    PageTransition(
       child: child,
       type: PageTransitionType.rightToLeft,
       settings: settings,
@@ -121,8 +124,8 @@ class _UnknownRoutePage extends StatelessWidget {
               Text('No page is registered for "$name".'),
               const SizedBox(height: 16),
               FilledButton(
-                onPressed: () =>
-                    Navigator.of(context).pushNamedAndRemoveUntil(homePage, (_) => false),
+                onPressed: () => Navigator.of(context)
+                    .pushNamedAndRemoveUntil(homePage, (_) => false),
                 child: const Text('Back to home'),
               ),
             ],

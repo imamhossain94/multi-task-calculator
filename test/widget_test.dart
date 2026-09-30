@@ -1,4 +1,4 @@
-﻿// Smoke tests: the app builds and the home screen renders its calculator grid.
+// Smoke tests: the app builds and the home screen renders its calculator grid.
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:multi_task_calculator/main.dart';

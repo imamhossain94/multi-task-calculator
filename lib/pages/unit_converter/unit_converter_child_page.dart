@@ -1,25 +1,25 @@
-﻿import 'package:flutter/material.dart';
-import '../../services/google_ad_service.dart';
+import 'package:flutter/material.dart';
 
-import '../../components/app_surface.dart';
 import '../../components/calculator_scaffold.dart';
-import '../../utils/app_color.dart';
 import '../../utils/extensions.dart';
 import 'models/unit_category.dart';
+import '../../utils/app_color.dart';
+import '../../components/app_surface.dart';
+import '../../utils/themes_mode.dart';
 
 class UnitConverterChildPage extends StatefulWidget {
   const UnitConverterChildPage({super.key, this.arguments});
 
-  /// `{'category': '<label>'}` â€” see [UnitCategory.label].
+  /// `{'category': '<label>'}` —” see [UnitCategory.label].
   final Object? arguments;
 
   @override
-  State<UnitConverterChildPage> createState() =>
-      _UnitConverterChildPageState();
+  State<UnitConverterChildPage> createState() => _UnitConverterChildPageState();
 }
 
 class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
-  final TextEditingController _fromController = TextEditingController(text: '1');
+  final TextEditingController _fromController =
+      TextEditingController(text: '1');
   final TextEditingController _toController = TextEditingController();
 
   UnitCategory? _category;
@@ -152,21 +152,22 @@ class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
                 ? entries[index].value == _fromUnit
                 : entries[index].value == _toUnit;
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 3),
+              padding: const EdgeInsets.symmetric(vertical: 2),
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: AppRadii.allMd,
                   onTap: () => Navigator.of(sheetContext).pop(label),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 12),
+                        horizontal: 12, vertical: 12),
                     decoration: BoxDecoration(
-                      gradient: selected ? _palette.linear : null,
                       color: selected
-                          ? null
-                          : Theme.of(context).colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(12),
+                          ? _palette.accent
+                          : Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest,
+                      borderRadius: AppRadii.allMd,
                     ),
                     child: Row(
                       children: <Widget>[
@@ -178,7 +179,10 @@ class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
                               fontSize: 14.5,
                               color: selected
                                   ? Colors.white
-                                  : Theme.of(context).textTheme.titleMedium?.color,
+                                  : Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.color,
                             ),
                           ),
                         ),
@@ -210,8 +214,7 @@ class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
 
   void _swap() {
     if (_fromUnit == null || _toUnit == null) return;
-    final double converted =
-        double.tryParse(_toController.text) ?? 1;
+    final double converted = double.tryParse(_toController.text) ?? 1;
     setState(() {
       final Object? tmp = _fromUnit;
       _fromUnit = _toUnit;
@@ -223,7 +226,6 @@ class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
   }
 
   Future<void> _reset() async {
-    await showInterstitialAd();
     if (!mounted) return;
     resetPage(
       context,
@@ -251,7 +253,7 @@ class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
               children: <Widget>[
                 const Icon(Icons.error_outline_rounded,
                     color: AppColors.danger, size: 36),
-                const SizedBox(height: 10),
+                const SizedBox(height: AppSpacing.sm),
                 Text(
                   _error!,
                   textAlign: TextAlign.center,
@@ -261,48 +263,44 @@ class _UnitConverterChildPageState extends State<UnitConverterChildPage> {
             ),
           )
         else ...<Widget>[
-          AppCard(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                _UnitField(
-                  title: 'From',
-                  unitName: _labelFor(_pretty(_fromUnit)),
-                  controller: _fromController,
-                  editable: true,
-                  palette: _palette,
-                  onTapUnit: () => _pickUnit(isFrom: true),
-                ),
-                Center(
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(20),
-                      onTap: _swap,
-                      child: Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          gradient: _palette.linear,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.swap_vert_rounded,
-                            color: Colors.white, size: 22),
+          AppInputCard(
+            children: <Widget>[
+              _UnitField(
+                title: 'From',
+                unitName: _labelFor(_pretty(_fromUnit)),
+                controller: _fromController,
+                editable: true,
+                palette: _palette,
+                onTapUnit: () => _pickUnit(isFrom: true),
+              ),
+              Center(
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: AppRadii.allLg,
+                    onTap: _swap,
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: _palette.accent,
+                        shape: BoxShape.circle,
                       ),
+                      child: const Icon(Icons.swap_vert_rounded,
+                          color: Colors.white, size: 22),
                     ),
                   ),
                 ),
-                _UnitField(
-                  title: 'To',
-                  unitName: _labelFor(_pretty(_toUnit)),
-                  controller: _toController,
-                  editable: false,
-                  palette: _palette,
-                  onTapUnit: () => _pickUnit(isFrom: false),
-                ),
-              ],
-            ),
+              ),
+              _UnitField(
+                title: 'To',
+                unitName: _labelFor(_pretty(_toUnit)),
+                controller: _toController,
+                editable: false,
+                palette: _palette,
+                onTapUnit: () => _pickUnit(isFrom: false),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
           _UnitList(
@@ -365,14 +363,14 @@ class _UnitField extends StatelessWidget {
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: AppRadii.allMd,
                     onTap: onTapUnit,
                     child: Container(
                       height: 48,
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
-                        gradient: palette.linear,
-                        borderRadius: BorderRadius.circular(14),
+                        color: palette.accent,
+                        borderRadius: AppRadii.allMd,
                       ),
                       child: Row(
                         children: <Widget>[
@@ -395,14 +393,14 @@ class _UnitField extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 flex: 4,
                 child: Container(
                   height: 48,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(14),
+                    color: ThemesMode.subtleFill,
+                    borderRadius: AppRadii.allMd,
                   ),
                   child: TextField(
                     controller: controller,
@@ -416,7 +414,7 @@ class _UnitField extends StatelessWidget {
                       border: InputBorder.none,
                       enabledBorder: InputBorder.none,
                       disabledBorder: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 14),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12),
                       hintText: '0.00',
                     ),
                     keyboardType: const TextInputType.numberWithOptions(
@@ -451,7 +449,7 @@ class _UnitList extends StatelessWidget {
   Widget build(BuildContext context) {
     if (isLoading) {
       return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 40),
+        padding: EdgeInsets.symmetric(vertical: 32),
         child: Center(child: CircularProgressIndicator()),
       );
     }
@@ -467,14 +465,14 @@ class _UnitList extends StatelessWidget {
       children: rows.map((_UnitRow row) {
         final bool selected = row.name == selectedName;
         return Padding(
-          padding: const EdgeInsets.only(bottom: 7),
+          padding: const EdgeInsets.only(bottom: 6),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             decoration: BoxDecoration(
               color: selected
                   ? palette.accent.withValues(alpha: 0.16)
-                  : Theme.of(context).cardColor,
-              borderRadius: BorderRadius.circular(16),
+                  : ThemesMode.surface,
+              borderRadius: AppRadii.allLg,
             ),
             child: Row(
               children: <Widget>[

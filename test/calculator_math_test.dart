@@ -1,4 +1,4 @@
-﻿// Tests for the pure calculation layer in `lib/utils/calculator_math.dart`.
+// Tests for the pure calculation layer in `lib/utils/calculator_math.dart`.
 //
 // These lock in the specific bugs that were fixed:
 //   * loan maths returned Infinity/NaN at 0% interest

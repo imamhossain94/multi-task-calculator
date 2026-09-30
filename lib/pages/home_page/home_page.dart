@@ -1,14 +1,15 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../components/build_banner_ad.dart';
 import '../../services/app_version_service.dart';
-import '../../utils/app_color.dart';
 import '../../utils/constant.dart';
 import '../../utils/extensions.dart';
 import 'components/build_app_drawer.dart';
 import 'components/build_home_menu_pad.dart';
+import '../../utils/themes_mode.dart';
+import '../../utils/app_color.dart';
+import '../../components/app_surface.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -45,8 +46,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final Color background = Theme.of(context).scaffoldBackgroundColor;
-
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (bool didPop, Object? _) async {
@@ -64,69 +63,32 @@ class _HomePageState extends State<HomePage> {
       },
       child: Scaffold(
         key: _scaffoldKey,
-        extendBodyBehindAppBar: true,
         drawerScrimColor: Colors.black.withValues(alpha: 0.35),
-        appBar: AppBar(
-          titleSpacing: 4,
-          title: Row(
-            children: <Widget>[
-              Image.asset(appIconLight, height: 30, width: 30),
-              const SizedBox(width: 10),
-              const Expanded(
-                child: Text(
-                  appName,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontFamily: 'Audiowide',
-                    fontSize: 17,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
-          ),
+        appBar: AppTitleBar(
+          palette: AppPalettes.general,
+          title: appName,
+          leading: const SizedBox.shrink(),
           actions: <Widget>[
             IconButton(
-              onPressed: () =>
-                  Navigator.of(context).pushNamed(historyPage),
+              onPressed: () => Navigator.of(context).pushNamed(historyPage),
               tooltip: 'History',
-              icon: const Icon(Icons.history_rounded, size: 21),
+              icon: const Icon(Icons.history_rounded, size: 20),
             ),
             IconButton(
               onPressed: _share,
               tooltip: 'Share',
-              icon: const Icon(Icons.share_rounded, size: 20),
+              icon: const Icon(Icons.share_rounded, size: 19),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppSpacing.xs),
           ],
         ),
         drawer: const BuildAppDrawer(),
         body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: <Color>[
-                AppColors.brand.withValues(alpha: 0.20),
-                background,
-                background,
-              ],
-              stops: const <double>[0, 0.24, 1],
-            ),
-          ),
+          color: ThemesMode.background,
           child: SafeArea(
+            top: false,
             bottom: false,
-            child: Column(
-              children: <Widget>[
-                Expanded(
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    child: const BuildHomeMenuPad(),
-                  ),
-                ),
-                const BuildBannerAd(),
-              ],
-            ),
+            child: const BuildHomeMenuPad(),
           ),
         ),
       ),

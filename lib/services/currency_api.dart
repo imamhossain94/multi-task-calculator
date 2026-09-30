@@ -1,6 +1,7 @@
-﻿import 'package:dio/dio.dart';
+import 'package:dio/dio.dart';
 
 import '../pages/currency_calc_page/model/exchange_rate_api_response.dart';
+
 /// Fetches live exchange rates from exchangerate-api.com.
 class CurrencyApiServices {
   CurrencyApiServices({Dio? dio})
@@ -36,8 +37,7 @@ class CurrencyApiServices {
         DioExceptionType.sendTimeout ||
         DioExceptionType.receiveTimeout =>
           'Connection timed out. Check your internet and try again.',
-        DioExceptionType.connectionError =>
-          'No internet connection.',
+        DioExceptionType.connectionError => 'No internet connection.',
         DioExceptionType.badResponse =>
           'Server error (${e.response?.statusCode ?? '?'}).',
         _ => e.message ?? 'Request failed.',
