@@ -19,12 +19,6 @@ no account and no data collection.
 
 ## Screenshots
 
-<!--
-  Screenshots live in assets/screenshots/.
-  See assets/screenshots/README.md for the exact list of filenames.
-  Uncomment a row once you have added the matching image.
--->
-
 | Home | General Calculator | Scientific |
 | :---: | :---: | :---: |
 | <img src="assets/screenshots/01-home.png" width="220" alt="Home screen with the calculator grid"> | <img src="assets/screenshots/02-general-calculator.png" width="220" alt="General calculator"> | <img src="assets/screenshots/03-scientific-functions.png" width="220" alt="Scientific functions row"> |
@@ -33,19 +27,20 @@ no account and no data collection.
 | **Length converter** | **Number Base** | **Tip Calculator** |
 | <img src="assets/screenshots/07-unit-converter-child.png" width="220" alt="Length unit converter"> | <img src="assets/screenshots/08-number-base.png" width="220" alt="Number base converter"> | <img src="assets/screenshots/09-tip-calculator.png" width="220" alt="Tip calculator"> |
 | **Discount** | **Sales Tax** | **Loan** |
-| <img src="assets/screenshots/10-discount-calculator.png" width="220" alt="Discount calculator"> | <img src="assets/screenshots/11-sales-tax.png" width="220" alt="Sales tax calculator"> | <img src="assets/screenshots/12-loan-calculator.png" width="220" alt="Loan calculator"> |
+| <img src="assets/screenshots/10-discount-calculator.png" width="220" alt="Discount calculator"> | <img src="assets/screenshots/11-sales-tax.png" width="220" alt="Sales tax calculator"> | <img src="assets/screenshots/12-loan-calculator.png" width="220" alt="Loan calculator, monthly cost mode"> |
 | **Savings** | **Health** | **Fuel Cost** |
-| <img src="assets/screenshots/14-savings.png" width="220" alt="Savings calculator"> | <img src="assets/screenshots/15-health.png" width="220" alt="Health calculator"> | <img src="assets/screenshots/16-fuel-cost.png" width="220" alt="Fuel cost calculator"> |
+| <img src="assets/screenshots/14-savings.png" width="220" alt="Savings calculator"> | <img src="assets/screenshots/15-health.png" width="220" alt="Health calculator with BMI and BMR"> | <img src="assets/screenshots/16-fuel-cost.png" width="220" alt="Fuel cost calculator"> |
 | **Fuel Efficiency** | **Date Calculator** | **Unit Price** |
 | <img src="assets/screenshots/17-fuel-efficiency.png" width="220" alt="Fuel efficiency calculator"> | <img src="assets/screenshots/18-date-calculator.png" width="220" alt="Date calculator"> | <img src="assets/screenshots/19-unit-price.png" width="220" alt="Unit price comparison"> |
 
 <div align="center">
 
-**Dark mode** &nbsp;·&nbsp; **Navigation drawer** &nbsp;·&nbsp; **Help & FAQ**
+**Loan · Maximum** &nbsp;·&nbsp; **Dark mode** &nbsp;·&nbsp; **Navigation drawer** &nbsp;·&nbsp; **Help & FAQ**
 
-<img src="assets/screenshots/20-theme-dark.png" width="180" alt="Dark mode">
-<img src="assets/screenshots/21-drawer.png" width="180" alt="Navigation drawer">
-<img src="assets/screenshots/23-help.png" width="180" alt="Help and FAQ">
+<img src="assets/screenshots/13-loan-maximum.png" width="170" alt="Loan calculator, maximum loan mode">
+<img src="assets/screenshots/20-theme-dark.png" width="170" alt="Dark mode">
+<img src="assets/screenshots/21-drawer.png" width="170" alt="Navigation drawer">
+<img src="assets/screenshots/23-help.png" width="170" alt="Help and FAQ">
 
 </div>
 
@@ -240,7 +235,7 @@ Issues and pull requests are welcome. If you are adding a calculator:
 
 1. Put the maths in `lib/utils/calculator_math.dart` with tests.
 2. Guard every division — use `NumX.divide`, never raw `/`.
-3. Pick a `ToolPalette` in `app_color.dart` so the screen gets a gradient.
+3. Pick a `ToolPalette` in `app_color.dart` so the screen gets its accent colour.
 4. Use `CalculatorScaffold` so the layout stays consistent.
 5. Run `flutter analyze` and `flutter test` before opening a PR.
 

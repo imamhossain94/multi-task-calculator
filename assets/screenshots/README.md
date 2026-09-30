@@ -35,13 +35,16 @@ filenames listed below, in that order.
 - Capture at 1080 × 2340 (or any 9:19.5 ratio) so the phone frames line up.
 - Use a light-mode capture for the numbered sequence; add one dark-mode shot
   (`20-theme-dark.png`) to show the theme support.
-- Hide the status bar clock / notification shade if you can, and turn on
-  Developer Options → "Show layout bounds" off.
-- The banner ad appears at the bottom of most screens. Either crop it out or
-  leave it — it is honest either way.
+- Fill the inputs with realistic values — a screenshot full of `0.00` does not
+  sell the app. Tap the fields rather than guessing coordinates; `adb shell
+  uiautomator dump` reports the exact bounds of every Flutter `TextField`.
+- Watch out for the soft keyboard: it covers the lower half of the screen and
+  the layout shifts when it opens. Dismiss it (only when
+  `dumpsys input_method` reports `mInputShown=true`, or BACK pops the route)
+  before capturing.
 
-## Not committed yet
+## Status
 
-This folder is intentionally empty apart from this file, so nothing is broken
-if you skip some screens. Any image you add is picked up by Git automatically
-(no `.gitignore` rule excludes it).
+All 24 images are committed and referenced from the top-level `README.md`
+except `13-loan-maximum`, `22-about` and `24-update-check`, which are kept here
+for completeness.
