@@ -33,17 +33,6 @@ no account and no data collection.
 | **Fuel Efficiency** | **Date Calculator** | **Unit Price** |
 | <img src="assets/screenshots/17-fuel-efficiency.png" width="220" alt="Fuel efficiency calculator"> | <img src="assets/screenshots/18-date-calculator.png" width="220" alt="Date calculator"> | <img src="assets/screenshots/19-unit-price.png" width="220" alt="Unit price comparison"> |
 
-<div align="center">
-
-**Loan · Maximum** &nbsp;·&nbsp; **Dark mode** &nbsp;·&nbsp; **Navigation drawer** &nbsp;·&nbsp; **Help & FAQ**
-
-<img src="assets/screenshots/13-loan-maximum.png" width="170" alt="Loan calculator, maximum loan mode">
-<img src="assets/screenshots/20-theme-dark.png" width="170" alt="Dark mode">
-<img src="assets/screenshots/21-drawer.png" width="170" alt="Navigation drawer">
-<img src="assets/screenshots/23-help.png" width="170" alt="Help and FAQ">
-
-</div>
-
 ---
 
 ## Features
@@ -238,6 +227,19 @@ Issues and pull requests are welcome. If you are adding a calculator:
 3. Pick a `ToolPalette` in `app_color.dart` so the screen gets its accent colour.
 4. Use `CalculatorScaffold` so the layout stays consistent.
 5. Run `flutter analyze` and `flutter test` before opening a PR.
+
+---
+
+## Background
+
+This is the author's **second Flutter app**.
+
+The first one was built for a client who agreed to pay **$3,000** for the project
+and then refused to pay once it was finished.
+
+Rather than let the work sit unused, it was cleaned up and released here under the
+MIT licence instead — free to use, fork and ship. If it saves you a weekend, that
+is the whole point.
 
 ---
 
