@@ -5,11 +5,12 @@ import '../../../utils/themes_mode.dart';
 
 /// The expression / result display for the general calculator.
 ///
-/// A single flat panel that owns a fixed share of the screen, so the result
-/// always has room and the key pad below it always gets a square grid.
+/// Fills whatever height it is given and aligns its content to the bottom, so
+/// the result sits on a stable baseline while the card grows and shrinks as
+/// the scientific row toggles.
 ///
-/// Both lines auto-shrink rather than clip: a long expression scrolls
-/// horizontally and the result shrinks to fit its one line.
+/// Both lines auto-fit rather than clip: the expression scrolls horizontally
+/// and the result scales down to one line.
 class BuildDisplay extends StatelessWidget {
   const BuildDisplay({
     super.key,
@@ -37,7 +38,7 @@ class BuildDisplay extends StatelessWidget {
     final bool idle = !typed && preview.isEmpty && !isError;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+      margin: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.sm),
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.lg,
         AppSpacing.sm,
@@ -56,7 +57,7 @@ class BuildDisplay extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         // The result hugs the bottom edge and the expression sits directly
         // above it, so the block grows upward from a fixed baseline. Centring
-        // it instead left a large void on an idle calculator.
+        // it instead left a void above a short result.
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
           // The typed expression sits above the result in the muted colour, so
@@ -81,24 +82,29 @@ class BuildDisplay extends StatelessWidget {
               ),
             ),
           if (typed) const SizedBox(height: AppSpacing.xs),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerRight,
-            child: Text(
-              result,
-              maxLines: 1,
-              textAlign: TextAlign.right,
-              style: TextStyle(
-                // Idle state is deliberately larger - it is the first thing
-                // the eye lands on.
-                fontSize: idle ? 52 : 40,
-                fontWeight: FontWeight.w800,
-                height: 1.15,
-                color: isError
-                    ? AppColors.danger
-                    : idle
-                        ? ThemesMode.onSurface
-                        : palette.accent,
+          Flexible(
+            child: FittedBox(
+              // `scaleDown` against a generous base size: the result fills
+              // whatever height the card has, so it looks deliberate whether
+              // the scientific row is open (short card) or closed (tall card).
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.bottomRight,
+              child: Text(
+                result,
+                maxLines: 1,
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  // Idle state is deliberately larger - it is the first thing
+                  // the eye lands on.
+                  fontSize: idle ? 88 : 64,
+                  fontWeight: FontWeight.w800,
+                  height: 1.1,
+                  color: isError
+                      ? AppColors.danger
+                      : idle
+                          ? ThemesMode.onSurface
+                          : palette.accent,
+                ),
               ),
             ),
           ),

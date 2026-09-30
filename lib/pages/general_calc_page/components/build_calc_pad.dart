@@ -36,24 +36,26 @@ abstract final class CalcGlyphs {
 
 /// Numeric / operator pad for the general calculator.
 ///
-/// Every key is the same size: the pad derives one square key dimension from
-/// the smaller of the available width and height, so the six rows are always
-/// evenly proportioned and no key is taller or wider than its neighbours. The
-/// gap is part of the key's footprint, which keeps the rhythm identical
-/// horizontally and vertically.
+/// Every key is the same size and has a fixed **4:3** shape, derived from the
+/// available width alone. Because the width does not change when the scientific
+/// row is toggled, neither does the pad - the display above it absorbs the
+/// difference, so the keys never jump.
 ///
-/// A [Table] would have been the obvious choice, but it sizes rows to their
-/// content and overflowed on shorter screens.
+/// The gap is the same on all four sides, so the outer margin between the
+/// outermost keys and the page gutter matches the gap between keys.
 class BuildCalcPad extends StatelessWidget {
   const BuildCalcPad({super.key, required this.onPressed});
 
   final ValueChanged<String> onPressed;
 
   static const int columns = 4;
+  static const int rowCount = 6;
 
-  /// Gap between keys, applied on all four sides so the outer margins match
-  /// the inner ones.
-  static const double _gap = 5;
+  /// Key width : key height.
+  static const double aspect = 4 / 3;
+
+  /// Gap between keys, and between the outer keys and the page gutter.
+  static const double gap = 5;
 
   static const List<List<String>> _rows = <List<String>>[
     <String>[CalcGlyphs.more, '(', ')', CalcGlyphs.backspace],
@@ -64,48 +66,40 @@ class BuildCalcPad extends StatelessWidget {
     <String>['0', '00', '.', '='],
   ];
 
+  /// Total height the pad occupies for a given available width.
+  static double heightFor(double width) {
+    final double key = (width - gap * (columns + 1)) / columns;
+    return key / aspect + gap * (rowCount + 1);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final int rows = _rows.length;
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        // One key edge, derived from both axes so the grid stays square.
-        final double byWidth =
-            (constraints.maxWidth - _gap * (columns + 1)) / columns;
-        final double byHeight =
-            (constraints.maxHeight - _gap * (rows + 1)) / rows;
-        final double size = byWidth < byHeight ? byWidth : byHeight;
-
-        return Align(
-          alignment: Alignment.topCenter,
-          child: SizedBox(
-            width: size * columns + _gap * (columns + 1),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                for (final List<String> row in _rows)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: _gap),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        for (int i = 0; i < columns; i++)
-                          Padding(
-                            padding: const EdgeInsets.only(right: _gap),
-                            child: SizedBox(
-                              width: size,
-                              height: size,
-                              child: _key(
-                                i < row.length ? row[i] : '',
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-              ],
-            ),
-          ),
+        final double key =
+            (constraints.maxWidth - gap * (columns + 1)) / columns;
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            for (final List<String> row in _rows)
+              Padding(
+                padding: const EdgeInsets.only(bottom: gap),
+                child: Row(
+                  children: <Widget>[
+                    for (int i = 0; i < columns; i++) ...<Widget>[
+                      if (i > 0) const SizedBox(width: gap),
+                      SizedBox(
+                        width: key,
+                        height: key / aspect,
+                        child: _key(i < row.length ? row[i] : ''),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            // Trailing gap, so the bottom margin matches the side margins.
+            const SizedBox(height: gap),
+          ],
         );
       },
     );

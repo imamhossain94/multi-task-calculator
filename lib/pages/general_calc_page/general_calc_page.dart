@@ -6,6 +6,7 @@ import '../../utils/constant.dart';
 import '../../services/history_service.dart';
 import 'components/build_calc_pad.dart';
 import 'components/build_display.dart';
+import 'components/general_calc_body.dart';
 import 'components/scientific_pad.dart';
 import '../../utils/app_color.dart';
 
@@ -42,10 +43,10 @@ class _GeneralCalcPageState extends State<GeneralCalcPage> {
       palette: _palette,
       title: 'General Calculator',
       icon: Icons.calculate_rounded,
-      padding: const EdgeInsets.fromLTRB(
-          AppSpacing.page, AppSpacing.md, AppSpacing.page, AppSpacing.sm),
-      // The key pad uses `Expanded`, which needs a Flex parent - a
-      // SingleChildScrollView is not one.
+      // Horizontal padding only: the general calculator manages its own
+      // vertical rhythm so the three bands line up exactly.
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.page),
+      // The key pad needs a Flex parent - a SingleChildScrollView is not one.
       fillHeight: true,
       actions: <Widget>[
         IconButton(
@@ -56,29 +57,28 @@ class _GeneralCalcPageState extends State<GeneralCalcPage> {
         CalculatorResetButton(onPressed: _clear),
       ],
       children: <Widget>[
-        // A fixed height, not a flex share: the display is a readout, so it
-        // needs enough room for a 60 px result and no more. A flex share left
-        // it ~40% of the screen on a tall phone.
-        SizedBox(
-          height: 116,
-          child: BuildDisplay(
-            expression: _expression,
-            preview: _result.isNotEmpty
-                ? _result
-                : (_preview.isEmpty ? '' : '= $_preview'),
-            error: _error,
-            palette: _palette,
+        // `Expanded` so the body receives a bounded height: a Column passes
+        // unbounded main-axis constraints to its non-flex children, which would
+        // break the display's `Expanded` further down.
+        Expanded(
+          child: GeneralCalcBody(
+            display: BuildDisplay(
+              expression: _expression,
+              preview: _result.isNotEmpty
+                  ? _result
+                  : (_preview.isEmpty ? '' : '= $_preview'),
+              error: _error,
+              palette: _palette,
+            ),
+            scientific: ScientificPad(
+              onPressed: _onScientific,
+              palette: _palette,
+              expanded: _showScientific,
+              toggleKey: _onKey,
+            ),
+            onKey: _onKey,
           ),
         ),
-        ScientificPad(
-          onPressed: _onScientific,
-          palette: _palette,
-          expanded: _showScientific,
-          toggleKey: _onKey,
-        ),
-        // Everything left over goes to the pad. Keys scale to the smaller of
-        // the two axes, so the grid is always square and never overflows.
-        Expanded(child: BuildCalcPad(onPressed: _onKey)),
       ],
     );
   }

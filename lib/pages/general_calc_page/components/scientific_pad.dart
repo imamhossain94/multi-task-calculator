@@ -75,12 +75,10 @@ class ScientificPad extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.page,
-            AppSpacing.xs,
-            AppSpacing.page,
-            AppSpacing.xs,
-          ),
+          // Vertical padding only: the scaffold already applies the page
+          // gutter, so adding it again would break the alignment with the
+          // display card and the outermost keys.
+          padding: const EdgeInsets.only(bottom: AppSpacing.xs),
           child: Row(
             children: <Widget>[
               Text(
@@ -136,12 +134,8 @@ class ScientificPad extends StatelessWidget {
               expanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
           firstChild: const SizedBox(width: double.infinity),
           secondChild: Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.page,
-              0,
-              AppSpacing.page,
-              AppSpacing.sm,
-            ),
+            // Bottom only - see the header note about the page gutter.
+            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
             // Two fixed rows rather than a GridView: the chips are then always
             // the same height and never re-flow when the text scale changes.
             child: Column(
